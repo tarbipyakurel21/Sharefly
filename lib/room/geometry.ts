@@ -78,3 +78,18 @@ export const FIT_TEXT: Record<FitStatus, string> = {
   wont_fit: "Won't fit your room",
   cant_confirm: "Can't confirm fit yet",
 };
+
+/** Place a new piece in the first non-overlapping spot, scanning outward from the room centre. Falls back to the centre. */
+export function findFreeSpot<T extends Placed & { category?: string }>(piece: T, others: Placed[], room: Dims, step = 0.25): T {
+  const start = clampToRoom(piece, room);
+  if (piece.category === "rug" || !others.some((o) => overlaps(start, o))) return start;
+  const maxR = Math.max(room.lengthM, room.widthM);
+  for (let r = step; r <= maxR; r += step) {
+    for (let a = 0; a < 16; a++) {
+      const th = (a / 16) * Math.PI * 2;
+      const cand = clampToRoom({ ...piece, x: Math.cos(th) * r, z: Math.sin(th) * r }, room);
+      if (!others.some((o) => overlaps(cand, o))) return cand;
+    }
+  }
+  return start;
+}

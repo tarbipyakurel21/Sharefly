@@ -3,7 +3,7 @@ import type { Category } from "@/lib/categories";
 import { lookupNeighborhood } from "@/lib/geo/neighborhoods";
 import type { Listing, ListingStatus, MatchRow, Notification, Pickup, PickupStatusT, Placement, Room, User, Wishlist, Driver } from "./types";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 type Row = any;
 const bool = (v: unknown) => v === 1 || v === true;
 

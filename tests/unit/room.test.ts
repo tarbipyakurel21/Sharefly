@@ -41,3 +41,13 @@ describe("fitStatus", () => {
     expect(fitStatus({ widthM: 1, depthM: 1, heightM: 1 }, null)).toBe("cant_confirm");
   });
 });
+
+import { findFreeSpot } from "@/lib/room/geometry";
+describe("findFreeSpot", () => {
+  it("avoids existing pieces", () => {
+    const bed = desk({ x: 0, z: 0, widthM: 1.4, depthM: 2 });
+    const spot = findFreeSpot(desk(), [bed], room);
+    expect(overlaps(spot, bed)).toBe(false);
+  });
+  it("uses the centre when free", () => expect(findFreeSpot(desk(), [], room)).toMatchObject({ x: 0, z: 0 }));
+});

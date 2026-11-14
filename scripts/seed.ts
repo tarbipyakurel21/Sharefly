@@ -1,7 +1,7 @@
 /* Deterministic demo seed. `npm run db:seed` upserts fixed ids; `--reset` wipes everything first.
    Not seeded on purpose: the demo desk listing and Maya's desk wishlist/room (the demo creates them live). */
 import fs from "node:fs";
-try { if (fs.existsSync(".env")) process.loadEnvFile(".env"); } catch { /* optional */ }
+for (const f of [".env.local", ".env"]) { try { if (fs.existsSync(f)) process.loadEnvFile(f); } catch { /* optional */ } }
 import { getDb } from "../lib/db/client";
 import { createListing, createPickup, createRoom, createWishlist, replacePlacements, upsertDriver, upsertUserByEmail } from "../lib/db/queries";
 import { runMatchingForListing, runMatchingForWishlist } from "../lib/matching/run";

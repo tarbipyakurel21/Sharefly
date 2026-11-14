@@ -38,7 +38,10 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
     <div className="grid gap-8 md:grid-cols-[1.2fr_1fr]">
       <div className="space-y-3">
         <div className="overflow-hidden rounded-3xl bg-sunken">
-          {l.photoUrl ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={l.photoUrl} alt={l.title} className="aspect-[4/3] w-full object-cover" /> : <div className="flex aspect-[4/3] items-center justify-center text-muted">No photo</div>}
+          {l.photoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={l.photoUrl} alt={l.title} className="aspect-[4/3] w-full object-cover" />
+          ) : <div className="flex aspect-[4/3] items-center justify-center text-muted">No photo</div>}
         </div>
       </div>
       <div className="space-y-6">

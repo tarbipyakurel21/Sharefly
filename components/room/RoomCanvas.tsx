@@ -1,6 +1,6 @@
 "use client";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Html, Line, OrbitControls } from "@react-three/drei";
+import { Line, OrbitControls } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { OrbitControls as OrbitImpl } from "three-stdlib";
@@ -66,12 +66,28 @@ function Floor({ room }: { room: Dims }) {
   );
 }
 
+function TextSprite({ text, position }: { text: string; position: [number, number, number] }) {
+  const tex = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = 256; c.height = 64;
+    const g = c.getContext("2d")!;
+    g.fillStyle = "rgba(255,255,255,0.92)";
+    g.beginPath(); g.roundRect(4, 8, 248, 48, 24); g.fill();
+    g.fillStyle = "#26221d"; g.font = "600 28px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+    g.fillText(text, 128, 33);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }, [text]);
+  useEffect(() => () => tex.dispose(), [tex]);
+  return <sprite position={position} scale={[1.0, 0.25, 1]}><spriteMaterial map={tex} depthTest={false} transparent /></sprite>;
+}
+
 function Labels({ room, unit }: { room: Dims; unit: Unit }) {
-  const style = "rounded-full bg-surface/90 px-2 py-0.5 text-xs font-semibold text-ink shadow whitespace-nowrap pointer-events-none";
   return (
     <>
-      <Html position={[0, 0.02, room.lengthM / 2 + 0.3]} center zIndexRange={[5, 0]}><span className={style}>{formatLength(room.widthM, unit)}</span></Html>
-      <Html position={[room.widthM / 2 + 0.3, 0.02, 0]} center zIndexRange={[5, 0]}><span className={style}>{formatLength(room.lengthM, unit)}</span></Html>
+      <TextSprite text={formatLength(room.widthM, unit)} position={[0, 0.05, room.lengthM / 2 + 0.35]} />
+      <TextSprite text={formatLength(room.lengthM, unit)} position={[room.widthM / 2 + 0.55, 0.05, 0]} />
     </>
   );
 }
@@ -147,7 +163,7 @@ export default function RoomCanvas(props: Props) {
   const { room } = props;
   const span = Math.max(room.lengthM, room.widthM);
   return (
-    <Canvas shadows dpr={[1, 2]} camera={{ position: [room.widthM * 0.7, span * 0.9 + 1, room.lengthM * 0.95 + 1.5], fov: 45, near: 0.1, far: 200 }}
+    <Canvas shadows="percentage" dpr={[1, 2]} camera={{ position: [room.widthM * 0.7, span * 0.9 + 1, room.lengthM * 0.95 + 1.5], fov: 45, near: 0.1, far: 200 }}
       style={{ touchAction: "none" }} onPointerMissed={() => props.onSelect(null)} aria-label="3D view of your room">
       <color attach="background" args={["#f5efe4"]} />
       <Scene {...props} controls={controls} />

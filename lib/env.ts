@@ -16,6 +16,11 @@ export function getEnv() {
     const keys = parsed.error.issues.map((i) => i.path.join(".")).join(", ");
     throw new Error(`Invalid environment configuration: ${keys}`);
   }
+  if (process.env.NODE_ENV === "production" && parsed.data.SESSION_SECRET.startsWith("dev-only") && !warned) {
+    warned = true;
+    console.warn("[sharefly] SESSION_SECRET is the development default. Set a long random value before sharing this deployment.");
+  }
   return parsed.data;
 }
+let warned = false;
 export const isDemoMode = () => getEnv().DEMO_MODE === "true";

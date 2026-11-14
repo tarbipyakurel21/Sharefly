@@ -27,7 +27,7 @@ export function Header({ user }: { user: User | null }) {
         </nav>
         <div className="ml-auto flex items-center gap-2">
           {user && <NotificationBell />}
-          <LinkButton href="/give" className="hidden sm:inline-flex">Give something away</LinkButton>
+          <span className="hidden sm:block"><LinkButton href="/give">Give something away</LinkButton></span>
           <AccountMenu user={user} demo={demo} people={demo ? listUsers() : []} />
         </div>
       </div>

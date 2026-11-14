@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api, errMsg } from "@/lib/client";
 import { CATEGORY_LABEL, type Category } from "@/lib/categories";
 import { TYPICAL_SIZE } from "@/lib/room/defaults";
-import { clampToRoom, fitStatus, overlaps, halfExtents } from "@/lib/room/geometry";
+import { clampToRoom, fitStatus, overlaps, halfExtents, findFreeSpot } from "@/lib/room/geometry";
 import { formatLength, parseLength, type Unit } from "@/lib/units";
 import type { Room } from "@/lib/db/types";
 import { Button } from "@/components/ui/Button";
@@ -37,7 +37,7 @@ export function RoomPlanner({ room, initial, listings, addListingId }: { room: R
     const base = [...initial];
     if (addListingId && listings[addListingId] && !base.some((p) => p.listingId === addListingId)) {
       const np = pieceFromListing(addListingId, listings[addListingId]);
-      base.push(clampToRoom(np, dims));
+      base.push(findFreeSpot(np, base, dims));
     }
     return base;
   });
@@ -93,7 +93,7 @@ export function RoomPlanner({ room, initial, listings, addListingId }: { room: R
 
   function add(cat: Category) {
     const t = TYPICAL_SIZE[cat];
-    const p = clampToRoom({ id: `p-${crypto.randomUUID()}`, listingId: null, label: `My ${CATEGORY_LABEL[cat].toLowerCase()}`, category: cat, x: 0, z: 0, rotationY: 0, widthM: t.w, depthM: t.d, heightM: t.h, dimensionsConfirmed: false }, dims);
+    const p = findFreeSpot({ id: `p-${crypto.randomUUID()}`, listingId: null, label: `My ${CATEGORY_LABEL[cat].toLowerCase()}`, category: cat, x: 0, z: 0, rotationY: 0, widthM: t.w, depthM: t.d, heightM: t.h, dimensionsConfirmed: false }, pieces, dims);
     setPieces((ps) => [...ps, p]); setSelectedId(p.id); schedule();
   }
   function remove(id: string) {
@@ -126,7 +126,7 @@ export function RoomPlanner({ room, initial, listings, addListingId }: { room: R
   const warnings = (p: PlacedPiece) => {
     const w: string[] = [];
     const o = colliding.get(p.id);
-    if (o) w.push(`Overlaps ${o.length === 1 ? `the ${o[0].toLowerCase()}` : `${o.length} other pieces`}.`);
+    if (o) w.push(`Overlaps ${o.length === 1 ? (/^my /i.test(o[0]) ? o[0].replace(/^my /i, "your ").toLowerCase() : `the ${o[0].toLowerCase()}`) : `${o.length} other pieces`}.`);
     if (p.heightM > room.heightM) w.push("This piece is taller than your ceiling.");
     else if (fitStatus({ widthM: p.widthM, depthM: p.depthM, heightM: p.heightM }, dims) === "wont_fit") w.push("This piece is too big for your floor, even turned.");
     else { const { hx, hz } = halfExtents(p); if (hx * 2 > room.widthM + 1e-6 || hz * 2 > room.lengthM + 1e-6) w.push("This piece doesn't fit in this direction. Try turning it."); }
@@ -161,6 +161,7 @@ export function RoomPlanner({ room, initial, listings, addListingId }: { room: R
           <section className="space-y-3 rounded-2xl border border-line bg-surface p-4" aria-label="Selected piece">
             <div className="flex items-start justify-between gap-2"><h3 className="font-semibold">{selected.label}</h3>
               {selected.listingId && <FitBadge status={pieceFit(selected)} />}</div>
+            <span className="sr-only" data-testid="piece-pos">{selected.x.toFixed(2)},{selected.z.toFixed(2)}</span>
             {!selected.dimensionsConfirmed && <p className="rounded-lg bg-warn-soft p-2 text-sm text-warn" data-testid="unconfirmed-note">Typical {CATEGORY_LABEL[selected.category].toLowerCase()} size. Actual size not confirmed.</p>}
             {meta && !meta.hasSize && <Button variant="secondary" onClick={async () => { try { await api(`/api/listings/${selected.listingId}/measurement-request`, { method: "POST" }); toast({ message: "We've asked for the size." }); } catch (e) { toast({ message: errMsg(e), tone: "error" }); } }}>Request measurements</Button>}
             {meta && meta.status !== "available" && <p className="text-sm text-warn">No longer available.</p>}

@@ -17,3 +17,20 @@ describe("sanitizeSuggestion", () => {
     expect(sanitizeSuggestion({ title: "Thing", category: "spaceship", description: "y" })).toBeNull();
   });
 });
+
+import { getAIProvider } from "@/lib/ai/providers";
+describe("provider selection", () => {
+  const bytes = new Uint8Array([1, 2, 3]);
+  it("none and missing key are unavailable, never a fake success", async () => {
+    process.env.AI_PROVIDER = "none";
+    expect(await getAIProvider().describeItem({ imageBytes: bytes, mimeType: "image/jpeg" })).toEqual({ status: "unavailable", reason: "no_provider" });
+    process.env.AI_PROVIDER = "anthropic"; delete process.env.ANTHROPIC_API_KEY;
+    expect(getAIProvider().name).toBe("none");
+  });
+  it("mock is keyed on file name and says so", async () => {
+    process.env.AI_PROVIDER = "mock";
+    const r = await getAIProvider().describeItem({ imageBytes: bytes, mimeType: "image/jpeg", fileName: "demo-desk.jpg" });
+    expect(r).toMatchObject({ status: "ok", source: "mock", suggestion: { category: "desk" } });
+    delete process.env.AI_PROVIDER;
+  });
+});
