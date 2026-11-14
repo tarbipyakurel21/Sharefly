@@ -1,3 +1,8 @@
+# Secrets: only the example files are tracked
+.env
+.env.*
+!.env.example
+
 # Python
 .venv/
 __pycache__/
@@ -7,14 +12,11 @@ __pycache__/
 # Local SQLite database (created at runtime)
 backend/data/
 
-# Node
+# Node / build output
 node_modules/
 frontend/dist/
+dist/
+build/
 
 # Misc
 .DS_Store
-
-# Secrets: only the example file is tracked
-.env
-.env.*
-!.env.example
