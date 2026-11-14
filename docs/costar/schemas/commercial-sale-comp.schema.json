@@ -1,0 +1,2363 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CommercialSaleComp",
+  "type": "object",
+  "properties": {
+    "apartments": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/CommercialSaleCompApartment"
+      },
+      "description": "Collection of multifamily unit-mix/rent rows attached to the comp, supporting per-unit pricing metrics for apartment sales."
+    },
+    "askingPriceHigh": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64",
+      "description": "Upper end of the sale price range requested by the seller; most pertinent to portfolio sales."
+    },
+    "askingPriceLow": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64",
+      "description": "Lower end of the sale price range requested by the seller; most pertinent to portfolio sales."
+    },
+    "assessment": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Assessment"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Assessed value (improved/land/total) from the tax authority for the comp, typically aggregated across transfer documents; supports valuation context."
+    },
+    "auctionForSaleIds": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "description": "Identifiers of auction for-sale listings associated with this comp, linking the sale to auction-sourced listings (e.g. Ten-X). Join on integer IDs."
+    },
+    "belowMarketSaleReasons": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/BelowMarketSaleReason"
+      },
+      "description": "Reasons the sale priced below market (e.g. correction deed, refinance, trust deed, related-party). These disqualify the comp from contact sync and affect comparability — exclude/flag accordingly."
+    },
+    "buildingParkType": {
+      "$ref": "#/$defs/BuildingParkType",
+      "description": "Type of building park for a portfolio sale; values include Business Park, Office Park, and Industrial Park."
+    },
+    "capitalizationRateActual": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Cap rate from actual in-place NOI over price (R = NOI / Value); lower cap = lower risk/higher price. In US/Canada CoStar captures Cap Rate; in the UK/France the same field carries Yield, which is inclusive of acquisition costs."
+    },
+    "capitalizationRateProForma": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Cap rate based on projected/pro-forma NOI rather than actual in-place income (R = NOI / Value); flag as a projection when reported. In UK/France this field carries Yield rather than Cap Rate."
+    },
+    "contacts": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/CommercialSaleCompContact"
+      },
+      "description": "Parties tied to the comp (buyers, sellers, brokers, preparers) with their roles; True vs Recorded distinguishes real parties from deed-name parties. Contacts sync only for a valid comp with a qualifying Buyer/Seller and no disqualifying below-market reason."
+    },
+    "dateOffMarket": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "The date the for-sale item (Property, Land, or CondoUnit) was taken off the market, via sale or owner withdrawal."
+    },
+    "dateOnMarket": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "The date the for-sale item (Property, Land, or CondoUnit) went on the market."
+    },
+    "downPayment": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64",
+      "description": "Amount of money presented up front in a completed sale."
+    },
+    "entities": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/CommercialSaleCompEntity"
+      },
+      "description": "Per-property/asset breakdown of what sold in the transaction; each entity carries allocated price and property-type-specific attributes. Filter to true-comp grain before aggregating."
+    },
+    "escrowLengthInDays": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Number of days elapsing between the date the property goes under contract (in escrow) and the date it settles (close of escrow)."
+    },
+    "forSaleIds": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "description": "Identifiers of the for-sale listing records associated with this comp, linking the completed sale back to its marketing listings. Join on integer IDs."
+    },
+    "grossIncomeMultiplier": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "(GIM) Ratio of sale price to gross scheduled income plus other income at sale (or projected first-year GSI); a price-to-income valuation multiplier."
+    },
+    "grossRentMultiplier": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "(GRM) Multifamily valuation statistic: sale price relative to the property's gross monthly rent, used to gauge a reasonable price against the income generated."
+    },
+    "id": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Unique identifier of the sale comp record; the join/anchor key for a completed sale used as a comparable transaction."
+    },
+    "isLandValueSale": {
+      "type": "boolean",
+      "description": "Flag indicating the property(ies) sold for the value of the land."
+    },
+    "isNoBuyerBroker": {
+      "type": "boolean",
+      "description": "Explicitly indicates that no buyer broker was involved with the sale."
+    },
+    "isNoListingBroker": {
+      "type": "boolean",
+      "description": "Explicitly indicates that no listing broker was involved with the sale."
+    },
+    "marketAssessment": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MarketAssessment"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Market (full-value) assessment figures (improvement/land/total) from the assessor, distinct from assessed value; valuation context for the comp."
+    },
+    "monetaryUnit": {
+      "$ref": "#/$defs/MonetaryUnit",
+      "description": "Currency/monetary unit of the comp amounts."
+    },
+    "notes": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/Note"
+      },
+      "description": "Collection of free-text research notes attached to the comp, often capturing the deal story/motivation behind the sale."
+    },
+    "numberOfEntities": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Count of properties/assets (entities) included in the sale transaction; >1 indicates a multi-property or portfolio sale where prices may be allocated."
+    },
+    "partialInterestSalePercent": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "For a partial-interest sale, the percentage of the property that was sold; does not apply to all sales."
+    },
+    "portfolioName": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "For a portfolio sale, the name of the portfolio."
+    },
+    "portfolioType": {
+      "$ref": "#/$defs/PortfolioType",
+      "description": "Code classifying whether/how this sale is part of a multi-property portfolio transaction."
+    },
+    "pricePerRoom": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Sale price per room; applies only to hotel/hospitality properties."
+    },
+    "pricePerUnit": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Sale price per unit; applicable only to multi-family property and residential land."
+    },
+    "proposedLandUse": {
+      "$ref": "#/$defs/ProposedLandUse",
+      "description": "Intended/best use of the land for a land-value sale (e.g. zoning/development intent); only meaningful when isLandValueSale is true."
+    },
+    "saleConditions": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/SaleCondition"
+      },
+      "description": "Collection of conditions affecting the sale price/comparability (distressed, lease-up, business-value-included, etc.); surface when comparing comps."
+    },
+    "saleFinancingType": {
+      "$ref": "#/$defs/SaleFinancingType",
+      "description": "Indicates whether or not the sale involved financing."
+    },
+    "saleMethod": {
+      "$ref": "#/$defs/SaleMethod",
+      "description": "Method by which the sale was transacted (e.g. standard sale, auction); defaults to standard sale."
+    },
+    "salePriceStatus": {
+      "$ref": "#/$defs/SalePriceStatus",
+      "description": "How the sale price was established: 3 Confirmed by a party to the sale; 5 FullValue, calculated from the transfer tax and not confirmed; 7 Unconfirmed, a regional form of FullValue; 2 Approximate, reported by the buyer or in a news article; 1 Affidavit or 4 Declaration, taken from the document recorded with the deed; 6 Mini, only one of price and size is public; 0 Unknown when no status is recorded. Carry it with soldForPrice."
+    },
+    "saleType": {
+      "$ref": "#/$defs/SaleType",
+      "description": "Nature of the sale (e.g. Investment vs Owner/User). A core comparability dimension: investment sales (bought for income) vs owner/user sales surface different relevant fields and should be screened together when comparing comps."
+    },
+    "soldDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date the property sold under the current sale; technically, the date the most recent deed on the property was recorded."
+    },
+    "soldForPrice": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64",
+      "description": "Price for which the Property, Land, or CondoUnit sold. Disclosure/trust level varies (full amount stated on document, computed from transfer/excise tax, or non-disclosure), so always carry salePriceStatus."
+    },
+    "source": {
+      "$ref": "#/$defs/CompSourceType",
+      "description": "Source of the comp transaction."
+    },
+    "tenure": {
+      "$ref": "#/$defs/Tenure",
+      "description": "Tenure of the sale."
+    },
+    "transferDocuments": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/TransferDocument"
+      },
+      "description": "Collection of recorded transfer/deed documents underlying the sale, carrying recording details, taxes, and assessments."
+    },
+    "verificationFields": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/CommercialSaleCompVerificationField"
+      },
+      "description": "Collection of per-field verification records indicating which comp fields were verified, by whom, and from which source."
+    },
+    "verificationSources": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/VerificationSource"
+      },
+      "description": "Collection of sources used to verify the comp (e.g. broker, public record); supports field-level verification provenance."
+    }
+  },
+  "$defs": {
+    "CommercialSaleCompApartment": {
+      "type": "object",
+      "properties": {
+        "apartmentDataSource": {
+          "$ref": "#/$defs/ApartmentDataSourceType",
+          "description": "Source of the apartment unit data (e.g. multifamily research vs marketplace feed), indicating provenance."
+        },
+        "avgUnitSizeSqFt": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Average rentable area in square feet for this unit type; size context for rent and price comparisons."
+        },
+        "maxEffectiveRent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Upper bound of effective monthly rent (asking adjusted for concessions) for this unit type; keep the effective flavor separate from asking rent when aggregating."
+        },
+        "maxMonthlyRent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Upper bound of asking monthly rent for this unit type; asking-flavor rent, normalize before aggregating."
+        },
+        "maxOccupants": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Maximum permitted occupants for this unit type."
+        },
+        "minEffectiveRent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Lower bound of effective monthly rent (asking adjusted for concessions) for this unit type; keep the effective flavor distinct from asking rent before comparing."
+        },
+        "minMonthlyRent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Lower bound of asking monthly rent for this unit type; normalize to $/SF/yr and keep the asking flavor distinct before comparing."
+        },
+        "monthlyDiscount": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Monthly rent discount/concession amount applied to this unit type, bridging asking and effective rent."
+        },
+        "numBaths": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Bathroom count for this unit type, fractional to allow half-baths; multifamily unit-mix attribute."
+        },
+        "numBeds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255,
+          "description": "Bedroom count of this unit type within the multifamily comp; primary unit-mix attribute."
+        },
+        "numOccupantsVacant": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Vacant occupancy capacity for this unit type (occupant slots unfilled); a multifamily occupancy detail."
+        },
+        "numUnits": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of units of this type in the property; drives the multifamily unit count and per-unit pricing."
+        },
+        "numUnitsAvailable": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Count of units of this type marketed as available; available is distinct from vacant and includes occupied/future-available units."
+        },
+        "numUnitsVacant": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Count of vacant (physically empty) units of this type at the property; vacancy is physical regardless of lease obligation."
+        },
+        "propertyId": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Foreign key to the property the apartment data belongs to; join on integer ID."
+        },
+        "totalConcessionValue": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Total monetary value of concessions offered on this unit type; reduces effective rent below asking."
+        }
+      }
+    },
+    "Assessment": {
+      "type": "object",
+      "properties": {
+        "improvedValue": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "description": "Assessed value of the buildings and other improvements, excluding land."
+        },
+        "landValue": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "description": "Assessed value of the land alone."
+        },
+        "totalValue": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "description": "Total assessed value (land plus improvements)."
+        },
+        "improvedRatio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Share of the total assessed value attributed to improvements, as a fraction from 0 to 1."
+        }
+      }
+    },
+    "CommercialSaleCompContact": {
+      "type": "object",
+      "properties": {
+        "contactFirstName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "First name of the party as captured on the comp; free-text name used when the contact is not resolved to a Contact ID."
+        },
+        "contactId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the person in CoStar contact data."
+        },
+        "contactLastName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Last name of the party as captured on the comp; free-text name fallback alongside the contact ID."
+        },
+        "contactPhone": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Phone number for the contact party to the sale; personal contact detail captured by research."
+        },
+        "contactRole": {
+          "$ref": "#/$defs/ContactRole2",
+          "description": "Role of the person or company on this record, such as listing broker, buyer or seller."
+        },
+        "funds": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": "Collection of investment fund references tied to this party, linking the buyer/seller to the funds behind the transaction. Join on integer IDs."
+        },
+        "locationId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "The contact's location - the main work location of the contact."
+        },
+        "locationName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the company/location for the party as captured on the comp; free-text fallback when not resolved to a Location ID. Join on IDs, not names."
+        },
+        "locationPhone": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Phone number of the company/location party to the sale; contact detail captured by research."
+        },
+        "percentOwned": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 255,
+          "description": "Ownership percentage held by this buyer/seller party; summed across parties cannot exceed 100 and is bounded by the partial-interest sale percent."
+        }
+      }
+    },
+    "CommercialSaleCompEntity": {
+      "type": "object",
+      "properties": {
+        "allocatedPrice": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "description": "Estimated price attributed to this individual asset within a multi-property/portfolio sale when the actual per-property price is unknown; a confidence-flagged modeled value (carry allocatedPriceStatus)."
+        },
+        "allocatedPriceStatus": {
+          "$ref": "#/$defs/SalePriceStatus",
+          "description": "How allocatedPrice was established. 8 Allocated means it is an estimated share of the portfolio price; the other values have the meanings given for salePriceStatus."
+        },
+        "assetType": {
+          "$ref": "#/$defs/AssetType",
+          "description": "Type of the asset/entity in the sale (e.g. property, document); determines the grain and which fields apply. Filter on this before counting true comps."
+        },
+        "averageRentalRate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Average rental rate for the asset at sale; income input for investment-sale valuation. Normalize flavor/type before comparing."
+        },
+        "buildingFullName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Full name of the building/asset; hospitality-specific identifier used for hotel comps."
+        },
+        "capitalizationRateActual": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Actual (in-place NOI) cap rate for this individual asset (R = NOI / Value); core per-asset valuation metric. In UK/France this field carries Yield (inclusive of acquisition costs) rather than Cap Rate."
+        },
+        "capitalizationRateProForma": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Pro forma (projected-NOI) cap rate for this individual asset; flag as a projection when reported."
+        },
+        "documentId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Foreign key to the transfer document associated with this entity, linking the asset to its recorded deed."
+        },
+        "entityId": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the sold asset this entry describes; read it with assetType (a property, a condo unit or a rumored property)."
+        },
+        "hotelClass": {
+          "$ref": "#/$defs/HotelClass",
+          "description": "Hotel class/tier of the asset (hospitality-specific); a benchmarking attribute for hotel sale comps, aligned to STR-style hospitality classification used in hospitality KPI calculations."
+        },
+        "hotelOperationType": {
+          "$ref": "#/$defs/HotelOperationType",
+          "description": "Hotel operating arrangement (e.g. franchise, managed, independent); hospitality-specific attribute affecting value."
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Unique identifier of this per-asset comp-entity row within the sale comp."
+        },
+        "notes": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Note"
+          },
+          "description": "Collection of free-text research notes attached to this comp-entity, often capturing per-asset deal context."
+        },
+        "numberOfUnits": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Unit count for the asset; multifamily/land attribute supporting price-per-unit metrics."
+        },
+        "percentLeased": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Share of the asset under lease at the time of sale; the occupancy/leasing profile is a key comp comparability dimension for income durability (leased differs from physically occupied)."
+        },
+        "propertyId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "PropertyID added to enable searches by property/address without joining to Property or CondoUnit+Property by sale entity type, dramatically improving comp retrieval speed."
+        },
+        "totalSquarefeet": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Total square footage of the asset; size denominator for price/SF and multifamily/land sizing."
+        }
+      }
+    },
+    "Note": {
+      "type": "object",
+      "properties": {
+        "noteType": {
+          "$ref": "#/$defs/NoteType",
+          "description": "A pre-defined categorization of note text, typically referred to as 'Notes' in CRM Enterprise."
+        },
+        "value": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The body (free-text content) of the note."
+        }
+      }
+    },
+    "MarketAssessment": {
+      "type": "object",
+      "properties": {
+        "marketImprovementValue": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "description": "Assessor's market value of the buildings and other improvements."
+        },
+        "marketLandValue": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "description": "Assessor's market value of the land."
+        },
+        "marketTotalValue": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "description": "Assessor's total market value (land plus improvements)."
+        },
+        "marketImprovementPercent": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Share of the assessor's total market value attributed to improvements."
+        }
+      }
+    },
+    "TransferDocument": {
+      "type": "object",
+      "properties": {
+        "assessments": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/TransferDocumentAssessment"
+          },
+          "description": "Collection of per-document assessment records (assessed/market improvement, land, and total values) rolled up to support comp valuation."
+        },
+        "cityTax": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "City-level transfer tax paid on the conveyance; additional tax-stamp basis that can corroborate price."
+        },
+        "countyId": {
+          "type": "integer",
+          "format": "int32",
+          "description": "County whose recorder/assessor holds the document; scopes the document number, which is only unique within a county. Join to county geography on the ID."
+        },
+        "dateFiled": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Date the transfer document was recorded/filed with the county; recording date for the deed."
+        },
+        "documentNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Normalized recording/document number identifying the deed in the county recorder's records, used to tie the sale to public records."
+        },
+        "documentNumberRaw": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Original unnormalized document number as recorded by the source, preserved alongside the cleaned documentNumber."
+        },
+        "exciseNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Excise/recording reference number associated with the transfer tax payment on the document."
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Unique identifier of the transfer (deed) document record underlying the sale comp."
+        },
+        "isNonDisclosure": {
+          "type": "boolean",
+          "description": "Whether the sale falls in a non-disclosure jurisdiction where price is not publicly recorded, explaining undisclosed/estimated prices."
+        },
+        "isPrimaryDocument": {
+          "type": "boolean",
+          "description": "Whether this is the primary deed for the sale comp (vs supporting/secondary documents), used to pick the authoritative conveyance."
+        },
+        "legalDescription": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Legal description of the land parcel conveyed by the deed, defining exactly what real property transferred."
+        },
+        "noDocumentAvailable": {
+          "type": "boolean",
+          "description": "Flag indicating no recorded transfer document is available for the sale, so deed-derived details cannot be sourced."
+        },
+        "taxStampType": {
+          "$ref": "#/$defs/TaxStampType",
+          "description": "Type of documentary tax stamp on the deed, indicating the basis/jurisdiction of the transfer tax."
+        },
+        "transferTax": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Transfer (county/state) tax paid on the recorded conveyance; can be used to infer or corroborate undisclosed sale price."
+        }
+      }
+    },
+    "TransferDocumentAssessment": {
+      "type": "object",
+      "properties": {
+        "assessment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Assessment"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Value-typed assessed-valuation breakdown from the assessor (improved value, land value, total value, and derived improved-to-total ratio); the tax-roll basis of value for the parcel."
+        },
+        "assessmentSourceType": {
+          "$ref": "#/$defs/AssessmentSourceType",
+          "description": "Code identifying the origin of the assessment data (e.g. which assessor/tax source supplied the valuation), used to gauge provenance and reliability of the figures."
+        },
+        "assessmentYear": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Tax assessment year the assessed valuation figures apply to, anchoring the assessor's improved/land/total values to a specific assessment roll period."
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Unique identifier for the transfer-document assessment record, which captures the assessor/tax valuation tied to a property's deed transfer within a commercial sale comp."
+        },
+        "isPartialAPNSale": {
+          "type": "boolean",
+          "description": "Flag indicating the sale transaction covered only part of the assessor's parcel (APN) rather than the whole parcel, a comparability caveat when relating the assessment to the sale price."
+        },
+        "marketAssessment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MarketAssessment"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Value-typed market-valuation breakdown (market improvement, land, total value, and derived improvement percent) representing the assessor's estimated market value as distinct from the assessed/taxable value."
+        },
+        "parcelNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "County assessor's parcel number (APN) for the land parcel covered by this transfer document, tying the assessment to public tax/ownership records; APNs are unique only within a county."
+        },
+        "propertyTax": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Annual property tax amount levied on the parcel per the assessor record; a financial datum used in income/expense analysis of the comp and in comparability adjustments."
+        },
+        "propertyTaxYear": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Tax year the propertyTax amount applies to, anchoring the levied tax figure to a specific billing period."
+        }
+      }
+    },
+    "CommercialSaleCompVerificationField": {
+      "type": "object",
+      "properties": {
+        "verificationField": {
+          "$ref": "#/$defs/VerificationField",
+          "description": "Code identifying which specific sale-comp field this verification record pertains to, enabling field-level tracking of what data has been verified and from which source in the comp research workflow."
+        },
+        "verificationSource": {
+          "$ref": "#/$defs/VerificationSource",
+          "description": "Code identifying the source through which a field of the commercial sale comp was verified (e.g. broker, buyer, seller, public record), recording how the deal datum was confirmed in the field-level verification workflow."
+        }
+      }
+    },
+    "ApartmentDataSourceType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "AutomatedDataCollection",
+        "Feed",
+        "CommunityCaller",
+        "CoStarResearch",
+        "UserEntry"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = AutomatedDataCollection\n2 = Feed\n3 = CommunityCaller\n4 = CoStarResearch\n5 = UserEntry"
+    },
+    "BelowMarketSaleReason": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        4,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        15,
+        16,
+        17,
+        21,
+        25,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        35,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "AssignmentOfBeneficialInterestDeed",
+        "AffidavitOfDeath",
+        "AssignmentOfLease",
+        "BusinessSaleZeroReallocation",
+        "ChangeInTitleVesting",
+        "ContractInstallmentSale",
+        "CorrectionDeed",
+        "DatedSalePrice",
+        "DeedInLieuOfForeclosure",
+        "DevelopmentAuthoritySale",
+        "EasementRightOfWay",
+        "GiftDeed",
+        "InterrelatedParties",
+        "MortgageReleaseOfMortgage",
+        "PackageSaleRandomAllocation",
+        "PartnershipDissolution",
+        "QuitclaimDeed",
+        "Rerecording",
+        "RedevelopmentAgencySale",
+        "Refinance",
+        "RelatedPrincipals",
+        "ReleaseOfCosigner",
+        "RightOfWay",
+        "TrustDeed",
+        "TrustTransfer",
+        "TrusteesDeed",
+        "UnknownReason",
+        "Foreclosure",
+        "EminentDomain"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = AssignmentOfBeneficialInterestDeed\n2 = AffidavitOfDeath\n4 = AssignmentOfLease\n7 = BusinessSaleZeroReallocation\n8 = ChangeInTitleVesting\n9 = ContractInstallmentSale\n10 = CorrectionDeed\n11 = DatedSalePrice\n12 = DeedInLieuOfForeclosure\n13 = DevelopmentAuthoritySale\n15 = EasementRightOfWay\n16 = GiftDeed\n17 = InterrelatedParties\n21 = MortgageReleaseOfMortgage\n25 = PackageSaleRandomAllocation\n27 = PartnershipDissolution\n28 = QuitclaimDeed\n29 = Rerecording\n30 = RedevelopmentAgencySale\n31 = Refinance\n32 = RelatedPrincipals\n33 = ReleaseOfCosigner\n35 = RightOfWay\n39 = TrustDeed\n40 = TrustTransfer\n41 = TrusteesDeed\n42 = UnknownReason\n43 = Foreclosure\n44 = EminentDomain"
+    },
+    "BuildingParkType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "BusinessPark",
+        "IndustrialPark",
+        "OfficePark",
+        "ShoppingCenter",
+        "DualBrandedHotel"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = BusinessPark\n2 = IndustrialPark\n3 = OfficePark\n4 = ShoppingCenter\n5 = DualBrandedHotel"
+    },
+    "ContactRole2": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        15,
+        17,
+        18,
+        20,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        1000,
+        1001,
+        1002,
+        1003,
+        1004,
+        1005
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Developer",
+        "Architect",
+        "RecordedOwner",
+        "PropertyManager",
+        "PrimaryLeasingCompany",
+        "TrueOwner",
+        "SignAgent",
+        "AssetManager",
+        "BuyerBroker",
+        "ListingBroker",
+        "TenantRep",
+        "DecisionMakerLeasing",
+        "DecisionInfluencer",
+        "LeasingCompany",
+        "Principal",
+        "SurveyContact",
+        "CenterMailContact",
+        "CenterManager",
+        "AssistantAssociateCenterManager",
+        "MarketingDirectorManager",
+        "SpecialtyLeasingManager",
+        "BuildingSuperintendent",
+        "SecuritySupervisor",
+        "AdvertisingManager",
+        "SpecialEventsManager",
+        "PromotionDirectorManager",
+        "Other",
+        "RecordedSeller",
+        "TrueSeller",
+        "Attorney",
+        "RecordedBuyer",
+        "TrueBuyer",
+        "BuyerContact",
+        "SellerContact",
+        "ListingAgent",
+        "LeasingAgent",
+        "TenantContact",
+        "Preparer",
+        "ListingAdministrator",
+        "SurveillanceOperator",
+        "OwnerListingContact",
+        "WSRListingAdministrator",
+        "SocialAdminSetupContact",
+        "OwnerListingAdministrator",
+        "OwnerPermissionAdministrator",
+        "ListingPermissionAdministrator",
+        "HotelMembershipCompany",
+        "AcquisitionsDispositions",
+        "Development",
+        "AssetorPortfolioManagement",
+        "Leasing",
+        "Finance",
+        "InvestorRelations",
+        "Marketing",
+        "Research",
+        "HumanResourcesAndLegalAndInformationTechnologyAndOperations",
+        "DecisionMakerAcquisitions",
+        "DecisionInfluencerAcquisitions",
+        "DecisionMakerProductPurchase",
+        "DecisionInfluencerProductPurchase",
+        "Servicer",
+        "Borrower",
+        "SpecialServicer",
+        "Originator",
+        "Sponsor",
+        "HotelOperator",
+        "Auctioneer",
+        "AuctionContact",
+        "GeneralContractor",
+        "TitleCompany",
+        "EscrowCompany",
+        "AuctionAssetManager",
+        "ReportVendor",
+        "FundManager",
+        "LawFirm",
+        "Auditor",
+        "FundPlacementAgent",
+        "FundAdministrator",
+        "Investor",
+        "MediaSchedulingContact",
+        "BrokerInStateLicensee",
+        "TerritoryManager",
+        "Freeholder",
+        "ListingLeadRecipient",
+        "SiteListingAdministrator",
+        "BrandedProperty",
+        "SalesAgent",
+        "BuilderAdmin",
+        "SiteListingAdministratorCommunities",
+        "CompanyListingAdministratorCommunities",
+        "ListingPermissionAdministratorCommunities",
+        "MortgageBroker",
+        "DataCenterOperator",
+        "SubletContact",
+        "PreviousTrueOwner",
+        "PreviousRecordedOwner",
+        "ExecutiveLeadershipPrincipal",
+        "LeaseCompsAdministrator",
+        "FeedContact"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Developer (also DeveloperConstruction)\n2 = Architect\n3 = RecordedOwner\n4 = PropertyManager\n6 = PrimaryLeasingCompany\n7 = TrueOwner\n8 = SignAgent\n9 = AssetManager\n10 = BuyerBroker\n11 = ListingBroker\n15 = TenantRep\n17 = DecisionMakerLeasing (also DecisionMaker)\n18 = DecisionInfluencer (also DecisionInfluencerLeasing)\n20 = LeasingCompany\n26 = Principal\n27 = SurveyContact\n28 = CenterMailContact\n29 = CenterManager\n30 = AssistantAssociateCenterManager\n31 = MarketingDirectorManager\n32 = SpecialtyLeasingManager\n33 = BuildingSuperintendent\n34 = SecuritySupervisor\n35 = AdvertisingManager\n36 = SpecialEventsManager\n37 = PromotionDirectorManager\n38 = Other\n39 = RecordedSeller\n40 = TrueSeller\n41 = Attorney\n42 = RecordedBuyer\n43 = TrueBuyer\n44 = BuyerContact\n45 = SellerContact\n46 = ListingAgent\n47 = LeasingAgent\n48 = TenantContact\n49 = Preparer\n50 = ListingAdministrator\n51 = SurveillanceOperator\n52 = OwnerListingContact (also OwnerLeasingContact)\n53 = WSRListingAdministrator\n54 = SocialAdminSetupContact\n55 = OwnerListingAdministrator\n56 = OwnerPermissionAdministrator\n57 = ListingPermissionAdministrator\n58 = HotelMembershipCompany\n59 = AcquisitionsDispositions\n60 = Development\n61 = AssetorPortfolioManagement\n62 = Leasing\n63 = Finance\n64 = InvestorRelations\n65 = Marketing\n66 = Research\n67 = HumanResourcesAndLegalAndInformationTechnologyAndOperations\n68 = DecisionMakerAcquisitions\n69 = DecisionInfluencerAcquisitions\n70 = DecisionMakerProductPurchase\n71 = DecisionInfluencerProductPurchase\n72 = Servicer\n73 = Borrower\n74 = SpecialServicer\n75 = Originator\n76 = Sponsor\n77 = HotelOperator\n78 = Auctioneer\n79 = AuctionContact (also AuctionManager)\n80 = GeneralContractor\n81 = TitleCompany\n82 = EscrowCompany\n83 = AuctionAssetManager\n84 = ReportVendor\n85 = FundManager\n86 = LawFirm\n87 = Auditor\n88 = FundPlacementAgent\n89 = FundAdministrator\n90 = Investor\n91 = MediaSchedulingContact\n92 = BrokerInStateLicensee\n93 = TerritoryManager\n94 = Freeholder\n95 = ListingLeadRecipient\n96 = SiteListingAdministrator\n97 = BrandedProperty\n98 = SalesAgent\n99 = BuilderAdmin\n100 = SiteListingAdministratorCommunities\n101 = CompanyListingAdministratorCommunities\n102 = ListingPermissionAdministratorCommunities\n103 = MortgageBroker\n104 = DataCenterOperator\n1000 = SubletContact\n1001 = PreviousTrueOwner\n1002 = PreviousRecordedOwner\n1003 = ExecutiveLeadershipPrincipal (also Executive)\n1004 = LeaseCompsAdministrator\n1005 = FeedContact"
+    },
+    "SalePriceStatus": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Affidavit",
+        "Approximate",
+        "Confirmed",
+        "Declaration",
+        "FullValue",
+        "Mini",
+        "Unconfirmed",
+        "Allocated"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Affidavit\n2 = Approximate\n3 = Confirmed\n4 = Declaration\n5 = FullValue\n6 = Mini\n7 = Unconfirmed\n8 = Allocated"
+    },
+    "AssetType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Property",
+        "Condo",
+        "RumorProperty"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Property\n2 = Condo\n3 = RumorProperty"
+    },
+    "HotelClass": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Luxury",
+        "UpperUpscale",
+        "Upscale",
+        "UpperMidscale",
+        "Midscale",
+        "Economy"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Luxury\n2 = UpperUpscale\n3 = Upscale\n4 = UpperMidscale\n5 = Midscale\n6 = Economy"
+    },
+    "HotelOperationType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "ChainManagement",
+        "Franchise",
+        "Independent"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = ChainManagement\n2 = Franchise\n3 = Independent"
+    },
+    "NoteType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        14,
+        15,
+        16,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "PropertyInternal",
+        "PropertyExternal",
+        "SaleExternal",
+        "CommissionNote",
+        "TenantExternal",
+        "TenantInternal",
+        "TenantTransactionInternal",
+        "SpaceNote",
+        "SpaceVacantInternal",
+        "SupplementalExternal",
+        "LocationInternal",
+        "LocationExternal",
+        "LocationBilling",
+        "CompExternal",
+        "CompInternal",
+        "CompSeller",
+        "CompBuyer",
+        "CompManager",
+        "PropertyGroupExternal",
+        "PropertyGroupInternal",
+        "LeaseDealInternal",
+        "LeaseDealExternal",
+        "LandLease",
+        "LandLeaseCommission",
+        "CompEntityInternal",
+        "CompEntityExternal",
+        "PropertyLoan",
+        "PropertyResidentialExternal",
+        "ListingExternal",
+        "AptsSalesForceNote",
+        "WhyYouLoveUs",
+        "CheckInCheckOutPolicy",
+        "PaymentPolicy",
+        "AdvancedPaymentPolicy",
+        "CancellationPolicy",
+        "ListingLocationDescription",
+        "ContactExternal",
+        "ContactInternal",
+        "ListingExternalGenerated",
+        "DrivingDirections",
+        "StudentHousingDescription",
+        "RenterQualification",
+        "MarketingStakeholderOne",
+        "MarketingStakeholderTwo",
+        "SpaceManager",
+        "ApartmentUnitMarketing",
+        "CmbsLoanCommentary",
+        "CmbsLoanModification",
+        "CmbsLoanDelinquency",
+        "CmbsLoanRealEstateOwned",
+        "CmbsLoanWatchlist",
+        "AuctionDashboardComments",
+        "AuctionReportInternal",
+        "NeighborhoodInternal",
+        "ParkInternal",
+        "SchoolInternal",
+        "RetailBrandInternal",
+        "RetailBrandExternal",
+        "AuctionMarketingInternal",
+        "RetailBrandRequirement",
+        "ConstructionProjectInternal",
+        "FundInternal",
+        "CommunityProjectExternal",
+        "WhyLiveHere"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = PropertyInternal\n2 = PropertyExternal\n3 = SaleExternal\n4 = CommissionNote\n5 = TenantExternal\n6 = TenantInternal\n7 = TenantTransactionInternal\n8 = SpaceNote\n9 = SpaceVacantInternal\n10 = SupplementalExternal\n14 = LocationInternal\n15 = LocationExternal\n16 = LocationBilling\n25 = CompExternal\n26 = CompInternal\n27 = CompSeller\n28 = CompBuyer\n29 = CompManager\n30 = PropertyGroupExternal\n31 = PropertyGroupInternal\n32 = LeaseDealInternal\n33 = LeaseDealExternal\n34 = LandLease\n35 = LandLeaseCommission\n36 = CompEntityInternal\n37 = CompEntityExternal\n38 = PropertyLoan\n39 = PropertyResidentialExternal\n40 = ListingExternal\n41 = AptsSalesForceNote\n42 = WhyYouLoveUs\n43 = CheckInCheckOutPolicy\n44 = PaymentPolicy\n45 = AdvancedPaymentPolicy\n46 = CancellationPolicy\n47 = ListingLocationDescription\n48 = ContactExternal\n49 = ContactInternal\n50 = ListingExternalGenerated\n51 = DrivingDirections\n52 = StudentHousingDescription\n53 = RenterQualification\n54 = MarketingStakeholderOne\n55 = MarketingStakeholderTwo\n56 = SpaceManager\n57 = ApartmentUnitMarketing\n58 = CmbsLoanCommentary\n59 = CmbsLoanModification\n60 = CmbsLoanDelinquency\n61 = CmbsLoanRealEstateOwned\n62 = CmbsLoanWatchlist\n63 = AuctionDashboardComments\n64 = AuctionReportInternal\n66 = NeighborhoodInternal\n67 = ParkInternal\n68 = SchoolInternal\n69 = RetailBrandInternal\n70 = RetailBrandExternal\n71 = AuctionMarketingInternal\n72 = RetailBrandRequirement\n73 = ConstructionProjectInternal\n74 = FundInternal\n75 = CommunityProjectExternal\n76 = WhyLiveHere"
+    },
+    "MonetaryUnit": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "UnitedStatesDollar",
+        "CanadianDollar",
+        "PoundSterling",
+        "Euro",
+        "AustralianDollar",
+        "BrazilianReal",
+        "SwissFranc",
+        "JapaneseYen",
+        "SingaporeDollar",
+        "HongKongDollar",
+        "ChineseYuan",
+        "UnitedArabEmiratesDirham",
+        "AfghanistanAfghani",
+        "AlbanianLek",
+        "ArmenianDram",
+        "NetherlandsAntilleanGuilder",
+        "AngolanKwanza",
+        "ArgentinaPeso",
+        "ArubanGuilder",
+        "AzerbaijanNewManat",
+        "BosnianMark",
+        "BarbadosDollar",
+        "BangladeshTaka",
+        "BulgarianLev",
+        "BurundiFranc",
+        "BermudianDollars",
+        "BruneiDollars",
+        "BolivianBoliviano",
+        "BahamianDollar",
+        "Bitcoin",
+        "BotswanianPula",
+        "BelarusianRuble",
+        "BelizeDollar",
+        "CongoleseFranc",
+        "ChileanPeso",
+        "ColombianPeso",
+        "CostaRicanColon",
+        "CubanPeso",
+        "CapeVerdeEscudo",
+        "CzechKoruna",
+        "DjiboutiFranc",
+        "DanishKrone",
+        "DominicanPeso",
+        "AlgerianDinar",
+        "EgyptianPound",
+        "EthiopianBirr",
+        "FijiDollars",
+        "GeorgianLari",
+        "GhanaianNewCedi",
+        "GambianDalasi",
+        "GuineanFranc",
+        "GuatemalanQuetzal",
+        "GuyanaDollar",
+        "HondurasLempira",
+        "CroatianKuna",
+        "HaitianGourde",
+        "HungarianForint",
+        "IndonesianRupiah",
+        "IsraeliShekel",
+        "IndianRupee",
+        "IraqiDinar",
+        "IranianRial",
+        "IcelandKrona",
+        "JamaicanDollar",
+        "JordanDinar",
+        "KenyanShilling",
+        "KyrgyzstaniSom",
+        "CambodiaRiel",
+        "ComorosFranc",
+        "SouthKoreanWon",
+        "KuwaitiDinar",
+        "CaymanIslandDollar",
+        "KazakhstaniTenge",
+        "LaoKip",
+        "LebanesePound",
+        "SriLankanRupee",
+        "LiberianDollar",
+        "LesothoLoti",
+        "LibyanDinar",
+        "MoroccanDirham",
+        "MoldovanLeu",
+        "MalagasyAriary",
+        "MyanmarKyat",
+        "MacauPataca",
+        "MauritanianQuguiya",
+        "MauritiusRupee",
+        "MaldivesRufiyaa",
+        "MalawiKwacha",
+        "MexicanPeso",
+        "MalaysianRinggit",
+        "MozambiqueNewMetical",
+        "NamibianDollar",
+        "NigerianNaira",
+        "NicaraguanCordobaOro",
+        "NorwegianKrone",
+        "NepalRupee",
+        "NewZealandDollar",
+        "OmaniRial",
+        "PanameanBalboa",
+        "PeruvianNuevoSol",
+        "PapuaNewGuineaKina",
+        "PhilippinePeso",
+        "PakistaniRupee",
+        "PolishZloty",
+        "ParaguayanGuarani",
+        "QatarRiyal",
+        "NewRomanianLeu",
+        "SerbianDinar",
+        "RussianRuble",
+        "RwandanFranc",
+        "SaudiRiyal",
+        "SolomonIslandsDollar",
+        "SeychellesRupee",
+        "SudanesePound",
+        "SwedishKrona",
+        "SierraLeoneLeone",
+        "SomaliShilling",
+        "SurinameDollar",
+        "SaoTomeanDobra",
+        "ElSalvadorColon",
+        "SwazilandLilangeni",
+        "ThailandBaht",
+        "TajikistanSomoni",
+        "TurkmenNewManat",
+        "TunisianDinar",
+        "TonganPaanga",
+        "TurkishLira",
+        "TrinidadianDollar",
+        "TaiwanDollar",
+        "TanzanianShilling",
+        "UkrainianHryvnia",
+        "UgandanShilling",
+        "UruguayPeso",
+        "UzbekistaniSom",
+        "VenezuelanBolivarSoberano",
+        "VietnameseDong",
+        "CentralAfricanFranc",
+        "EastCaribbeanDollar",
+        "WestAfricanFranc",
+        "FrenchPacificIslandsFranc",
+        "YemenRial",
+        "SouthAfricanRand",
+        "ZambianKwacha",
+        "BahrainiDinar",
+        "EritreanNakfa",
+        "FalklandIslandsPound",
+        "GibraltarPound",
+        "NorthKoreanWon",
+        "MongolianTughrik",
+        "SaintHelenaPound",
+        "SyrianPound",
+        "VanuatuVatu",
+        "ZimbabweanDollar",
+        "SamoanTala",
+        "BhutaneseNgultrum",
+        "MacedonianDenar"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = UnitedStatesDollar\n2 = CanadianDollar\n3 = PoundSterling\n4 = Euro\n5 = AustralianDollar\n6 = BrazilianReal\n7 = SwissFranc\n8 = JapaneseYen\n9 = SingaporeDollar\n10 = HongKongDollar\n11 = ChineseYuan\n12 = UnitedArabEmiratesDirham\n13 = AfghanistanAfghani\n14 = AlbanianLek\n15 = ArmenianDram\n16 = NetherlandsAntilleanGuilder\n17 = AngolanKwanza\n18 = ArgentinaPeso\n19 = ArubanGuilder\n20 = AzerbaijanNewManat\n21 = BosnianMark\n22 = BarbadosDollar\n23 = BangladeshTaka\n24 = BulgarianLev\n25 = BurundiFranc\n26 = BermudianDollars\n27 = BruneiDollars\n28 = BolivianBoliviano\n29 = BahamianDollar\n30 = Bitcoin\n31 = BotswanianPula\n32 = BelarusianRuble\n33 = BelizeDollar\n34 = CongoleseFranc\n35 = ChileanPeso\n36 = ColombianPeso\n37 = CostaRicanColon\n38 = CubanPeso\n39 = CapeVerdeEscudo\n40 = CzechKoruna\n41 = DjiboutiFranc\n42 = DanishKrone\n43 = DominicanPeso\n44 = AlgerianDinar\n45 = EgyptianPound\n46 = EthiopianBirr\n47 = FijiDollars\n48 = GeorgianLari\n49 = GhanaianNewCedi\n50 = GambianDalasi\n51 = GuineanFranc\n52 = GuatemalanQuetzal\n53 = GuyanaDollar\n54 = HondurasLempira\n55 = CroatianKuna\n56 = HaitianGourde\n57 = HungarianForint\n58 = IndonesianRupiah\n59 = IsraeliShekel\n60 = IndianRupee\n61 = IraqiDinar\n62 = IranianRial\n63 = IcelandKrona\n64 = JamaicanDollar\n65 = JordanDinar\n66 = KenyanShilling\n67 = KyrgyzstaniSom\n68 = CambodiaRiel\n69 = ComorosFranc\n70 = SouthKoreanWon\n71 = KuwaitiDinar\n72 = CaymanIslandDollar\n73 = KazakhstaniTenge\n74 = LaoKip\n75 = LebanesePound\n76 = SriLankanRupee\n77 = LiberianDollar\n78 = LesothoLoti\n79 = LibyanDinar\n80 = MoroccanDirham\n81 = MoldovanLeu\n82 = MalagasyAriary\n83 = MyanmarKyat\n84 = MacauPataca\n85 = MauritanianQuguiya\n86 = MauritiusRupee\n87 = MaldivesRufiyaa\n88 = MalawiKwacha\n89 = MexicanPeso\n90 = MalaysianRinggit\n91 = MozambiqueNewMetical\n92 = NamibianDollar\n93 = NigerianNaira\n94 = NicaraguanCordobaOro\n95 = NorwegianKrone\n96 = NepalRupee\n97 = NewZealandDollar\n98 = OmaniRial\n99 = PanameanBalboa\n100 = PeruvianNuevoSol\n101 = PapuaNewGuineaKina\n102 = PhilippinePeso\n103 = PakistaniRupee\n104 = PolishZloty\n105 = ParaguayanGuarani\n106 = QatarRiyal\n107 = NewRomanianLeu\n108 = SerbianDinar\n109 = RussianRuble\n110 = RwandanFranc\n111 = SaudiRiyal\n112 = SolomonIslandsDollar\n113 = SeychellesRupee\n114 = SudanesePound\n115 = SwedishKrona\n116 = SierraLeoneLeone\n117 = SomaliShilling\n118 = SurinameDollar\n119 = SaoTomeanDobra\n120 = ElSalvadorColon\n121 = SwazilandLilangeni\n122 = ThailandBaht\n123 = TajikistanSomoni\n124 = TurkmenNewManat\n125 = TunisianDinar\n126 = TonganPaanga\n127 = TurkishLira\n128 = TrinidadianDollar\n129 = TaiwanDollar\n130 = TanzanianShilling\n131 = UkrainianHryvnia\n132 = UgandanShilling\n133 = UruguayPeso\n134 = UzbekistaniSom\n135 = VenezuelanBolivarSoberano\n136 = VietnameseDong\n137 = CentralAfricanFranc\n138 = EastCaribbeanDollar\n139 = WestAfricanFranc\n140 = FrenchPacificIslandsFranc\n141 = YemenRial\n142 = SouthAfricanRand\n143 = ZambianKwacha\n144 = BahrainiDinar\n145 = EritreanNakfa\n146 = FalklandIslandsPound\n147 = GibraltarPound\n148 = NorthKoreanWon\n149 = MongolianTughrik\n150 = SaintHelenaPound\n151 = SyrianPound\n152 = VanuatuVatu\n153 = ZimbabweanDollar\n154 = SamoanTala\n155 = BhutaneseNgultrum\n156 = MacedonianDenar"
+    },
+    "PortfolioType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "x-enum-varnames": [
+        "Individual",
+        "MultipleProperty",
+        "BulkPortfolio",
+        "PartOfMultipleProperty",
+        "PartOfBulkPortfolio",
+        "MultipleCondo"
+      ],
+      "description": "Allowed values:\n0 = Individual (also Unknown)\n1 = MultipleProperty\n2 = BulkPortfolio\n3 = PartOfMultipleProperty\n4 = PartOfBulkPortfolio\n5 = MultipleCondo"
+    },
+    "ProposedLandUse": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Commercial",
+        "Industrial",
+        "Retail",
+        "Office",
+        "MixedUse",
+        "Multifamily",
+        "Hospitality",
+        "AirplaneHangar",
+        "Airport",
+        "ApartmentUnits",
+        "ApartmentUnitsCondo",
+        "ApartmentUnitsDorms",
+        "ApartmentUnitsSenior",
+        "ApartmentUnitsSubsidized",
+        "AutoDealership",
+        "AutoRepair",
+        "AutoSalvageFacility",
+        "Bank",
+        "Bar",
+        "BaseballField",
+        "BowlingAlley",
+        "Carwash",
+        "Casino",
+        "CementGravelPlant",
+        "CemeteryMausoleum",
+        "ChemicalOilRefinery",
+        "CommunityCenter",
+        "ContractorStorageYard",
+        "ConvenienceStore",
+        "CorrectionalFacility",
+        "DaycareCenter",
+        "DepartmentStore",
+        "Distribution",
+        "Drugstore",
+        "FastFood",
+        "FoodProcessing",
+        "FuneralHome",
+        "GardenCenter",
+        "GeneralFreestanding",
+        "GolfCourseDrivingRange",
+        "Healthcare",
+        "HealthClub",
+        "HoldForDevelopment",
+        "HoldForInvestment",
+        "HorseStables",
+        "Hospital",
+        "Hotel",
+        "IndustrialLiveWorkUnit",
+        "IndustrialPark",
+        "Landfill",
+        "LodgeMeetingHall",
+        "LoftCreativeSpace",
+        "Lumberyard",
+        "ManuftrdHmsMoblHmPrk",
+        "Marina",
+        "MasterPlannedCommunity",
+        "Medical",
+        "Motel",
+        "MovieTheater",
+        "MovieRadioTVStudio",
+        "NeighborhoodCenter",
+        "OfficePark",
+        "OpenSpace",
+        "OutletCenter",
+        "ParkingGarage",
+        "ParkingLot",
+        "PlannedUnitDevelopment",
+        "PoliceFireStation",
+        "PostOffice",
+        "PowerCenter",
+        "PublicLibrary",
+        "PublicPark",
+        "PublicSwimmingPool",
+        "RAndD",
+        "RaceTrack",
+        "RadioTVTransmnFacility",
+        "RailroadYard",
+        "RecyclingCenter",
+        "RefrigerationColdStor",
+        "RegionalMall",
+        "RehabilitationCenter",
+        "ReligiousFacility",
+        "Restaurant",
+        "RetailWarehouse",
+        "Schools",
+        "SelfStorage",
+        "ServiceStation",
+        "Shelter",
+        "Shipyard",
+        "SingleFamilyDevelopment",
+        "SkatingRink",
+        "SpcltyFestvlEntertnmnt",
+        "Storefront",
+        "StorefrontRetailOffice",
+        "StorefrntRetailResidntl",
+        "StripCenter",
+        "Supermarket",
+        "TheaterConcertHall",
+        "TrailerCamperPark",
+        "TruckStop",
+        "TruckTerminal",
+        "UnknownProposedLandUse",
+        "UtilitySubStation",
+        "VeterinarianKennel",
+        "Warehouse",
+        "WaterRetentionFacility",
+        "WaterTreatmentFacility",
+        "WineryVineyard",
+        "AmusementPark",
+        "Agricultural",
+        "Agribusiness",
+        "PastureRanch",
+        "Timberland",
+        "SingleFamilyResidence",
+        "DataCenters"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Commercial\n2 = Industrial\n3 = Retail\n4 = Office\n5 = MixedUse\n6 = Multifamily\n7 = Hospitality\n8 = AirplaneHangar\n9 = Airport\n10 = ApartmentUnits\n11 = ApartmentUnitsCondo\n12 = ApartmentUnitsDorms\n13 = ApartmentUnitsSenior\n14 = ApartmentUnitsSubsidized\n15 = AutoDealership\n16 = AutoRepair\n17 = AutoSalvageFacility\n18 = Bank\n19 = Bar\n20 = BaseballField\n21 = BowlingAlley\n22 = Carwash\n23 = Casino\n24 = CementGravelPlant\n25 = CemeteryMausoleum\n26 = ChemicalOilRefinery\n27 = CommunityCenter\n28 = ContractorStorageYard\n29 = ConvenienceStore\n30 = CorrectionalFacility\n31 = DaycareCenter\n32 = DepartmentStore\n33 = Distribution\n34 = Drugstore\n35 = FastFood\n36 = FoodProcessing\n37 = FuneralHome\n38 = GardenCenter\n39 = GeneralFreestanding\n40 = GolfCourseDrivingRange\n41 = Healthcare\n42 = HealthClub\n43 = HoldForDevelopment\n44 = HoldForInvestment\n45 = HorseStables\n46 = Hospital\n47 = Hotel\n48 = IndustrialLiveWorkUnit\n49 = IndustrialPark\n50 = Landfill\n51 = LodgeMeetingHall\n52 = LoftCreativeSpace\n53 = Lumberyard\n54 = ManuftrdHmsMoblHmPrk\n55 = Marina\n56 = MasterPlannedCommunity\n57 = Medical\n58 = Motel\n59 = MovieTheater\n60 = MovieRadioTVStudio\n61 = NeighborhoodCenter\n62 = OfficePark\n63 = OpenSpace\n64 = OutletCenter\n65 = ParkingGarage\n66 = ParkingLot\n67 = PlannedUnitDevelopment\n68 = PoliceFireStation\n69 = PostOffice\n70 = PowerCenter\n71 = PublicLibrary\n72 = PublicPark\n73 = PublicSwimmingPool\n74 = RAndD\n75 = RaceTrack\n76 = RadioTVTransmnFacility\n77 = RailroadYard\n78 = RecyclingCenter\n79 = RefrigerationColdStor\n80 = RegionalMall\n81 = RehabilitationCenter\n82 = ReligiousFacility\n83 = Restaurant\n84 = RetailWarehouse\n85 = Schools\n86 = SelfStorage\n87 = ServiceStation\n88 = Shelter\n89 = Shipyard\n90 = SingleFamilyDevelopment\n91 = SkatingRink\n92 = SpcltyFestvlEntertnmnt\n93 = Storefront\n94 = StorefrontRetailOffice\n95 = StorefrntRetailResidntl\n96 = StripCenter\n97 = Supermarket\n98 = TheaterConcertHall\n99 = TrailerCamperPark\n100 = TruckStop\n101 = TruckTerminal\n102 = UnknownProposedLandUse\n103 = UtilitySubStation\n104 = VeterinarianKennel\n105 = Warehouse\n106 = WaterRetentionFacility\n107 = WaterTreatmentFacility\n108 = WineryVineyard\n109 = AmusementPark\n110 = Agricultural\n111 = Agribusiness\n112 = PastureRanch\n113 = Timberland\n114 = SingleFamilyResidence\n115 = DataCenters"
+    },
+    "SaleCondition": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "DistressSale",
+        "TenThreeOneExchange",
+        "SaleLeaseback",
+        "GroundLeaseLeasehold",
+        "GroundLeaseLeasedFee",
+        "InvestmentTripleNet",
+        "DirectExchange",
+        "Assemblage",
+        "AuctionSale",
+        "BuildToSuit",
+        "BulkPortfolioSale",
+        "BusinessValueIncluded",
+        "CondoConversion",
+        "DeedRestriction",
+        "EstateProbateSale",
+        "HistoricalSite",
+        "LeaseOption",
+        "BuildingContaminationIssue",
+        "DeferredMaintenance",
+        "DoubleEscrow",
+        "ExerciseOfOption",
+        "ExcessLand",
+        "Expansion",
+        "HighVacancyProperty",
+        "LandContract",
+        "PartialInterestTransfer",
+        "PurchaseByTenant",
+        "RedevelopmentProject",
+        "RollingOptionTakedown",
+        "SoilContaminationIssue",
+        "BuildingInShellCondition",
+        "RealEstateOwnedSale",
+        "ShortSale",
+        "ThreatOfCondemnation",
+        "CourtAppointedSale",
+        "Recapitalization",
+        "DebtAssumption",
+        "NotePurchase",
+        "BankruptcySale",
+        "ZeroCashFlowInvestment",
+        "LowIncomeHousingTaxCredit",
+        "EntityBuyMembershipInterests",
+        "CondoDeconversion",
+        "FurnitureFixturesAndEquipmentIncluded",
+        "HotelBrandChange",
+        "LongTermEncumbrances",
+        "ConversionProject",
+        "BuildingInLeaseUp",
+        "NonOperatingHotel",
+        "VEFA",
+        "ForwardFunding",
+        "ForwardCommitment"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = DistressSale\n2 = TenThreeOneExchange\n3 = SaleLeaseback\n4 = GroundLeaseLeasehold\n5 = GroundLeaseLeasedFee\n6 = InvestmentTripleNet\n7 = DirectExchange\n8 = Assemblage\n9 = AuctionSale\n11 = BuildToSuit\n12 = BulkPortfolioSale\n13 = BusinessValueIncluded\n14 = CondoConversion\n15 = DeedRestriction\n16 = EstateProbateSale\n17 = HistoricalSite\n18 = LeaseOption\n19 = BuildingContaminationIssue\n20 = DeferredMaintenance\n21 = DoubleEscrow\n22 = ExerciseOfOption\n23 = ExcessLand\n24 = Expansion\n25 = HighVacancyProperty\n26 = LandContract\n27 = PartialInterestTransfer\n28 = PurchaseByTenant\n29 = RedevelopmentProject\n30 = RollingOptionTakedown\n31 = SoilContaminationIssue\n32 = BuildingInShellCondition\n33 = RealEstateOwnedSale\n34 = ShortSale\n35 = ThreatOfCondemnation\n36 = CourtAppointedSale\n37 = Recapitalization\n38 = DebtAssumption\n39 = NotePurchase\n40 = BankruptcySale\n41 = ZeroCashFlowInvestment\n42 = LowIncomeHousingTaxCredit\n43 = EntityBuyMembershipInterests\n44 = CondoDeconversion\n45 = FurnitureFixturesAndEquipmentIncluded\n46 = HotelBrandChange\n47 = LongTermEncumbrances\n48 = ConversionProject\n49 = BuildingInLeaseUp\n50 = NonOperatingHotel\n51 = VEFA\n52 = ForwardFunding\n53 = ForwardCommitment"
+    },
+    "SaleFinancingType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Yes",
+        "No"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Yes\n2 = No"
+    },
+    "SaleMethod": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "StandardSale",
+        "Auction",
+        "ExpressionOfInterest",
+        "Tender"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = StandardSale\n2 = Auction\n3 = ExpressionOfInterest\n4 = Tender"
+    },
+    "SaleType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Investment",
+        "OwnerUser",
+        "InvestmentOrOwnerUser"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Investment\n2 = OwnerUser\n3 = InvestmentOrOwnerUser"
+    },
+    "CompSourceType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "ForSaleOffMarket",
+        "PressRelease",
+        "SecFilings",
+        "NewsStories",
+        "CountyWebsites",
+        "Ace",
+        "Fares",
+        "Accudata",
+        "SkldDeeds",
+        "SkldWarrantyDeeds",
+        "DupageAssessor",
+        "KingAssessor",
+        "Foxdata",
+        "Crain",
+        "WarrenGroup",
+        "RecordInformationServices",
+        "PowerBrokerSubmission",
+        "Teranet",
+        "ListingManager",
+        "BritishColumbiaAssessment",
+        "CoreLogic",
+        "HmLandRegistry",
+        "EquifaxQuebec",
+        "Mpac",
+        "LightBox",
+        "Tenx",
+        "Preqin",
+        "FirstAmerican",
+        "BlackKnight",
+        "Explore",
+        "RegistersOfScotland",
+        "DemandesDeValeursFoncieres",
+        "NSWValuerGeneral"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = ForSaleOffMarket\n3 = PressRelease\n4 = SecFilings\n5 = NewsStories\n6 = CountyWebsites\n7 = Ace\n8 = Fares\n9 = Accudata\n10 = SkldDeeds\n11 = SkldWarrantyDeeds\n12 = DupageAssessor\n13 = KingAssessor\n14 = Foxdata\n15 = Crain\n16 = WarrenGroup\n17 = RecordInformationServices\n18 = PowerBrokerSubmission\n19 = Teranet\n21 = ListingManager\n22 = BritishColumbiaAssessment\n23 = CoreLogic\n24 = HmLandRegistry\n25 = EquifaxQuebec\n26 = Mpac\n27 = LightBox\n28 = Tenx\n29 = Preqin\n30 = FirstAmerican\n31 = BlackKnight\n32 = Explore\n33 = RegistersOfScotland\n34 = DemandesDeValeursFoncieres\n35 = NSWValuerGeneral"
+    },
+    "Tenure": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Freehold",
+        "LongLeasehold",
+        "FreeholdLongLeasehold"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Freehold\n2 = LongLeasehold\n3 = FreeholdLongLeasehold"
+    },
+    "AssessmentSourceType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "CountyWebsite",
+        "FirstAmerican",
+        "Other"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = CountyWebsite\n2 = FirstAmerican\n3 = Other"
+    },
+    "TaxStampType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Exempt",
+        "Blank",
+        "Partial",
+        "Full",
+        "Zero"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Exempt\n2 = Blank\n3 = Partial\n4 = Full\n5 = Zero"
+    },
+    "VerificationField": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Price",
+        "RBA",
+        "BuyersCap",
+        "SellersCap",
+        "GBA",
+        "GLA",
+        "LandArea"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Price\n2 = RBA\n3 = BuyersCap\n4 = SellersCap\n5 = GBA\n6 = GLA\n7 = LandArea"
+    },
+    "VerificationSource": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "OtherNoCall",
+        "DocInspection",
+        "PressRelease",
+        "SecCmbs",
+        "SalesReportForm",
+        "ListingBroker",
+        "BuyerBroker",
+        "BuyerOrRep",
+        "SellerOrRep",
+        "OtherCall"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = OtherNoCall\n2 = DocInspection\n3 = PressRelease\n4 = SecCmbs\n5 = SalesReportForm\n6 = ListingBroker\n7 = BuyerBroker\n8 = BuyerOrRep\n9 = SellerOrRep\n10 = OtherCall"
+    }
+  }
+}

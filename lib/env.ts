@@ -4,9 +4,11 @@ const schema = z.object({
   DATABASE_PATH: z.string().default("data/sharefly.db"),
   SESSION_SECRET: z.string().min(16).default("dev-only-secret-change-me-please"),
   DEMO_MODE: z.enum(["true", "false"]).default("false"),
-  AI_PROVIDER: z.enum(["anthropic", "mock", "none"]).default("none"),
+  AI_PROVIDER: z.enum(["anthropic", "gemini", "mock", "none"]).default("none"),
   ANTHROPIC_API_KEY: z.string().optional(),
   ANTHROPIC_MODEL: z.string().default("claude-sonnet-5-5"),
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_MODEL: z.string().default("gemini-3.5-flash"),
 });
 
 export function getEnv() {

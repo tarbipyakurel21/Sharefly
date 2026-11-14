@@ -1,0 +1,1235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ApartmentListing",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Id of the listing: one apartment community's rental listing. It is unique in the file, and so is `propertyId`."
+    },
+    "propertyId": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Id of the community, the `id` of its commercial-property record."
+    },
+    "buildingName": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Marketing name of the community, such as `City Lights on Fig`. Empty on 59 records."
+    },
+    "address": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ApartmentListingAddress"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Street address of the community: the property's primary address, with latitude and longitude."
+    },
+    "yearBuilt": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Year the community was built."
+    },
+    "totalNumUnits": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Number of units in the community."
+    },
+    "totalActiveUnits": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Number of units across the floor plans in `apartmentModels`; the sum of their `numUnits`. It equals `totalNumUnits` on 1,597 records."
+    },
+    "numUnitsAvailable": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Number of units that can be rented now, the sum of the floor plans' `numUnitsAvailable`. Null on 11 records and 0 on 70."
+    },
+    "minRent": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Lowest asking rent across the community's floor plans, in dollars per month. 0 means no rent was given (571 records)."
+    },
+    "maxRent": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Highest asking rent across the community's floor plans, in dollars per month."
+    },
+    "monetaryUnit": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MonetaryUnit"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Currency of the rents: 1 (US dollars) on 1,665 records and 0 (Unknown) on 82. Every community is in Texas or California."
+    },
+    "minSquareFeet": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Size of the smallest unit across the floor plans, in square feet."
+    },
+    "maxSquareFeet": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Size of the largest unit across the floor plans, in square feet."
+    },
+    "lifestyleType": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ApartmentLifestyleType"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Who the community is for: 1 (All) the general market, 2 Senior, 3 Student, 5 Corporate. 0 on 4 records."
+    },
+    "primarySubmarketId": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Id of the community's CoStar submarket, as `primarySubmarketId` on the property record. The kit has ids only."
+    },
+    "propertyManagementCompanyId": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Id of the company location that manages the community. It joins to company-detail `id` on 1,072 records."
+    },
+    "propertyManagementCompanyName": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Name of the management company, such as `Greystar Real Estate Partners`."
+    },
+    "propertyManagementCompanyHqLocationId": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Id of the management company's headquarters location. It joins to company-detail `id` on 116 records."
+    },
+    "primaryPhoto": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ApartmentListingPhoto"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The community's main photo."
+    },
+    "apartmentModels": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ApartmentListingFloorPlan"
+      },
+      "description": "The community's floor plans, one entry each, with units, availability, size and asking rent."
+    }
+  },
+  "$defs": {
+    "ApartmentListingAddress": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the address; equals `primaryAddress.id` on the property record."
+        },
+        "streetNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Street number, as text."
+        },
+        "streetNumberEndRange": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Last street number when the address covers a range."
+        },
+        "streetDirection": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Direction before the street name, such as `S` or `NW`."
+        },
+        "streetName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Street name without its type."
+        },
+        "streetType": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Street type, such as `St`, `Ave` or `Blvd`."
+        },
+        "streetSuffix": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Direction after the street name, such as `SW`."
+        },
+        "buildingNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Building number or name within a complex."
+        },
+        "crossStreetDescription": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Nearest cross street, as text."
+        },
+        "city": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "City."
+        },
+        "countyId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "CoStar id of the county."
+        },
+        "state": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Two-letter state code: `TX` or `CA`."
+        },
+        "postCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "ZIP code, five or nine digits without a hyphen."
+        },
+        "countryCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Three-letter country code, `USA` on every record."
+        },
+        "latitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Latitude of the address, in decimal degrees."
+        },
+        "longitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Longitude of the address, in decimal degrees."
+        }
+      }
+    },
+    "ApartmentListingPhoto": {
+      "type": "object",
+      "properties": {
+        "attachmentMasterId": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the photo. The same id is in the property record's `attachments` on 1,061 records."
+        },
+        "attachmentType": {
+          "$ref": "#/$defs/AttachmentType",
+          "description": "Kind of photo: 4 (BuildingPhoto) on 1,432 records, 33 (InteriorPhoto) on 304 and 6 (Lobby) on 11."
+        },
+        "attachmentTypeExtension": {
+          "$ref": "#/$defs/AttachmentTypeExtension",
+          "description": "File type: 6 (Jpg) or 9 (Png)."
+        },
+        "caption": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Caption of the photo, on 1,277 records."
+        },
+        "attachmentUri": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Link to the photo on CoStar's CDN at image size 112 (up to 1,880 by 900 pixels). Replace the `/112/` segment with 113 (1,400×720) or 116 (2,048×2,048) for another size."
+        }
+      }
+    },
+    "ApartmentListingFloorPlan": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the floor plan; equals `propertyApartment.models[].id` on the property record, which carries the plan's amenities, attachments and units."
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the floor plan, such as `1x1` or `The Madison`. Empty on 277 plans."
+        },
+        "numUnits": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of units with this floor plan."
+        },
+        "numUnitsAvailable": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Number of those units that can be rented now. Null on 679 plans."
+        },
+        "numBeds": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Bedrooms; 0 is a studio."
+        },
+        "numBaths": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float",
+          "description": "Bathrooms, with half and quarter baths as decimals, such as 1.5 or 2.25."
+        },
+        "maxOccupants": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Most occupants allowed in a unit, where given (1,520 plans)."
+        },
+        "minSquareFeet": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Size of the smallest unit with this floor plan, in square feet."
+        },
+        "maxSquareFeet": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Size of the largest unit with this floor plan, in square feet."
+        },
+        "minRent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Lowest asking rent for this floor plan, in dollars per month on the basis `rentPricingType` gives. 0 means no rent was given (4,364 plans); null on 506."
+        },
+        "maxRent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Highest asking rent for this floor plan, in dollars per month."
+        },
+        "monetaryUnit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MonetaryUnit"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Currency of the plan's rents: 1 (US dollars) or 0 (Unknown, 532 plans)."
+        },
+        "rentPricingType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RentPricingType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Basis of the rent: 1 (PerUnit) on 23,467 plans, 2 (PerBed, student housing rented by the bed) on 319, 3 (PerBedroom) on 20."
+        }
+      }
+    },
+    "MonetaryUnit": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "UnitedStatesDollar",
+        "CanadianDollar",
+        "PoundSterling",
+        "Euro",
+        "AustralianDollar",
+        "BrazilianReal",
+        "SwissFranc",
+        "JapaneseYen",
+        "SingaporeDollar",
+        "HongKongDollar",
+        "ChineseYuan",
+        "UnitedArabEmiratesDirham",
+        "AfghanistanAfghani",
+        "AlbanianLek",
+        "ArmenianDram",
+        "NetherlandsAntilleanGuilder",
+        "AngolanKwanza",
+        "ArgentinaPeso",
+        "ArubanGuilder",
+        "AzerbaijanNewManat",
+        "BosnianMark",
+        "BarbadosDollar",
+        "BangladeshTaka",
+        "BulgarianLev",
+        "BurundiFranc",
+        "BermudianDollars",
+        "BruneiDollars",
+        "BolivianBoliviano",
+        "BahamianDollar",
+        "Bitcoin",
+        "BotswanianPula",
+        "BelarusianRuble",
+        "BelizeDollar",
+        "CongoleseFranc",
+        "ChileanPeso",
+        "ColombianPeso",
+        "CostaRicanColon",
+        "CubanPeso",
+        "CapeVerdeEscudo",
+        "CzechKoruna",
+        "DjiboutiFranc",
+        "DanishKrone",
+        "DominicanPeso",
+        "AlgerianDinar",
+        "EgyptianPound",
+        "EthiopianBirr",
+        "FijiDollars",
+        "GeorgianLari",
+        "GhanaianNewCedi",
+        "GambianDalasi",
+        "GuineanFranc",
+        "GuatemalanQuetzal",
+        "GuyanaDollar",
+        "HondurasLempira",
+        "CroatianKuna",
+        "HaitianGourde",
+        "HungarianForint",
+        "IndonesianRupiah",
+        "IsraeliShekel",
+        "IndianRupee",
+        "IraqiDinar",
+        "IranianRial",
+        "IcelandKrona",
+        "JamaicanDollar",
+        "JordanDinar",
+        "KenyanShilling",
+        "KyrgyzstaniSom",
+        "CambodiaRiel",
+        "ComorosFranc",
+        "SouthKoreanWon",
+        "KuwaitiDinar",
+        "CaymanIslandDollar",
+        "KazakhstaniTenge",
+        "LaoKip",
+        "LebanesePound",
+        "SriLankanRupee",
+        "LiberianDollar",
+        "LesothoLoti",
+        "LibyanDinar",
+        "MoroccanDirham",
+        "MoldovanLeu",
+        "MalagasyAriary",
+        "MyanmarKyat",
+        "MacauPataca",
+        "MauritanianQuguiya",
+        "MauritiusRupee",
+        "MaldivesRufiyaa",
+        "MalawiKwacha",
+        "MexicanPeso",
+        "MalaysianRinggit",
+        "MozambiqueNewMetical",
+        "NamibianDollar",
+        "NigerianNaira",
+        "NicaraguanCordobaOro",
+        "NorwegianKrone",
+        "NepalRupee",
+        "NewZealandDollar",
+        "OmaniRial",
+        "PanameanBalboa",
+        "PeruvianNuevoSol",
+        "PapuaNewGuineaKina",
+        "PhilippinePeso",
+        "PakistaniRupee",
+        "PolishZloty",
+        "ParaguayanGuarani",
+        "QatarRiyal",
+        "NewRomanianLeu",
+        "SerbianDinar",
+        "RussianRuble",
+        "RwandanFranc",
+        "SaudiRiyal",
+        "SolomonIslandsDollar",
+        "SeychellesRupee",
+        "SudanesePound",
+        "SwedishKrona",
+        "SierraLeoneLeone",
+        "SomaliShilling",
+        "SurinameDollar",
+        "SaoTomeanDobra",
+        "ElSalvadorColon",
+        "SwazilandLilangeni",
+        "ThailandBaht",
+        "TajikistanSomoni",
+        "TurkmenNewManat",
+        "TunisianDinar",
+        "TonganPaanga",
+        "TurkishLira",
+        "TrinidadianDollar",
+        "TaiwanDollar",
+        "TanzanianShilling",
+        "UkrainianHryvnia",
+        "UgandanShilling",
+        "UruguayPeso",
+        "UzbekistaniSom",
+        "VenezuelanBolivarSoberano",
+        "VietnameseDong",
+        "CentralAfricanFranc",
+        "EastCaribbeanDollar",
+        "WestAfricanFranc",
+        "FrenchPacificIslandsFranc",
+        "YemenRial",
+        "SouthAfricanRand",
+        "ZambianKwacha",
+        "BahrainiDinar",
+        "EritreanNakfa",
+        "FalklandIslandsPound",
+        "GibraltarPound",
+        "NorthKoreanWon",
+        "MongolianTughrik",
+        "SaintHelenaPound",
+        "SyrianPound",
+        "VanuatuVatu",
+        "ZimbabweanDollar",
+        "SamoanTala",
+        "BhutaneseNgultrum",
+        "MacedonianDenar"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = UnitedStatesDollar\n2 = CanadianDollar\n3 = PoundSterling\n4 = Euro\n5 = AustralianDollar\n6 = BrazilianReal\n7 = SwissFranc\n8 = JapaneseYen\n9 = SingaporeDollar\n10 = HongKongDollar\n11 = ChineseYuan\n12 = UnitedArabEmiratesDirham\n13 = AfghanistanAfghani\n14 = AlbanianLek\n15 = ArmenianDram\n16 = NetherlandsAntilleanGuilder\n17 = AngolanKwanza\n18 = ArgentinaPeso\n19 = ArubanGuilder\n20 = AzerbaijanNewManat\n21 = BosnianMark\n22 = BarbadosDollar\n23 = BangladeshTaka\n24 = BulgarianLev\n25 = BurundiFranc\n26 = BermudianDollars\n27 = BruneiDollars\n28 = BolivianBoliviano\n29 = BahamianDollar\n30 = Bitcoin\n31 = BotswanianPula\n32 = BelarusianRuble\n33 = BelizeDollar\n34 = CongoleseFranc\n35 = ChileanPeso\n36 = ColombianPeso\n37 = CostaRicanColon\n38 = CubanPeso\n39 = CapeVerdeEscudo\n40 = CzechKoruna\n41 = DjiboutiFranc\n42 = DanishKrone\n43 = DominicanPeso\n44 = AlgerianDinar\n45 = EgyptianPound\n46 = EthiopianBirr\n47 = FijiDollars\n48 = GeorgianLari\n49 = GhanaianNewCedi\n50 = GambianDalasi\n51 = GuineanFranc\n52 = GuatemalanQuetzal\n53 = GuyanaDollar\n54 = HondurasLempira\n55 = CroatianKuna\n56 = HaitianGourde\n57 = HungarianForint\n58 = IndonesianRupiah\n59 = IsraeliShekel\n60 = IndianRupee\n61 = IraqiDinar\n62 = IranianRial\n63 = IcelandKrona\n64 = JamaicanDollar\n65 = JordanDinar\n66 = KenyanShilling\n67 = KyrgyzstaniSom\n68 = CambodiaRiel\n69 = ComorosFranc\n70 = SouthKoreanWon\n71 = KuwaitiDinar\n72 = CaymanIslandDollar\n73 = KazakhstaniTenge\n74 = LaoKip\n75 = LebanesePound\n76 = SriLankanRupee\n77 = LiberianDollar\n78 = LesothoLoti\n79 = LibyanDinar\n80 = MoroccanDirham\n81 = MoldovanLeu\n82 = MalagasyAriary\n83 = MyanmarKyat\n84 = MacauPataca\n85 = MauritanianQuguiya\n86 = MauritiusRupee\n87 = MaldivesRufiyaa\n88 = MalawiKwacha\n89 = MexicanPeso\n90 = MalaysianRinggit\n91 = MozambiqueNewMetical\n92 = NamibianDollar\n93 = NigerianNaira\n94 = NicaraguanCordobaOro\n95 = NorwegianKrone\n96 = NepalRupee\n97 = NewZealandDollar\n98 = OmaniRial\n99 = PanameanBalboa\n100 = PeruvianNuevoSol\n101 = PapuaNewGuineaKina\n102 = PhilippinePeso\n103 = PakistaniRupee\n104 = PolishZloty\n105 = ParaguayanGuarani\n106 = QatarRiyal\n107 = NewRomanianLeu\n108 = SerbianDinar\n109 = RussianRuble\n110 = RwandanFranc\n111 = SaudiRiyal\n112 = SolomonIslandsDollar\n113 = SeychellesRupee\n114 = SudanesePound\n115 = SwedishKrona\n116 = SierraLeoneLeone\n117 = SomaliShilling\n118 = SurinameDollar\n119 = SaoTomeanDobra\n120 = ElSalvadorColon\n121 = SwazilandLilangeni\n122 = ThailandBaht\n123 = TajikistanSomoni\n124 = TurkmenNewManat\n125 = TunisianDinar\n126 = TonganPaanga\n127 = TurkishLira\n128 = TrinidadianDollar\n129 = TaiwanDollar\n130 = TanzanianShilling\n131 = UkrainianHryvnia\n132 = UgandanShilling\n133 = UruguayPeso\n134 = UzbekistaniSom\n135 = VenezuelanBolivarSoberano\n136 = VietnameseDong\n137 = CentralAfricanFranc\n138 = EastCaribbeanDollar\n139 = WestAfricanFranc\n140 = FrenchPacificIslandsFranc\n141 = YemenRial\n142 = SouthAfricanRand\n143 = ZambianKwacha\n144 = BahrainiDinar\n145 = EritreanNakfa\n146 = FalklandIslandsPound\n147 = GibraltarPound\n148 = NorthKoreanWon\n149 = MongolianTughrik\n150 = SaintHelenaPound\n151 = SyrianPound\n152 = VanuatuVatu\n153 = ZimbabweanDollar\n154 = SamoanTala\n155 = BhutaneseNgultrum\n156 = MacedonianDenar"
+    },
+    "ApartmentLifestyleType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "All",
+        "Senior",
+        "Student",
+        "Military",
+        "Corporate",
+        "Vacation"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = All\n2 = Senior\n3 = Student\n4 = Military\n5 = Corporate\n6 = Vacation"
+    },
+    "AttachmentType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Aerial",
+        "Financial",
+        "PrimaryPhoto",
+        "BuildingPhoto",
+        "VirtualTour",
+        "Lobby",
+        "Other",
+        "MarketingBrochureFlyer",
+        "PlatMap",
+        "FloorPlan",
+        "SitePlan",
+        "TypicalFloorPlan",
+        "Slate",
+        "PrimaryContactPhoto",
+        "Logo",
+        "Map",
+        "SixteenSquarePng",
+        "TwentyFourSquarePng",
+        "TenantPhoto",
+        "LeaseDocument",
+        "PublicFiling",
+        "Deed",
+        "TransferTaxDeclaration",
+        "PropertyRecordCard",
+        "AssignmentOfRentsAndLeases",
+        "Loan",
+        "Article",
+        "PressRelease",
+        "SecFiling",
+        "CompanyReport",
+        "MediaSource",
+        "DirectoryPhoto",
+        "InteriorPhoto",
+        "GoadMap",
+        "CommunityBrochure",
+        "PlacardLogo",
+        "PropertyLogo",
+        "ConstructionPhoto",
+        "ReinforcingAdvertisement",
+        "Video",
+        "CityPhoto",
+        "NeighborhoodPhoto",
+        "Matterport3DScan",
+        "ProVideoApartmentFinder",
+        "ConfidentialityAgreement",
+        "ProVideoApartamentos",
+        "CommercialListingVideo",
+        "MarketingLogo",
+        "ProVideoLoopNet",
+        "State",
+        "County",
+        "MilitaryBase",
+        "CollegeUniversity",
+        "ArticleVideo",
+        "AerialVideo",
+        "ThermalVideo",
+        "UavVideo",
+        "ProVideoForRent",
+        "PlacardPrimaryPhoto",
+        "ShortUavVideo",
+        "PlacardLogoVector",
+        "PlaneView",
+        "ProfileCoverDesktop",
+        "PlacardHighlightPhoto",
+        "PlacardHighlightVideo",
+        "AmenityPhoto",
+        "AmenityVideo",
+        "ProfileCoverMobileResidential",
+        "ProfileCoverDesktopCommercial",
+        "ProfileCoverMobileCommercial",
+        "LandRegistry",
+        "CollegeLogo",
+        "TenantExternalPhoto",
+        "TenantInternalPhoto",
+        "PylonPhoto",
+        "StockPhoto",
+        "CoverPagePhoto",
+        "SpaceManagerPhoto",
+        "ResidentialListingVideo",
+        "OfferingMemorandum",
+        "BrandExteriorPhoto",
+        "BrandInteriorPhoto",
+        "NeighborhoodVideo",
+        "NeighborhoodVideoClip",
+        "ParkVideo",
+        "ParkVideoClip",
+        "SchoolVideo",
+        "SchoolVideoClip",
+        "PropertyGuideVideo",
+        "PropertyGuideVideoClip",
+        "VideoProjectFile",
+        "AudioFile",
+        "ProductionScript",
+        "ParkPhoto",
+        "SchoolPhoto",
+        "CaseDocument",
+        "ViewFromUnit",
+        "AgentVideo",
+        "AgentVideoClip",
+        "StockVideo",
+        "RetailBrandRequirement",
+        "NeighborhoodEventPhoto",
+        "CityVideo",
+        "CityVideoClip",
+        "TransportationLogo",
+        "TextMessagePhoto",
+        "AgencyFees",
+        "MarketingHeroImage",
+        "AreaGuidePhoto",
+        "AreaGuideVideoClip",
+        "AreaGuideVideo",
+        "FloorPlanElevation",
+        "CommunityCollectionPhoto",
+        "FieldLeadSignPhoto",
+        "CommunityImage",
+        "SpecificationSheet",
+        "CommunityBoundary",
+        "CommunityCollectionVideo",
+        "FloorPlanVideo",
+        "GOADMarketingParticulars",
+        "CommunityCollectionVideoShortHorizontal",
+        "CommunityCollectionVideoShortVertical",
+        "CommunityCollectionVideoShortSquare",
+        "SquareLogo",
+        "CommunityCollectionVideoClip",
+        "FloorPlanVideoClip",
+        "GaussianFlyover",
+        "GaussianFlyoverRaw",
+        "CommunityVideo",
+        "CommunityVideoClip",
+        "MatterportCommunity",
+        "ExteriorPhoto",
+        "MatterportCommunityThumbnailVideo",
+        "CommonAreaPhoto",
+        "RawPhoto"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Aerial\n2 = Financial\n3 = PrimaryPhoto\n4 = BuildingPhoto\n5 = VirtualTour\n6 = Lobby\n7 = Other\n8 = MarketingBrochureFlyer\n9 = PlatMap\n10 = FloorPlan\n11 = SitePlan\n12 = TypicalFloorPlan\n13 = Slate\n14 = PrimaryContactPhoto\n15 = Logo\n16 = Map\n17 = SixteenSquarePng\n18 = TwentyFourSquarePng\n19 = TenantPhoto\n20 = LeaseDocument\n21 = PublicFiling\n22 = Deed\n23 = TransferTaxDeclaration\n24 = PropertyRecordCard\n25 = AssignmentOfRentsAndLeases\n26 = Loan\n27 = Article\n28 = PressRelease\n29 = SecFiling\n30 = CompanyReport\n31 = MediaSource\n32 = DirectoryPhoto\n33 = InteriorPhoto\n34 = GoadMap\n35 = CommunityBrochure\n36 = PlacardLogo\n37 = PropertyLogo\n38 = ConstructionPhoto\n39 = ReinforcingAdvertisement\n40 = Video (also ProVideoApartments)\n41 = CityPhoto\n42 = NeighborhoodPhoto\n43 = Matterport3DScan\n44 = ProVideoApartmentFinder\n45 = ConfidentialityAgreement\n46 = ProVideoApartamentos\n47 = CommercialListingVideo\n48 = MarketingLogo\n49 = ProVideoLoopNet\n50 = State\n51 = County\n52 = MilitaryBase\n53 = CollegeUniversity\n54 = ArticleVideo\n55 = AerialVideo\n56 = ThermalVideo\n57 = UavVideo\n58 = ProVideoForRent\n59 = PlacardPrimaryPhoto\n60 = ShortUavVideo\n61 = PlacardLogoVector\n62 = PlaneView\n63 = ProfileCoverDesktop (also CoverPhoto, ProfileCoverDesktopResidential)\n64 = PlacardHighlightPhoto\n65 = PlacardHighlightVideo\n66 = AmenityPhoto\n67 = AmenityVideo\n68 = ProfileCoverMobileResidential (also ProfileCoverMobile)\n69 = ProfileCoverDesktopCommercial\n70 = ProfileCoverMobileCommercial\n71 = LandRegistry\n72 = CollegeLogo\n73 = TenantExternalPhoto\n74 = TenantInternalPhoto\n75 = PylonPhoto\n76 = StockPhoto\n77 = CoverPagePhoto\n78 = SpaceManagerPhoto\n79 = ResidentialListingVideo\n80 = OfferingMemorandum\n81 = BrandExteriorPhoto\n82 = BrandInteriorPhoto\n83 = NeighborhoodVideo\n84 = NeighborhoodVideoClip\n85 = ParkVideo\n86 = ParkVideoClip\n87 = SchoolVideo\n88 = SchoolVideoClip\n89 = PropertyGuideVideo (also CondoBuildingVideo)\n90 = PropertyGuideVideoClip (also CondoBuildingVideoClip)\n91 = VideoProjectFile\n92 = AudioFile\n93 = ProductionScript\n94 = ParkPhoto\n95 = SchoolPhoto\n96 = CaseDocument\n97 = ViewFromUnit\n98 = AgentVideo\n99 = AgentVideoClip\n100 = StockVideo\n101 = RetailBrandRequirement\n102 = NeighborhoodEventPhoto\n103 = CityVideo\n104 = CityVideoClip\n105 = TransportationLogo\n106 = TextMessagePhoto\n107 = AgencyFees\n108 = MarketingHeroImage\n109 = AreaGuidePhoto\n110 = AreaGuideVideoClip\n111 = AreaGuideVideo\n112 = FloorPlanElevation\n113 = CommunityCollectionPhoto (also CommunityProjectImage, CommunityProjectPhoto)\n114 = FieldLeadSignPhoto\n115 = CommunityImage (also CommunityPhoto)\n116 = SpecificationSheet\n117 = CommunityBoundary\n118 = CommunityCollectionVideo\n119 = FloorPlanVideo\n120 = GOADMarketingParticulars\n121 = CommunityCollectionVideoShortHorizontal\n122 = CommunityCollectionVideoShortVertical\n123 = CommunityCollectionVideoShortSquare\n124 = SquareLogo\n125 = CommunityCollectionVideoClip\n126 = FloorPlanVideoClip\n127 = GaussianFlyover (also MatterportExterior)\n128 = GaussianFlyoverRaw\n129 = CommunityVideo\n130 = CommunityVideoClip\n131 = MatterportCommunity\n132 = ExteriorPhoto\n133 = MatterportCommunityThumbnailVideo\n134 = CommonAreaPhoto\n135 = RawPhoto"
+    },
+    "AttachmentTypeExtension": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Bmp",
+        "Csv",
+        "Doc",
+        "Gif",
+        "Htm",
+        "Jpg",
+        "Msg",
+        "Pdf",
+        "Png",
+        "Rtf",
+        "Tif",
+        "Txt",
+        "Xls",
+        "Ppt",
+        "Arg",
+        "Ipx",
+        "Mov",
+        "Bak",
+        "Bat",
+        "Cal",
+        "Cri",
+        "Dat",
+        "Dbf",
+        "Dbt",
+        "Eps",
+        "Eqy",
+        "Err",
+        "Exe",
+        "Fxp",
+        "Htt",
+        "Iax",
+        "Idx",
+        "Ind",
+        "Isx",
+        "Jbf",
+        "Ldb",
+        "Lnk",
+        "Log",
+        "Map",
+        "Mdb",
+        "Mid",
+        "Mif",
+        "Ntx",
+        "Psd",
+        "Sav",
+        "Tab",
+        "Td4",
+        "Tdo",
+        "Wor",
+        "Docx",
+        "Svg",
+        "Mp4",
+        "Mp3",
+        "Wav",
+        "Xlsx",
+        "Pptx",
+        "Prprod",
+        "Prproj",
+        "Aep",
+        "Xlsm",
+        "Eml",
+        "FCPT",
+        "DRP",
+        "Xml",
+        "Aif",
+        "Fcpxmld",
+        "Kml",
+        "Heic",
+        "Heif",
+        "Zip",
+        "Splat",
+        "Ply",
+        "Cr2",
+        "Cr3",
+        "Nef",
+        "Arw",
+        "Dng"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Bmp\n2 = Csv\n3 = Doc\n4 = Gif\n5 = Htm\n6 = Jpg\n7 = Msg\n8 = Pdf\n9 = Png\n10 = Rtf\n11 = Tif\n12 = Txt\n13 = Xls\n15 = Ppt\n16 = Arg\n17 = Ipx\n18 = Mov\n19 = Bak\n20 = Bat\n21 = Cal\n22 = Cri\n23 = Dat\n24 = Dbf\n25 = Dbt\n26 = Eps\n27 = Eqy\n28 = Err\n29 = Exe\n30 = Fxp\n31 = Htt\n32 = Iax\n33 = Idx\n34 = Ind\n35 = Isx\n36 = Jbf\n37 = Ldb\n38 = Lnk\n39 = Log\n40 = Map\n41 = Mdb\n42 = Mid\n43 = Mif\n44 = Ntx\n45 = Psd\n46 = Sav\n47 = Tab\n48 = Td4\n49 = Tdo\n50 = Wor\n51 = Docx\n52 = Svg\n53 = Mp4\n54 = Mp3\n55 = Wav\n56 = Xlsx\n57 = Pptx\n58 = Prprod\n59 = Prproj\n60 = Aep\n61 = Xlsm\n62 = Eml\n63 = FCPT\n64 = DRP\n65 = Xml\n66 = Aif\n67 = Fcpxmld\n68 = Kml\n69 = Heic\n70 = Heif\n71 = Zip\n72 = Splat\n73 = Ply\n74 = Cr2\n75 = Cr3\n76 = Nef\n77 = Arw\n78 = Dng"
+    },
+    "RentPricingType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "PerUnit",
+        "PerBed",
+        "PerBedroom"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = PerUnit\n2 = PerBed\n3 = PerBedroom"
+    }
+  }
+}
