@@ -1,0 +1,2442 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LocationOccupancy",
+  "type": "object",
+  "properties": {
+    "addressId": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Foreign key to the specific address/suite the tenant occupies within the property, for multi-address properties."
+    },
+    "expirationReason": {
+      "$ref": "#/$defs/LocationOccupancyExpirationReason",
+      "description": "Reason the occupancy ended (e.g. lease expiration, relocation), explaining tenant move-out and informing rollover analysis."
+    },
+    "fromDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Start date of the occupancy period; when the tenant's occupancy of the space begins, used for tenancy timelines and absorption."
+    },
+    "id": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Unique identifier of the tenant-occupancy record, representing one company's occupancy of space in a property over a date range."
+    },
+    "industryType": {
+      "$ref": "#/$defs/IndustryType",
+      "description": "Industry/business classification of the occupying tenant; for unknown tenants it captures the business type when the company is not yet identified."
+    },
+    "leaseDeal": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LeaseDeal"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The associated lease-deal record carrying the negotiated lease terms (rent, dates, escalations, concessions) for this occupancy when a lease comp exists."
+    },
+    "leaseType": {
+      "$ref": "#/$defs/LeaseType",
+      "description": "Lease arrangement governing the occupancy (direct lease, sublease, owner-occupied). For leasing-activity rollups Direct = relet + new space and Sublet = sublet + assignment space; owner leases of their own buildings are excluded."
+    },
+    "moveInDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Date the tenant physically moved into the space (occupancy event). Drives net/gross absorption — absorption is counted from move-in events on occupied space, not the lease sign date."
+    },
+    "propertyId": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Foreign key to the property in which the tenant occupies space; anchors the occupancy to the building."
+    },
+    "spaces": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/SpaceOccupied"
+      },
+      "description": "Collection of occupied-space records detailing the specific spaces/suites and square footage the tenant occupies within the property."
+    },
+    "tenantLocationId": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Foreign key to the Location (company node) that is the tenant occupying the space; null for an unknown/unidentified tenant."
+    },
+    "toDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "End date of the occupancy period; null while the tenant is still in place. Distinguishes current versus historical occupancies and rollover timing."
+    }
+  },
+  "$defs": {
+    "LeaseDeal": {
+      "type": "object",
+      "properties": {
+        "askingRate": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LeaseRate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Lessor's quoted asking rent for the space as a low/high per-SF range with rate basis; the asking rent flavor, distinct from contract and effective."
+        },
+        "askingRatePerMonth": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Asking rent expressed as a per-month total; mutually exclusive with the per-year and per-SF forms, set when an asking amount is entered."
+        },
+        "askingRatePerYear": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Asking rent expressed as a per-year total; mutually exclusive with the per-month and per-SF forms, set when an asking amount is entered."
+        },
+        "breakDates": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/LeaseBreakDate"
+          },
+          "description": "Collection of UK lease break dates at which the tenant may terminate early; rollover-risk inputs. State exposed separately via breakDatesState."
+        },
+        "breakDatesState": {
+          "$ref": "#/$defs/RecordStateType",
+          "description": "For the UK break-dates collection (early-exit points) on the lease."
+        },
+        "businessRatesPerYear": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Annual UK business rates (occupier property tax levied by the local authority) payable on the leased premises; a tenant occupancy cost shown on the Lease Comps financial terms as $/SF/Year."
+        },
+        "commencementDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Date the lease term begins; anchors term, free-rent and escalation schedules and is derived from sign or move-in date for renewals."
+        },
+        "concessions": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/LeaseDealConcession"
+          },
+          "description": "Collection of landlord concession records (TI allowances, free rent, other inducements) granted to the tenant that lower effective rent."
+        },
+        "contacts": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/LeaseDealContact"
+          },
+          "description": "Collection of contacts on the deal (landlord/leasing-company and tenant representatives)."
+        },
+        "effectiveRate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "User-entered effective rent per SF: NPV of net lease payments less TIA and other concessions, amortized over the term. The effective-rent flavor (never mix with asking or contract); can be negative when concessions exceed base rent."
+        },
+        "effectiveRateBasis": {
+          "$ref": "#/$defs/RateBasis",
+          "description": "Time basis (monthly/yearly) of the user-entered effective rate, needed to normalize effective rent to a common basis."
+        },
+        "effectiveRateCalculatedBasis": {
+          "$ref": "#/$defs/RateBasis",
+          "description": "Time basis of the system-calculated effective rate, populated from the effective-rent calculation result rather than user entry."
+        },
+        "effectiveRatePerMonth": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "User-entered effective rent expressed as a per-month total, the per-month form of the concession-and-escalation-adjusted effective rent."
+        },
+        "effectiveRatePerYear": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "User-entered effective rent expressed as a per-year total, the per-year form of the concession-and-escalation-adjusted effective rent."
+        },
+        "expansionOptionComment": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Free-text comment describing the expansion-option terms."
+        },
+        "expansionOptionDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Date the tenant may exercise the expansion option."
+        },
+        "expansionOptionSquareFeet": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Square footage covered by the tenant's expansion option."
+        },
+        "expansionOptionState": {
+          "$ref": "#/$defs/RecordStateType",
+          "description": "Whether the tenant holds an option to expand into additional space."
+        },
+        "expirationDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Date the lease term ends, derived from commencement date plus lease term (or earliest off-market sublet space)."
+        },
+        "freeMonths": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of free-rent (abated) months granted as a concession; an inducement that lowers effective rent. Displayed as 'XX Months at Start/End' or 'XX Months Total, Varying'. In the UK methodology free months are taken net of the 3-month fit-out period."
+        },
+        "freeRentMethodType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FreeRentMethodType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Method of applying free rent (e.g. months at start versus a detailed schedule), set automatically from free months and the schedule."
+        },
+        "freeRentSchedule": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/LeaseDealFreeRentSchedule"
+          },
+          "description": "Collection of free-rent schedule entries detailing which lease months carry free or discounted rent; a concession schedule feeding effective-rent calculation."
+        },
+        "grossAggregateValue": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Total gross value of the lease deal over its term before concessions; an aggregate deal-value figure used to size the transaction."
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Unique identifier of the lease deal (lease comp) record; the negotiated terms of an executed or pending lease."
+        },
+        "isLeaseTermMonthToMonth": {
+          "type": "boolean",
+          "description": "Whether the lease runs month-to-month rather than for a fixed term, indicating an open-ended tenancy."
+        },
+        "leaseDealSourceType": {
+          "$ref": "#/$defs/LeaseDealSourceType",
+          "description": "Code indicating the source/origin classification of the lease deal data (where the deal information came from)."
+        },
+        "leaseDealType": {
+          "$ref": "#/$defs/LeaseDealType",
+          "description": "Type of lease deal (e.g. new lease, renewal); renewal drives different commencement-date derivation than new/relet deals."
+        },
+        "leaseTerm": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Length of the lease in leaseTermType units; the duration of the lease obligation, used to derive expiration and validate schedules."
+        },
+        "leaseTerminationOptionDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Date the tenant may exercise an early lease-termination option."
+        },
+        "leaseTerminationOptionPenalty": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Free-text description of the penalty owed for exercising the early-termination option."
+        },
+        "leaseTerminationOptionState": {
+          "$ref": "#/$defs/RecordStateType",
+          "description": "Whether the tenant holds an early-termination (break) option."
+        },
+        "leaseTermType": {
+          "$ref": "#/$defs/LeaseTermType",
+          "description": "Unit in which the lease term is expressed (days, months, years); combined with leaseTerm to compute term length in months."
+        },
+        "marketEffectiveRate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "System-calculated market effective rent per SF from the effective-rent engine — base/contract rent net of concessions, TIA and free rent, spread over the term. The modeled market-based effective-rent flavor."
+        },
+        "marketEffectiveRatePerMonth": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "System-calculated market effective rent expressed per month, derived from the effective-rent calculation result."
+        },
+        "marketEffectiveRatePerYear": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "System-calculated market effective rent expressed per year, derived from the effective-rent calculation result."
+        },
+        "monetaryUnit": {
+          "$ref": "#/$defs/MonetaryUnit",
+          "description": "Currency unit for all monetary amounts on the deal; normalize to a common currency before aggregating rents or values across deals."
+        },
+        "netAggregateValue": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Total net value of the lease deal over its term (net of concessions); an aggregate deal-value figure used to size the transaction."
+        },
+        "noLandlordRepresentative": {
+          "type": "boolean",
+          "description": "Whether the deal explicitly has no landlord/leasing representative; when true, no landlord rep contacts may be supplied."
+        },
+        "noRateEscalation": {
+          "type": "boolean",
+          "description": "Whether the lease explicitly has no rent escalations; when true, no escalation schedule may be supplied."
+        },
+        "noTenantRepresentative": {
+          "type": "boolean",
+          "description": "Whether the deal explicitly has no tenant representative; when true, no tenant rep contacts may be supplied."
+        },
+        "notes": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Note"
+          },
+          "description": "Collection of internal research notes/annotations attached to the lease deal record."
+        },
+        "numRenewalOption": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 255,
+          "description": "Number of renewal options the tenant holds."
+        },
+        "numRenewalOptionComment": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Free-text comment describing the renewal-option terms."
+        },
+        "percentageRent": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Percentage-rent rate: additional retail rent computed as a percentage of tenant sales above a breakpoint. Displayed as a % on the Lease Comps financial terms."
+        },
+        "percentageRentBreakpoint": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Sales breakpoint above which percentage rent applies; the retail-lease threshold triggering overage rent."
+        },
+        "propertyTaxAmount": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Property-tax amount allocated to the leased space as a tenant occupancy cost, shown on the Lease Comps financial terms ($/SF/Year)."
+        },
+        "propertyTaxAmountPerYear": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Annualized property-tax amount for the leased space; per-year form of the tenant's property-tax occupancy cost."
+        },
+        "proposalEffectiveRate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "System-calculated proposal effective rent per square foot from the effective-rent engine, reflecting the proposal-scenario effective rent."
+        },
+        "proposalEffectiveRatePerMonth": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "System-calculated proposal effective rent expressed per month, derived from the effective-rent calculation result."
+        },
+        "proposalEffectiveRatePerYear": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "System-calculated proposal effective rent expressed per year, derived from the effective-rent calculation result."
+        },
+        "purchaseOptionComment": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Free-text comment describing the purchase-option terms."
+        },
+        "purchaseOptionDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Date the tenant may exercise the purchase option."
+        },
+        "purchaseOptionPrice": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Price at which the tenant may buy the property under a purchase option, when the lease has one."
+        },
+        "purchaseOptionState": {
+          "$ref": "#/$defs/RecordStateType",
+          "description": "Whether the tenant holds an option to purchase the property."
+        },
+        "rateActual": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Actual contract rent rate per square foot negotiated in the lease; the contract rent flavor, distinct from asking and effective."
+        },
+        "rateActualIncreaseMethodType": {
+          "$ref": "#/$defs/RateActualIncreaseMethodType",
+          "description": "Method by which the actual rate increases over the term (escalation method), describing how contract rent steps up."
+        },
+        "rateActualPerMonth": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Actual contract rent expressed as a total per-month amount; mutually exclusive with per-year and per-SF forms, derived when rate is entered."
+        },
+        "rateActualPerYear": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Actual contract rent expressed as a total per-year amount; mutually exclusive with the per-month and per-SF forms, derived when rate is entered."
+        },
+        "rateAmountType": {
+          "$ref": "#/$defs/RateAmountType",
+          "description": "Code indicating how the actual rate is expressed (per square foot, per month, per year, per seat), governing which rateActual* field carries the value."
+        },
+        "rateBasis": {
+          "$ref": "#/$defs/RateBasis",
+          "description": "Time basis (monthly/yearly) of the actual rate, needed to normalize the contract rent to a common $/SF/yr basis."
+        },
+        "rateEscalations": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/LeaseDealRateEscalation"
+          },
+          "description": "Collection of contractual rent-escalation steps (bump-ups) over the term; each entry can carry the rate after escalation used in effective-rent math."
+        },
+        "renewalOptionDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Date by which or on which the renewal option may be exercised."
+        },
+        "renewalOptionState": {
+          "$ref": "#/$defs/RecordStateType",
+          "description": "Whether a renewal option exists on the lease."
+        },
+        "renewalOptionTermInMonths": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Length in months of the lease extension granted by exercising the renewal option."
+        },
+        "rentPlus": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Additional rent-plus amount layered on base rent (e.g. TMI = taxes, maintenance, insurance pass-throughs); a supplemental occupancy charge shown alongside CAM/additional rent on the Lease Comps financial terms."
+        },
+        "reviewDates": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/LeaseReviewDate"
+          },
+          "description": "Collection of UK rent-review dates at which the contract rent is reset; paired with reviewPatternYears and reviewDatesState."
+        },
+        "reviewDatesState": {
+          "$ref": "#/$defs/RecordStateType",
+          "description": "For the UK rent-review-dates collection on the lease."
+        },
+        "reviewPatternYears": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 255,
+          "description": "UK rent-review cadence in years (interval between contractual rent reviews)."
+        },
+        "rightOfFirstOfferComment": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Free-text comment describing the right-of-first-offer terms."
+        },
+        "rightOfFirstOfferState": {
+          "$ref": "#/$defs/RecordStateType",
+          "description": "Whether the tenant holds a right of first offer on additional/adjacent space."
+        },
+        "rightOfFirstRefusalComment": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Free-text comment describing the right-of-first-refusal terms."
+        },
+        "rightOfFirstRefusalSquareFeet": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Square footage covered by the tenant's right of first refusal on additional space."
+        },
+        "rightOfFirstRefusalState": {
+          "$ref": "#/$defs/RecordStateType",
+          "description": "Whether the tenant holds a right of first refusal on additional/adjacent space."
+        },
+        "serviceChargeAmount": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Service-charge amount (UK common-area maintenance / building service charge) payable under the lease — an occupancy cost beyond base rent."
+        },
+        "serviceChargeAmountPerYear": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Annualized service-charge amount for the leased space; per-year form of the building service charge."
+        },
+        "serviceChargeState": {
+          "$ref": "#/$defs/RecordStateType",
+          "description": "For the service-charge (UK CAM-equivalent) figures, indicating whether a service charge is in place, available, or none."
+        },
+        "serviceType": {
+          "$ref": "#/$defs/ServiceType",
+          "description": "Rent service type governing who pays operating expenses — e.g. Triple Net (NNN), Full Service, Modified Gross, Industrial Gross, Single/Double Net; UK FRI/IRI/IRO. Resolved from ref.servicetype; required to compare rents on a like basis."
+        },
+        "signagePayerType": {
+          "$ref": "#/$defs/SignagePayerType",
+          "description": "Code identifying who pays for signage under the lease (landlord vs tenant)."
+        },
+        "signageState": {
+          "$ref": "#/$defs/RecordStateType",
+          "description": "Whether the lease grants signage rights to the tenant."
+        },
+        "signDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Date the lease was signed by both parties; one of the three key lease dates (sign/commencement/move-in)."
+        },
+        "sourceTypes": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/LeaseDealSourceType"
+          },
+          "description": "Collection of source-type classifications contributing to the deal record, capturing the multiple origins of the deal data."
+        },
+        "spaceType": {
+          "$ref": "#/$defs/SpaceType",
+          "description": "Space provenance of the deal (New, Relet, Sublet); drives expiration-date derivation. In leasing-activity terms Direct = relet + new and Sublet = sublet + assignment; product 'Direct' corresponds to Relet."
+        },
+        "spaceUse": {
+          "$ref": "#/$defs/SpaceUse",
+          "description": "Primary use of the leased space (office, retail, industrial, etc.); gates use-specific fields such as Zone A rent for retail."
+        },
+        "spreadOverTermType": {
+          "$ref": "#/$defs/SpreadOverTermType",
+          "description": "Code controlling how concessions or rent are spread/amortized over the lease term when computing effective rent."
+        },
+        "tenantImprovementAllowancePerSquareFeet": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Tenant-improvement (TI) allowance per SF the landlord grants for fit-out. A key concession deducted in effective-rent math (NER = base rent less TIA over the term), so a large TIA can push effective rent below base rent."
+        },
+        "zoneARent": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Zone A rent: UK retail rental valuation method pricing the most valuable front-of-shop zone per square foot; only valid when the space use is Retail."
+        }
+      }
+    },
+    "LeaseRate": {
+      "type": "object",
+      "properties": {
+        "rateLow": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Low end of the asking rent range."
+        },
+        "rateHigh": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "High end of the asking rent range; equal to rateLow when a single rate was quoted."
+        },
+        "rateBasis": {
+          "$ref": "#/$defs/RateBasis",
+          "description": "Period the asking rent is quoted for (monthly or yearly)."
+        }
+      }
+    },
+    "LeaseBreakDate": {
+      "type": "object",
+      "properties": {
+        "breakDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Date on which the lease may be broken/early-terminated under this option; key to rollover risk and income-durability analysis."
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Unique identifier of a lease break/termination-option record within a lease deal."
+        },
+        "leaseBreakType": {
+          "$ref": "#/$defs/LeaseBreakType",
+          "description": "Code classifying the break-option type (e.g. tenant break, landlord break, mutual), describing who may early-terminate the lease and under what option."
+        },
+        "noticePeriodMonths": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 255,
+          "description": "Number of months of advance notice required to exercise the break option before the break date."
+        },
+        "terminationPenalty": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Free-text description of the penalty or fee payable to exercise the early-termination/break option."
+        }
+      }
+    },
+    "LeaseDealConcession": {
+      "type": "object",
+      "properties": {
+        "concessionAmount": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Monetary value of the landlord concession (inducement) granted to the tenant; reduces effective rent in lease-economics calculations."
+        },
+        "concessionAmountType": {
+          "$ref": "#/$defs/LandlordConcessionAmountType",
+          "description": "Unit/basis of the landlord concession amount (e.g. per square foot, total, per month), needed to normalize the inducement's value."
+        },
+        "concessionDescription": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Free-text description of the landlord concession (e.g. moving allowance, fit-out contribution) beyond standard TI and free rent."
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Unique identifier of a landlord-concession record within a lease deal."
+        }
+      }
+    },
+    "LeaseDealContact": {
+      "type": "object",
+      "properties": {
+        "contactId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the person in CoStar contact data."
+        },
+        "contactPhoneNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Phone number for the lease-deal contact (e.g. broker or party to the deal); personal contact data."
+        },
+        "contactPhoneNumberExt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Phone extension the contact prefers for discussing the stated space. A non-NULL value overrides the contact's usual phone number; added to accommodate the existing phone-extension naming convention."
+        },
+        "contactRole": {
+          "$ref": "#/$defs/ContactRole2",
+          "description": "Role of the person or company on this record, such as listing broker, buyer or seller."
+        },
+        "locationId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "The contact's location - the main work location of the contact."
+        },
+        "preferredPhoneType": {
+          "$ref": "#/$defs/PhoneType",
+          "description": "Code identifying the contact's preferred phone-number type, such as Contact Phone, Mobile, Fax, Other, or Override."
+        }
+      }
+    },
+    "LeaseDealFreeRentSchedule": {
+      "type": "object",
+      "properties": {
+        "calendarMonth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 255,
+          "description": "Calendar month (1-12, where 1=January through 12=December) in which the free rent applies."
+        },
+        "calendarYear": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "The calendar year in which the free-rent term applies."
+        },
+        "freeRentPercent": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Percentage of rent that is free (abated) during the scheduled term."
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Primary key enforcing uniqueness of a free-rent schedule entry within a lease deal's concession terms."
+        },
+        "intervalMonthCount": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of months over which this free-rent entry recurs/spreads, describing how the abatement is distributed across the term."
+        },
+        "leaseMonth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "The month, counted from when the lease actually began, to which this free-rent term applies."
+        }
+      }
+    },
+    "Note": {
+      "type": "object",
+      "properties": {
+        "noteType": {
+          "$ref": "#/$defs/NoteType",
+          "description": "A pre-defined categorization of note text, typically referred to as 'Notes' in CRM Enterprise."
+        },
+        "value": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The body (free-text content) of the note."
+        }
+      }
+    },
+    "LeaseDealRateEscalation": {
+      "type": "object",
+      "properties": {
+        "cpiAnnualMaxPercent": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Cap on the annual CPI-driven rent increase (collar maximum), limiting the bump regardless of how high CPI runs."
+        },
+        "cpiAnnualMinPercent": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Floor on the annual CPI-driven rent increase (collar minimum), guaranteeing a minimum bump regardless of how low CPI runs."
+        },
+        "escalationAmount": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Fixed dollar amount of the rate escalation. Nullable, because when an EscalationPct is specified the escalationAmount may not necessarily apply."
+        },
+        "escalationPercent": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Percentage of the rate escalation. Nullable, because when an escalationAmount is specified the EscalationPct may not necessarily apply."
+        },
+        "fromLeaseDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Calendar date on which this escalation step begins, an alternative to fromLeaseMonth for anchoring the bump to an absolute date."
+        },
+        "fromLeaseMonth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Start of the negotiated term during which the rate escalation applies. A unique constraint on LeaseDealID, RateEscalationTypeID, fromLeaseMonth, and toLeaseMonth prevents multiple rows for the same term on a given lease deal and escalation type."
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Surrogate primary key of the rate-escalation record, added to simplify updating and deleting records."
+        },
+        "intervalMonthCount": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Number of months between recurring applications of this escalation when it repeats, e.g. an annual bump is a 12-month interval."
+        },
+        "isRepeatToEnd": {
+          "type": "boolean",
+          "description": "Whether this escalation step repeats on its interval through the end of the lease term rather than applying just once."
+        },
+        "pctOfMarketRate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Percentage of prevailing market rent to which rent is reset at this escalation, used for market-rate (fair-market-value) review escalations."
+        },
+        "percentOfCpiInputRate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Percentage of the Consumer Price Index movement applied as the rent increase for a CPI-indexed escalation, e.g. 80 percent of CPI."
+        },
+        "rateActualAfterEscalation": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Resulting actual contract rent rate after this escalation has been applied; the stepped-up rent figure feeding effective-rent calculations."
+        },
+        "rateEscalationAmountType": {
+          "$ref": "#/$defs/RateEscalationAmountType",
+          "description": "Unit/basis for the escalation amount (e.g. per square foot, per month, total), needed to normalize the bump into a comparable rent figure."
+        },
+        "rateEscalationType": {
+          "$ref": "#/$defs/RateEscalationType",
+          "description": "Code describing if and how the contract rent steps up over the term (escalation method) — e.g. fixed periodic bumps, CPI-indexed, or market-rate reviews. Displayed as a single escalation % with pattern, or 'Varying' for multiple steps."
+        },
+        "toLeaseMonth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "End of the negotiated term during which the rate escalation applies. A unique constraint on LeaseDealID, RateEscalationTypeID, fromLeaseMonth, and toLeaseMonth prevents multiple rows for the same term on a given lease deal and escalation type."
+        }
+      }
+    },
+    "LeaseReviewDate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Unique identifier of a lease review-date record within a lease deal."
+        },
+        "leaseReviewType": {
+          "$ref": "#/$defs/LeaseReviewType",
+          "description": "Code classifying the type of scheduled lease review (e.g. rent review / market-rent review), describing the contractual review event."
+        },
+        "reviewDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date of a scheduled lease (rent) review at which contract rent may be reset to market; common in UK leases. Surfaced on the Lease Comps financial terms as a rent-review pattern plus date(s)."
+        }
+      }
+    },
+    "SpaceOccupied": {
+      "type": "object",
+      "properties": {
+        "buildOut": {
+          "$ref": "#/$defs/BuildOut",
+          "description": "Value describing the build-out type of the occupied space (the nature of the tenant improvements present)."
+        },
+        "buildOutConditionType": {
+          "$ref": "#/$defs/BuildOutConditionType",
+          "description": "Condition of the space's build-out/fit-out (e.g. shell, second-generation, fully built), indicating readiness for occupancy."
+        },
+        "buildOutStatus": {
+          "$ref": "#/$defs/BuildOutStatus",
+          "description": "Status of the space build-out (e.g. existing, planned, under construction), describing where the fit-out stands."
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Unique identifier of the occupied-space record representing space taken off-market and physically occupied under a lease."
+        },
+        "loadBay": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SpaceOccupiedLoadBay"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Loading-bay attributes of the occupied industrial space (dock/load configuration); a key industrial logistics attribute of the space."
+        },
+        "monthsOnMarket": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Number of months the space was marketed before being taken off-market and occupied; derived from on-market and off-market dates."
+        },
+        "propertyFloorId": {
+          "type": "integer",
+          "format": "int32",
+          "description": "A number uniquely identifying a floor on any property; foreign key locating the occupied space on its floor within the building."
+        },
+        "spaceLayout": {
+          "$ref": "#/$defs/SpaceLayout",
+          "description": "Code describing the physical layout/configuration of the occupied space (e.g. open plan, divided offices)."
+        },
+        "spacePosition": {
+          "$ref": "#/$defs/SpacePosition",
+          "description": "Retail space position (End Cap, In-line, Outparcel/Pad, Anchor, In-Store) describing where the occupied space sits within a center."
+        },
+        "squareFeetOccupied": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Rentable square footage physically occupied in this space; the area driver for occupancy and net/gross absorption measurement. Restricted and suppressed space-for-lease is excluded from aggregate SF."
+        },
+        "squareFeetOffice": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Office portion of the occupied space in square feet. Relevant to industrial/flex office content."
+        },
+        "squareFeetUsable": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Usable (tenant-exclusive) square footage of the occupied space, excluding shared common area; distinct from rentable area."
+        },
+        "suite": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Suite (or unit) number of the occupied space. NULL when the tenant cannot be identified; otherwise derived from the tenant's address. Its data size should match the corresponding field in SpaceForLease, SpaceOccupied, and CondoUnit."
+        }
+      }
+    },
+    "SpaceOccupiedLoadBay": {
+      "type": "object",
+      "properties": {
+        "driveInBayState": {
+          "$ref": "#/$defs/RecordStateType",
+          "description": "Indicating the presence/availability status of drive-in bays (grade-level doors) for the occupied industrial/flex space."
+        },
+        "loadingDockState": {
+          "$ref": "#/$defs/RecordStateType",
+          "description": "Indicating the presence/availability status of loading docks for the occupied industrial space; a core logistics loading attribute."
+        },
+        "numDriveInBays": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Count of drive-in bays (grade-level doors a vehicle drives directly through) serving the occupied space; a key loading-access attribute."
+        },
+        "numExternalLoadingDocks": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Count of exterior loading docks serving the occupied space; a key industrial/distribution logistics attribute."
+        },
+        "numInternalLoadingDocks": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Count of interior loading docks serving the occupied space."
+        }
+      }
+    },
+    "LocationOccupancyExpirationReason": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "MoveIntoAnotherProperty",
+        "UnableToConfirm",
+        "MovingIntoHomeOffice",
+        "ClosedLocationOrBankrupt",
+        "NoLongerInCustomerMarket",
+        "MovingIntoExecutiveSuite",
+        "Renewal",
+        "ShedSpace",
+        "SubletSpace",
+        "MovingOutNewAddressUnknown",
+        "Coversion",
+        "MovingIntoSameBuilding",
+        "MovingOutShellCompany",
+        "OccupancySplit"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = MoveIntoAnotherProperty\n2 = UnableToConfirm\n3 = MovingIntoHomeOffice\n4 = ClosedLocationOrBankrupt\n5 = NoLongerInCustomerMarket\n6 = MovingIntoExecutiveSuite\n7 = Renewal\n8 = ShedSpace\n9 = SubletSpace\n10 = MovingOutNewAddressUnknown\n11 = Coversion\n12 = MovingIntoSameBuilding\n13 = MovingOutShellCompany\n14 = OccupancySplit"
+    },
+    "IndustryType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Accountants",
+        "Transportation",
+        "EngineersOrArchitects",
+        "RealEstate",
+        "Manufacturing",
+        "RetailersOrWholesalers",
+        "FinancialInstitutions",
+        "ComputersOrDataProcessing",
+        "PublicAdministration",
+        "AgriculturalOrMiningOrUtilities",
+        "Information",
+        "ProfessionalScientificAndTechnicalServices",
+        "PersonalServices",
+        "Insurance",
+        "HealthCareAndSocialAssistance",
+        "LawFirms",
+        "AccommodationAndFoodServices",
+        "AdministrativeAndSupportServices",
+        "AgricultureForestryFishingAndHunting",
+        "ArtsEntertainmentAndRecreation",
+        "EducationalServices",
+        "ManagementOfCompaniesAndEnterprises",
+        "MiningQuarryingAndOilAndGasExtraction",
+        "RentalAndLeasingServices",
+        "Utilities",
+        "WasteManagementAndRemediationServices",
+        "Wholesaler"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Accountants\n2 = Transportation (also TransportationAndWarehousing)\n3 = EngineersOrArchitects\n4 = RealEstate\n5 = Manufacturing\n6 = RetailersOrWholesalers (also Retailer)\n7 = FinancialInstitutions (also FinanceAndInsurance)\n8 = ComputersOrDataProcessing\n9 = PublicAdministration (also Government)\n10 = AgriculturalOrMiningOrUtilities (also Construction)\n11 = Information (also Communications)\n12 = ProfessionalScientificAndTechnicalServices (also BusinessServices)\n13 = PersonalServices (also Services)\n14 = Insurance\n15 = HealthCareAndSocialAssistance (also Medical)\n16 = LawFirms\n17 = AccommodationAndFoodServices\n18 = AdministrativeAndSupportServices\n19 = AgricultureForestryFishingAndHunting\n20 = ArtsEntertainmentAndRecreation\n21 = EducationalServices\n22 = ManagementOfCompaniesAndEnterprises\n23 = MiningQuarryingAndOilAndGasExtraction\n24 = RentalAndLeasingServices\n25 = Utilities\n26 = WasteManagementAndRemediationServices\n27 = Wholesaler"
+    },
+    "RateBasis": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Monthly",
+        "Yearly"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Monthly\n2 = Yearly"
+    },
+    "LeaseBreakType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Landlord",
+        "Tenant",
+        "Mutual"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Landlord\n2 = Tenant\n3 = Mutual"
+    },
+    "RecordStateType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Yes",
+        "No"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Yes\n2 = No"
+    },
+    "LandlordConcessionAmountType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        10,
+        11
+      ],
+      "x-enum-varnames": [
+        "YearlyAmount",
+        "MonthlyAmount",
+        "AmountPeriodic",
+        "YearlyRatePerRentableArea",
+        "YearlyRatePerRentableAreaPeriodic",
+        "MonthlyRatePerRentableArea",
+        "MonthlyRatePerRentableAreaPeriodic",
+        "AmountAtStart",
+        "RatePerRentableArea"
+      ],
+      "description": "Allowed values:\n0 = YearlyAmount\n1 = MonthlyAmount\n2 = AmountPeriodic\n3 = YearlyRatePerRentableArea\n4 = YearlyRatePerRentableAreaPeriodic\n5 = MonthlyRatePerRentableArea\n6 = MonthlyRatePerRentableAreaPeriodic\n10 = AmountAtStart\n11 = RatePerRentableArea"
+    },
+    "ContactRole2": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        15,
+        17,
+        18,
+        20,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        1000,
+        1001,
+        1002,
+        1003,
+        1004,
+        1005
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Developer",
+        "Architect",
+        "RecordedOwner",
+        "PropertyManager",
+        "PrimaryLeasingCompany",
+        "TrueOwner",
+        "SignAgent",
+        "AssetManager",
+        "BuyerBroker",
+        "ListingBroker",
+        "TenantRep",
+        "DecisionMakerLeasing",
+        "DecisionInfluencer",
+        "LeasingCompany",
+        "Principal",
+        "SurveyContact",
+        "CenterMailContact",
+        "CenterManager",
+        "AssistantAssociateCenterManager",
+        "MarketingDirectorManager",
+        "SpecialtyLeasingManager",
+        "BuildingSuperintendent",
+        "SecuritySupervisor",
+        "AdvertisingManager",
+        "SpecialEventsManager",
+        "PromotionDirectorManager",
+        "Other",
+        "RecordedSeller",
+        "TrueSeller",
+        "Attorney",
+        "RecordedBuyer",
+        "TrueBuyer",
+        "BuyerContact",
+        "SellerContact",
+        "ListingAgent",
+        "LeasingAgent",
+        "TenantContact",
+        "Preparer",
+        "ListingAdministrator",
+        "SurveillanceOperator",
+        "OwnerListingContact",
+        "WSRListingAdministrator",
+        "SocialAdminSetupContact",
+        "OwnerListingAdministrator",
+        "OwnerPermissionAdministrator",
+        "ListingPermissionAdministrator",
+        "HotelMembershipCompany",
+        "AcquisitionsDispositions",
+        "Development",
+        "AssetorPortfolioManagement",
+        "Leasing",
+        "Finance",
+        "InvestorRelations",
+        "Marketing",
+        "Research",
+        "HumanResourcesAndLegalAndInformationTechnologyAndOperations",
+        "DecisionMakerAcquisitions",
+        "DecisionInfluencerAcquisitions",
+        "DecisionMakerProductPurchase",
+        "DecisionInfluencerProductPurchase",
+        "Servicer",
+        "Borrower",
+        "SpecialServicer",
+        "Originator",
+        "Sponsor",
+        "HotelOperator",
+        "Auctioneer",
+        "AuctionContact",
+        "GeneralContractor",
+        "TitleCompany",
+        "EscrowCompany",
+        "AuctionAssetManager",
+        "ReportVendor",
+        "FundManager",
+        "LawFirm",
+        "Auditor",
+        "FundPlacementAgent",
+        "FundAdministrator",
+        "Investor",
+        "MediaSchedulingContact",
+        "BrokerInStateLicensee",
+        "TerritoryManager",
+        "Freeholder",
+        "ListingLeadRecipient",
+        "SiteListingAdministrator",
+        "BrandedProperty",
+        "SalesAgent",
+        "BuilderAdmin",
+        "SiteListingAdministratorCommunities",
+        "CompanyListingAdministratorCommunities",
+        "ListingPermissionAdministratorCommunities",
+        "MortgageBroker",
+        "DataCenterOperator",
+        "SubletContact",
+        "PreviousTrueOwner",
+        "PreviousRecordedOwner",
+        "ExecutiveLeadershipPrincipal",
+        "LeaseCompsAdministrator",
+        "FeedContact"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Developer (also DeveloperConstruction)\n2 = Architect\n3 = RecordedOwner\n4 = PropertyManager\n6 = PrimaryLeasingCompany\n7 = TrueOwner\n8 = SignAgent\n9 = AssetManager\n10 = BuyerBroker\n11 = ListingBroker\n15 = TenantRep\n17 = DecisionMakerLeasing (also DecisionMaker)\n18 = DecisionInfluencer (also DecisionInfluencerLeasing)\n20 = LeasingCompany\n26 = Principal\n27 = SurveyContact\n28 = CenterMailContact\n29 = CenterManager\n30 = AssistantAssociateCenterManager\n31 = MarketingDirectorManager\n32 = SpecialtyLeasingManager\n33 = BuildingSuperintendent\n34 = SecuritySupervisor\n35 = AdvertisingManager\n36 = SpecialEventsManager\n37 = PromotionDirectorManager\n38 = Other\n39 = RecordedSeller\n40 = TrueSeller\n41 = Attorney\n42 = RecordedBuyer\n43 = TrueBuyer\n44 = BuyerContact\n45 = SellerContact\n46 = ListingAgent\n47 = LeasingAgent\n48 = TenantContact\n49 = Preparer\n50 = ListingAdministrator\n51 = SurveillanceOperator\n52 = OwnerListingContact (also OwnerLeasingContact)\n53 = WSRListingAdministrator\n54 = SocialAdminSetupContact\n55 = OwnerListingAdministrator\n56 = OwnerPermissionAdministrator\n57 = ListingPermissionAdministrator\n58 = HotelMembershipCompany\n59 = AcquisitionsDispositions\n60 = Development\n61 = AssetorPortfolioManagement\n62 = Leasing\n63 = Finance\n64 = InvestorRelations\n65 = Marketing\n66 = Research\n67 = HumanResourcesAndLegalAndInformationTechnologyAndOperations\n68 = DecisionMakerAcquisitions\n69 = DecisionInfluencerAcquisitions\n70 = DecisionMakerProductPurchase\n71 = DecisionInfluencerProductPurchase\n72 = Servicer\n73 = Borrower\n74 = SpecialServicer\n75 = Originator\n76 = Sponsor\n77 = HotelOperator\n78 = Auctioneer\n79 = AuctionContact (also AuctionManager)\n80 = GeneralContractor\n81 = TitleCompany\n82 = EscrowCompany\n83 = AuctionAssetManager\n84 = ReportVendor\n85 = FundManager\n86 = LawFirm\n87 = Auditor\n88 = FundPlacementAgent\n89 = FundAdministrator\n90 = Investor\n91 = MediaSchedulingContact\n92 = BrokerInStateLicensee\n93 = TerritoryManager\n94 = Freeholder\n95 = ListingLeadRecipient\n96 = SiteListingAdministrator\n97 = BrandedProperty\n98 = SalesAgent\n99 = BuilderAdmin\n100 = SiteListingAdministratorCommunities\n101 = CompanyListingAdministratorCommunities\n102 = ListingPermissionAdministratorCommunities\n103 = MortgageBroker\n104 = DataCenterOperator\n1000 = SubletContact\n1001 = PreviousTrueOwner\n1002 = PreviousRecordedOwner\n1003 = ExecutiveLeadershipPrincipal (also Executive)\n1004 = LeaseCompsAdministrator\n1005 = FeedContact"
+    },
+    "PhoneType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Phone",
+        "Mobile",
+        "Fax",
+        "Other",
+        "Override"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Phone\n2 = Mobile\n3 = Fax\n4 = Other\n5 = Override"
+    },
+    "FreeRentMethodType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1
+      ],
+      "x-enum-varnames": [
+        "MonthsAtStart",
+        "MonthsSpreadOverTerm"
+      ],
+      "description": "Allowed values:\n0 = MonthsAtStart (also Unknown)\n1 = MonthsSpreadOverTerm"
+    },
+    "LeaseDealSourceType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        6,
+        7,
+        8,
+        9,
+        12,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        26,
+        27
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "PublicRecord_Foia",
+        "PublicRecord_SecFiling",
+        "PublicRecord_CmbsFiling",
+        "Media_NewsOutlets",
+        "ThirdParty_LandlordRep",
+        "Direct_Landlord",
+        "ThirdParty_TenantRep",
+        "Direct_Tenant",
+        "Direct_PressRelease",
+        "PublicRecord_CountyFiling",
+        "PublicRecord_Other",
+        "ThirdParty_Appraiser",
+        "ThirdParty_PressRelease",
+        "ThirdParty_PropertyManager",
+        "ThirdParty_Other",
+        "Direct_PowerBrokerSubmission",
+        "PublicRecord_HMLandRegistry",
+        "ThirdParty_Explore"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = PublicRecord_Foia\n2 = PublicRecord_SecFiling\n3 = PublicRecord_CmbsFiling\n6 = Media_NewsOutlets\n7 = ThirdParty_LandlordRep\n8 = Direct_Landlord\n9 = ThirdParty_TenantRep\n12 = Direct_Tenant\n14 = Direct_PressRelease\n15 = PublicRecord_CountyFiling\n16 = PublicRecord_Other\n17 = ThirdParty_Appraiser\n18 = ThirdParty_PressRelease\n19 = ThirdParty_PropertyManager\n20 = ThirdParty_Other\n21 = Direct_PowerBrokerSubmission\n26 = PublicRecord_HMLandRegistry\n27 = ThirdParty_Explore"
+    },
+    "LeaseDealType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "NewLease",
+        "Renewal"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = NewLease\n2 = Renewal"
+    },
+    "LeaseTermType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Years",
+        "Months",
+        "Days",
+        "ToBeDetermined",
+        "Negotiable",
+        "ThreeOrSixOrNine",
+        "ShortTerm"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Years\n2 = Months\n3 = Days\n4 = ToBeDetermined\n5 = Negotiable\n6 = ThreeOrSixOrNine\n7 = ShortTerm"
+    },
+    "MonetaryUnit": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "UnitedStatesDollar",
+        "CanadianDollar",
+        "PoundSterling",
+        "Euro",
+        "AustralianDollar",
+        "BrazilianReal",
+        "SwissFranc",
+        "JapaneseYen",
+        "SingaporeDollar",
+        "HongKongDollar",
+        "ChineseYuan",
+        "UnitedArabEmiratesDirham",
+        "AfghanistanAfghani",
+        "AlbanianLek",
+        "ArmenianDram",
+        "NetherlandsAntilleanGuilder",
+        "AngolanKwanza",
+        "ArgentinaPeso",
+        "ArubanGuilder",
+        "AzerbaijanNewManat",
+        "BosnianMark",
+        "BarbadosDollar",
+        "BangladeshTaka",
+        "BulgarianLev",
+        "BurundiFranc",
+        "BermudianDollars",
+        "BruneiDollars",
+        "BolivianBoliviano",
+        "BahamianDollar",
+        "Bitcoin",
+        "BotswanianPula",
+        "BelarusianRuble",
+        "BelizeDollar",
+        "CongoleseFranc",
+        "ChileanPeso",
+        "ColombianPeso",
+        "CostaRicanColon",
+        "CubanPeso",
+        "CapeVerdeEscudo",
+        "CzechKoruna",
+        "DjiboutiFranc",
+        "DanishKrone",
+        "DominicanPeso",
+        "AlgerianDinar",
+        "EgyptianPound",
+        "EthiopianBirr",
+        "FijiDollars",
+        "GeorgianLari",
+        "GhanaianNewCedi",
+        "GambianDalasi",
+        "GuineanFranc",
+        "GuatemalanQuetzal",
+        "GuyanaDollar",
+        "HondurasLempira",
+        "CroatianKuna",
+        "HaitianGourde",
+        "HungarianForint",
+        "IndonesianRupiah",
+        "IsraeliShekel",
+        "IndianRupee",
+        "IraqiDinar",
+        "IranianRial",
+        "IcelandKrona",
+        "JamaicanDollar",
+        "JordanDinar",
+        "KenyanShilling",
+        "KyrgyzstaniSom",
+        "CambodiaRiel",
+        "ComorosFranc",
+        "SouthKoreanWon",
+        "KuwaitiDinar",
+        "CaymanIslandDollar",
+        "KazakhstaniTenge",
+        "LaoKip",
+        "LebanesePound",
+        "SriLankanRupee",
+        "LiberianDollar",
+        "LesothoLoti",
+        "LibyanDinar",
+        "MoroccanDirham",
+        "MoldovanLeu",
+        "MalagasyAriary",
+        "MyanmarKyat",
+        "MacauPataca",
+        "MauritanianQuguiya",
+        "MauritiusRupee",
+        "MaldivesRufiyaa",
+        "MalawiKwacha",
+        "MexicanPeso",
+        "MalaysianRinggit",
+        "MozambiqueNewMetical",
+        "NamibianDollar",
+        "NigerianNaira",
+        "NicaraguanCordobaOro",
+        "NorwegianKrone",
+        "NepalRupee",
+        "NewZealandDollar",
+        "OmaniRial",
+        "PanameanBalboa",
+        "PeruvianNuevoSol",
+        "PapuaNewGuineaKina",
+        "PhilippinePeso",
+        "PakistaniRupee",
+        "PolishZloty",
+        "ParaguayanGuarani",
+        "QatarRiyal",
+        "NewRomanianLeu",
+        "SerbianDinar",
+        "RussianRuble",
+        "RwandanFranc",
+        "SaudiRiyal",
+        "SolomonIslandsDollar",
+        "SeychellesRupee",
+        "SudanesePound",
+        "SwedishKrona",
+        "SierraLeoneLeone",
+        "SomaliShilling",
+        "SurinameDollar",
+        "SaoTomeanDobra",
+        "ElSalvadorColon",
+        "SwazilandLilangeni",
+        "ThailandBaht",
+        "TajikistanSomoni",
+        "TurkmenNewManat",
+        "TunisianDinar",
+        "TonganPaanga",
+        "TurkishLira",
+        "TrinidadianDollar",
+        "TaiwanDollar",
+        "TanzanianShilling",
+        "UkrainianHryvnia",
+        "UgandanShilling",
+        "UruguayPeso",
+        "UzbekistaniSom",
+        "VenezuelanBolivarSoberano",
+        "VietnameseDong",
+        "CentralAfricanFranc",
+        "EastCaribbeanDollar",
+        "WestAfricanFranc",
+        "FrenchPacificIslandsFranc",
+        "YemenRial",
+        "SouthAfricanRand",
+        "ZambianKwacha",
+        "BahrainiDinar",
+        "EritreanNakfa",
+        "FalklandIslandsPound",
+        "GibraltarPound",
+        "NorthKoreanWon",
+        "MongolianTughrik",
+        "SaintHelenaPound",
+        "SyrianPound",
+        "VanuatuVatu",
+        "ZimbabweanDollar",
+        "SamoanTala",
+        "BhutaneseNgultrum",
+        "MacedonianDenar"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = UnitedStatesDollar\n2 = CanadianDollar\n3 = PoundSterling\n4 = Euro\n5 = AustralianDollar\n6 = BrazilianReal\n7 = SwissFranc\n8 = JapaneseYen\n9 = SingaporeDollar\n10 = HongKongDollar\n11 = ChineseYuan\n12 = UnitedArabEmiratesDirham\n13 = AfghanistanAfghani\n14 = AlbanianLek\n15 = ArmenianDram\n16 = NetherlandsAntilleanGuilder\n17 = AngolanKwanza\n18 = ArgentinaPeso\n19 = ArubanGuilder\n20 = AzerbaijanNewManat\n21 = BosnianMark\n22 = BarbadosDollar\n23 = BangladeshTaka\n24 = BulgarianLev\n25 = BurundiFranc\n26 = BermudianDollars\n27 = BruneiDollars\n28 = BolivianBoliviano\n29 = BahamianDollar\n30 = Bitcoin\n31 = BotswanianPula\n32 = BelarusianRuble\n33 = BelizeDollar\n34 = CongoleseFranc\n35 = ChileanPeso\n36 = ColombianPeso\n37 = CostaRicanColon\n38 = CubanPeso\n39 = CapeVerdeEscudo\n40 = CzechKoruna\n41 = DjiboutiFranc\n42 = DanishKrone\n43 = DominicanPeso\n44 = AlgerianDinar\n45 = EgyptianPound\n46 = EthiopianBirr\n47 = FijiDollars\n48 = GeorgianLari\n49 = GhanaianNewCedi\n50 = GambianDalasi\n51 = GuineanFranc\n52 = GuatemalanQuetzal\n53 = GuyanaDollar\n54 = HondurasLempira\n55 = CroatianKuna\n56 = HaitianGourde\n57 = HungarianForint\n58 = IndonesianRupiah\n59 = IsraeliShekel\n60 = IndianRupee\n61 = IraqiDinar\n62 = IranianRial\n63 = IcelandKrona\n64 = JamaicanDollar\n65 = JordanDinar\n66 = KenyanShilling\n67 = KyrgyzstaniSom\n68 = CambodiaRiel\n69 = ComorosFranc\n70 = SouthKoreanWon\n71 = KuwaitiDinar\n72 = CaymanIslandDollar\n73 = KazakhstaniTenge\n74 = LaoKip\n75 = LebanesePound\n76 = SriLankanRupee\n77 = LiberianDollar\n78 = LesothoLoti\n79 = LibyanDinar\n80 = MoroccanDirham\n81 = MoldovanLeu\n82 = MalagasyAriary\n83 = MyanmarKyat\n84 = MacauPataca\n85 = MauritanianQuguiya\n86 = MauritiusRupee\n87 = MaldivesRufiyaa\n88 = MalawiKwacha\n89 = MexicanPeso\n90 = MalaysianRinggit\n91 = MozambiqueNewMetical\n92 = NamibianDollar\n93 = NigerianNaira\n94 = NicaraguanCordobaOro\n95 = NorwegianKrone\n96 = NepalRupee\n97 = NewZealandDollar\n98 = OmaniRial\n99 = PanameanBalboa\n100 = PeruvianNuevoSol\n101 = PapuaNewGuineaKina\n102 = PhilippinePeso\n103 = PakistaniRupee\n104 = PolishZloty\n105 = ParaguayanGuarani\n106 = QatarRiyal\n107 = NewRomanianLeu\n108 = SerbianDinar\n109 = RussianRuble\n110 = RwandanFranc\n111 = SaudiRiyal\n112 = SolomonIslandsDollar\n113 = SeychellesRupee\n114 = SudanesePound\n115 = SwedishKrona\n116 = SierraLeoneLeone\n117 = SomaliShilling\n118 = SurinameDollar\n119 = SaoTomeanDobra\n120 = ElSalvadorColon\n121 = SwazilandLilangeni\n122 = ThailandBaht\n123 = TajikistanSomoni\n124 = TurkmenNewManat\n125 = TunisianDinar\n126 = TonganPaanga\n127 = TurkishLira\n128 = TrinidadianDollar\n129 = TaiwanDollar\n130 = TanzanianShilling\n131 = UkrainianHryvnia\n132 = UgandanShilling\n133 = UruguayPeso\n134 = UzbekistaniSom\n135 = VenezuelanBolivarSoberano\n136 = VietnameseDong\n137 = CentralAfricanFranc\n138 = EastCaribbeanDollar\n139 = WestAfricanFranc\n140 = FrenchPacificIslandsFranc\n141 = YemenRial\n142 = SouthAfricanRand\n143 = ZambianKwacha\n144 = BahrainiDinar\n145 = EritreanNakfa\n146 = FalklandIslandsPound\n147 = GibraltarPound\n148 = NorthKoreanWon\n149 = MongolianTughrik\n150 = SaintHelenaPound\n151 = SyrianPound\n152 = VanuatuVatu\n153 = ZimbabweanDollar\n154 = SamoanTala\n155 = BhutaneseNgultrum\n156 = MacedonianDenar"
+    },
+    "NoteType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        14,
+        15,
+        16,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "PropertyInternal",
+        "PropertyExternal",
+        "SaleExternal",
+        "CommissionNote",
+        "TenantExternal",
+        "TenantInternal",
+        "TenantTransactionInternal",
+        "SpaceNote",
+        "SpaceVacantInternal",
+        "SupplementalExternal",
+        "LocationInternal",
+        "LocationExternal",
+        "LocationBilling",
+        "CompExternal",
+        "CompInternal",
+        "CompSeller",
+        "CompBuyer",
+        "CompManager",
+        "PropertyGroupExternal",
+        "PropertyGroupInternal",
+        "LeaseDealInternal",
+        "LeaseDealExternal",
+        "LandLease",
+        "LandLeaseCommission",
+        "CompEntityInternal",
+        "CompEntityExternal",
+        "PropertyLoan",
+        "PropertyResidentialExternal",
+        "ListingExternal",
+        "AptsSalesForceNote",
+        "WhyYouLoveUs",
+        "CheckInCheckOutPolicy",
+        "PaymentPolicy",
+        "AdvancedPaymentPolicy",
+        "CancellationPolicy",
+        "ListingLocationDescription",
+        "ContactExternal",
+        "ContactInternal",
+        "ListingExternalGenerated",
+        "DrivingDirections",
+        "StudentHousingDescription",
+        "RenterQualification",
+        "MarketingStakeholderOne",
+        "MarketingStakeholderTwo",
+        "SpaceManager",
+        "ApartmentUnitMarketing",
+        "CmbsLoanCommentary",
+        "CmbsLoanModification",
+        "CmbsLoanDelinquency",
+        "CmbsLoanRealEstateOwned",
+        "CmbsLoanWatchlist",
+        "AuctionDashboardComments",
+        "AuctionReportInternal",
+        "NeighborhoodInternal",
+        "ParkInternal",
+        "SchoolInternal",
+        "RetailBrandInternal",
+        "RetailBrandExternal",
+        "AuctionMarketingInternal",
+        "RetailBrandRequirement",
+        "ConstructionProjectInternal",
+        "FundInternal",
+        "CommunityProjectExternal",
+        "WhyLiveHere"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = PropertyInternal\n2 = PropertyExternal\n3 = SaleExternal\n4 = CommissionNote\n5 = TenantExternal\n6 = TenantInternal\n7 = TenantTransactionInternal\n8 = SpaceNote\n9 = SpaceVacantInternal\n10 = SupplementalExternal\n14 = LocationInternal\n15 = LocationExternal\n16 = LocationBilling\n25 = CompExternal\n26 = CompInternal\n27 = CompSeller\n28 = CompBuyer\n29 = CompManager\n30 = PropertyGroupExternal\n31 = PropertyGroupInternal\n32 = LeaseDealInternal\n33 = LeaseDealExternal\n34 = LandLease\n35 = LandLeaseCommission\n36 = CompEntityInternal\n37 = CompEntityExternal\n38 = PropertyLoan\n39 = PropertyResidentialExternal\n40 = ListingExternal\n41 = AptsSalesForceNote\n42 = WhyYouLoveUs\n43 = CheckInCheckOutPolicy\n44 = PaymentPolicy\n45 = AdvancedPaymentPolicy\n46 = CancellationPolicy\n47 = ListingLocationDescription\n48 = ContactExternal\n49 = ContactInternal\n50 = ListingExternalGenerated\n51 = DrivingDirections\n52 = StudentHousingDescription\n53 = RenterQualification\n54 = MarketingStakeholderOne\n55 = MarketingStakeholderTwo\n56 = SpaceManager\n57 = ApartmentUnitMarketing\n58 = CmbsLoanCommentary\n59 = CmbsLoanModification\n60 = CmbsLoanDelinquency\n61 = CmbsLoanRealEstateOwned\n62 = CmbsLoanWatchlist\n63 = AuctionDashboardComments\n64 = AuctionReportInternal\n66 = NeighborhoodInternal\n67 = ParkInternal\n68 = SchoolInternal\n69 = RetailBrandInternal\n70 = RetailBrandExternal\n71 = AuctionMarketingInternal\n72 = RetailBrandRequirement\n73 = ConstructionProjectInternal\n74 = FundInternal\n75 = CommunityProjectExternal\n76 = WhyLiveHere"
+    },
+    "RateActualIncreaseMethodType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "x-enum-varnames": [
+        "StepIncreases",
+        "ConsumerPriceIndexIncreases",
+        "ConsumerPriceIndexAndStepIncreases"
+      ],
+      "description": "Allowed values:\n0 = StepIncreases\n1 = ConsumerPriceIndexIncreases\n2 = ConsumerPriceIndexAndStepIncreases"
+    },
+    "RateAmountType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "x-enum-varnames": [
+        "AmountPerSquareFoot",
+        "AmountPerMonth",
+        "AmountPerYear",
+        "AmountPerSquareMeter",
+        "AmountPerSeatPerMonth",
+        "AmountPerSeatPerYear",
+        "AmountPerKilowatt"
+      ],
+      "description": "Allowed values:\n0 = AmountPerSquareFoot\n1 = AmountPerMonth\n2 = AmountPerYear\n3 = AmountPerSquareMeter\n4 = AmountPerSeatPerMonth\n5 = AmountPerSeatPerYear\n6 = AmountPerKilowatt"
+    },
+    "RateEscalationAmountType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "x-enum-varnames": [
+        "None",
+        "StepRatePerAreaOrAmount",
+        "StepPercent",
+        "ConsumerPriceIndex",
+        "ToMarket"
+      ],
+      "description": "Allowed values:\n0 = None\n1 = StepRatePerAreaOrAmount\n2 = StepPercent\n3 = ConsumerPriceIndex\n4 = ToMarket"
+    },
+    "RateEscalationType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "MonetaryIncrease",
+        "ConsumerPriceIndex",
+        "FixedPercentIncrease",
+        "Negotiable",
+        "ToMarket",
+        "EachCalendarYear",
+        "MidLeaseTerm",
+        "SpecificDate",
+        "IntervalAfterLeaseStart",
+        "IntervalStartingOnSpecDate"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = MonetaryIncrease\n2 = ConsumerPriceIndex\n3 = FixedPercentIncrease\n4 = Negotiable\n12 = ToMarket\n13 = EachCalendarYear\n14 = MidLeaseTerm\n15 = SpecificDate\n16 = IntervalAfterLeaseStart\n17 = IntervalStartingOnSpecDate"
+    },
+    "LeaseReviewType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "OpenMarket",
+        "Index"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = OpenMarket\n2 = Index"
+    },
+    "ServiceType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "PlusCleaning",
+        "PlusElectricAndCleaning",
+        "PlusElectric",
+        "UtilitiesAndChar",
+        "PlusUtilities",
+        "FullService",
+        "IndustrialGross",
+        "ModifiedGross",
+        "Net",
+        "Negotiable",
+        "DoubleNet",
+        "TripleNet",
+        "ToBeDetermined",
+        "TenantElectric",
+        "FullyRepairingAndInsuring",
+        "InternalRepairingOnly",
+        "InternalRepairingAndInsuring",
+        "FullServiceGrossNoPass",
+        "ChargesAndTaxesExcluded",
+        "PlusTaxes",
+        "ChargesAndTaxesIncluded",
+        "PlusCharges"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = PlusCleaning\n2 = PlusElectricAndCleaning\n4 = PlusElectric\n5 = UtilitiesAndChar (also PlusUtilitiesAndCleaning)\n6 = PlusUtilities (also PlusAllUtilities)\n7 = FullService (also FullServiceGross)\n8 = IndustrialGross\n9 = ModifiedGross\n10 = Net (also SingleNet)\n11 = Negotiable\n12 = DoubleNet\n13 = TripleNet\n14 = ToBeDetermined\n15 = TenantElectric (also PlusTenantElectric)\n16 = FullyRepairingAndInsuring\n17 = InternalRepairingOnly\n18 = InternalRepairingAndInsuring\n19 = FullServiceGrossNoPass\n20 = ChargesAndTaxesExcluded\n21 = PlusTaxes (also ChargesIncludedTaxesExcluded)\n22 = ChargesAndTaxesIncluded\n23 = PlusCharges (also ChargesExcludedTaxesIncluded)"
+    },
+    "SignagePayerType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Landlord",
+        "Tenant"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Landlord\n2 = Tenant"
+    },
+    "SpaceType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Relet",
+        "New",
+        "Sublet",
+        "Assignment"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Relet\n2 = New\n3 = Sublet\n4 = Assignment"
+    },
+    "SpaceUse": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Office",
+        "OfficeMedical",
+        "OfficeRetail",
+        "Medical",
+        "Retail",
+        "Flex",
+        "Industrial"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Office\n2 = OfficeMedical\n3 = OfficeRetail\n4 = Medical\n5 = Retail\n6 = Flex\n7 = Industrial"
+    },
+    "SpreadOverTermType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1
+      ],
+      "x-enum-varnames": [
+        "EnterByMonth",
+        "EnterByDate"
+      ],
+      "description": "Allowed values:\n0 = EnterByMonth\n1 = EnterByDate"
+    },
+    "LeaseType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Direct",
+        "Sublease",
+        "MonthToMonth",
+        "Owned",
+        "Assignment",
+        "Coworking"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Direct\n2 = Sublease\n3 = MonthToMonth\n4 = Owned\n5 = Assignment\n6 = Coworking"
+    },
+    "BuildOut": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "StandardOffice",
+        "FinancialServices",
+        "ProfessionalServices",
+        "LawFirm",
+        "CallCenter",
+        "GovernmentFacility",
+        "LiveWork",
+        "StandardIndustrial",
+        "StorageAndDistribution",
+        "SelfStorage",
+        "Warehouse",
+        "StandardRetail",
+        "RestaurantsAndCafes",
+        "FastFood",
+        "Bank",
+        "ConvenienceStore",
+        "BarOrNightclub",
+        "StandardFlex",
+        "StandardMedical",
+        "Dental",
+        "PhysicalTherapy",
+        "ResearchAndDevelopment",
+        "Healthcare",
+        "Specialty",
+        "ReligiousFacility",
+        "MovieTheater",
+        "PopupTemporary",
+        "PoliceFireStation",
+        "PostOffice",
+        "CarDealership",
+        "QuickService"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = StandardOffice\n2 = FinancialServices\n3 = ProfessionalServices\n4 = LawFirm\n5 = CallCenter\n7 = GovernmentFacility\n8 = LiveWork\n9 = StandardIndustrial\n10 = StorageAndDistribution\n11 = SelfStorage\n12 = Warehouse\n13 = StandardRetail\n14 = RestaurantsAndCafes\n15 = FastFood\n16 = Bank\n17 = ConvenienceStore\n18 = BarOrNightclub (also DrinkingEstablishment)\n19 = StandardFlex\n21 = StandardMedical\n22 = Dental\n23 = PhysicalTherapy\n24 = ResearchAndDevelopment\n25 = Healthcare\n26 = Specialty\n28 = ReligiousFacility\n29 = MovieTheater\n30 = PopupTemporary\n31 = PoliceFireStation\n32 = PostOffice\n33 = CarDealership\n34 = QuickService"
+    },
+    "BuildOutConditionType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "PartiallyDemolished",
+        "NeedsRenovation",
+        "Average",
+        "Excellent",
+        "Trophy",
+        "Renovated"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = PartiallyDemolished\n2 = NeedsRenovation\n3 = Average\n4 = Excellent\n5 = Trophy\n6 = Renovated"
+    },
+    "BuildOutStatus": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "RawSpace",
+        "ShellSpace",
+        "PartialBuildOut",
+        "FullBuildOut",
+        "SpecSuite"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = RawSpace\n2 = ShellSpace\n3 = PartialBuildOut\n4 = FullBuildOut\n5 = SpecSuite"
+    },
+    "SpaceLayout": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "OpenPlan",
+        "MostlyOpenPlan",
+        "PrivateOffices"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = OpenPlan\n2 = MostlyOpenPlan\n3 = PrivateOffices"
+    },
+    "SpacePosition": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "FoodCourt",
+        "Inline",
+        "EndCap",
+        "Outparcel",
+        "Corner"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "description": "Codes outside this list also occur and have no known meaning. Allowed values:\n0 = Unknown\n1 = FoodCourt\n2 = Inline\n3 = EndCap\n4 = Outparcel\n5 = Corner"
+    }
+  }
+}

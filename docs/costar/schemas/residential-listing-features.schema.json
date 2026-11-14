@@ -1,0 +1,322 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ResidentialListingFeatures",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Id of the MLS listing, the same as `id` in residential-listings. Each record in this file is the feature text of one listing."
+    },
+    "highlights": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ResidentialListingFeatureHighlight"
+      },
+      "description": "The listing's highlights in display order: the short list of standout features Homes.com shows at the top of the listing page."
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ResidentialListingFeatureSection"
+      },
+      "description": "The listing's details as display lines, grouped by category and subcategory in display order. This is the details section of the Homes.com listing page: every feature sentence, plus every feature with no sentence under its own name."
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ResidentialListingFeature"
+      },
+      "description": "Every feature on the listing, one entry per feature, in display order. A feature with no value is simply present."
+    },
+    "derivedValues": {
+      "$ref": "#/$defs/ResidentialListingDerivedValues",
+      "description": "Totals and summary values worked out from the features."
+    }
+  },
+  "$defs": {
+    "ResidentialListingFeatureHighlight": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The highlight as Homes.com shows it, such as `RV Access or Parking` or `0.49 Acre Lot`."
+        },
+        "kind": {
+          "type": "string",
+          "description": "What the highlight is about: `feature` (a feature of the home or community), `lot` (lot size), `hoa` (`No HOA`) or `nearby` (a short walk to a park)."
+        }
+      }
+    },
+    "ResidentialListingFeatureSection": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The top-level group: `Inside This Home` or `Community Details`."
+        },
+        "subcategory": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The group within the category, such as `Kitchen`, `Parking`, `Schools` or `Listing and Financial Details`."
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The display lines of the group, such as `Gas Cooktop`, `3 Carport Spaces`, `4 Bedrooms | 2 Main Level Bedrooms` or `$4,047 Total Annual Tax in 2023`. A line appears once per group."
+        }
+      }
+    },
+    "ResidentialListingFeature": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the feature in CoStar's residential feature catalog. The same id means the same feature on every listing."
+        },
+        "name": {
+          "type": "string",
+          "description": "The feature's display name, such as `Dishwasher` or `Annual Tax Amount`."
+        },
+        "category": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The top-level group of the feature: `Inside This Home` or `Community Details`."
+        },
+        "subcategory1": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The group within the category, the same groups as `sections.subcategory`."
+        },
+        "subcategory2": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "A finer group within `subcategory1`. Some names are internal labels, such as `Hidden Utilities`."
+        },
+        "source": {
+          "type": "string",
+          "description": "Where the feature came from: `Mls` (the listing's MLS data), `MachineLearning` (read from the listing's remarks or photos by a CoStar model), `Research` or `ComputerVision`."
+        },
+        "inSentence": {
+          "type": "boolean",
+          "description": "Whether a feature sentence shows the feature. A feature with no sentence appears in `sections` under its own name, unless Homes.com hides it, as it does utility connections."
+        },
+        "boolValue": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "The feature's yes or no value, on yes/no features only."
+        },
+        "doubleValue": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "The feature's number, such as a tax amount, a fee, a count or an area, on numeric features only."
+        },
+        "stringValues": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "The feature's text values, such as a school name, a subdivision name or the items an HOA fee covers."
+        },
+        "frequency": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "How often an amount is paid, on fee features only: `Monthly`, `Quarterly`, `Semiannually` or `Annually`."
+        }
+      }
+    },
+    "ResidentialListingDerivedValues": {
+      "type": "object",
+      "properties": {
+        "totalMonthlyAssociationFees": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Total HOA and association fees per month, in US dollars."
+        },
+        "totalParkingSpaces": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Total parking spaces of every kind."
+        },
+        "totalBathrooms": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Total bathrooms, with a half bathroom counted as 0.5."
+        },
+        "lotSizeInAcres": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Lot size in acres, rounded to two decimals."
+        },
+        "homeSquareFeet": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Living area in square feet."
+        },
+        "propertyType": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The home type, such as `House`, `Condominium` or `Townhouse`."
+        },
+        "numberOfStories": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Number of stories."
+        },
+        "yearBuilt": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Year the home was built."
+        },
+        "totalBedrooms": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Total bedrooms."
+        },
+        "totalGarageSpaces": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Total garage spaces."
+        },
+        "totalParkingGarageSpaces": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Spaces in a shared parking garage."
+        },
+        "totalPrivateGarageSpaces": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Spaces in the home's own garage."
+        },
+        "totalCarportParkingSpaces": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Carport spaces."
+        },
+        "totalOpenParkingSpaces": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Open, uncovered parking spaces."
+        },
+        "newConstruction": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "True when the home is new construction."
+        },
+        "squareFeetMin": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Smallest living area in square feet, the same as `homeSquareFeet` for a single home."
+        },
+        "squareFeetMax": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Largest living area in square feet, the same as `homeSquareFeet` for a single home."
+        },
+        "availabilityDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Date a rental becomes available, as `YYYY-MM-DD`."
+        },
+        "lotSizeInAcresRaw": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Lot size in acres, unrounded."
+        },
+        "buildingStyle": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The building's style, such as `midRise` or `highRise`."
+        },
+        "totalMonthlyLandFees": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Total land lease fees per month, in US dollars."
+        }
+      }
+    }
+  }
+}

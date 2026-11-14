@@ -35,3 +35,5 @@ data/
 .cache/
 scripts/explore/.cache/
 *.costar-cache.json
+
+costar-hackathon-kit/
