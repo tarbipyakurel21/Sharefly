@@ -1,15 +1,15 @@
-# Lightweight modular architecture
+# Target architecture
 
-The application will be one deployable service with provider adapters, not a fleet of microservices.
+- **Next.js (App Router) + TypeScript strict + Tailwind 4**, repo root. Server Components read the DB
+  directly; client components call `/api/*` route handlers for mutations.
+- **SQLite via better-sqlite3**, schema in `lib/db/schema.ts`, created on first use, seeded by `scripts/seed.ts`.
+- **Business logic in `lib/`** as pure functions: `units`, `geo`, `matching`, `room`, `pickups`, `ai`.
+- **Auth**: HMAC-signed HTTP-only cookie holding a user id. Sign in by name + email. `DEMO_MODE` adds a person switcher.
+- **AI**: `AIProvider` interface (`anthropic | mock | none`), Zod-validated output, post-check for invented measurements/brands, deterministic fallbacks.
+- **Matching**: hard filters → 0-100 score → human reasons, both directions, upsert on (listing, wishlist).
+- **Room planner**: React Three Fiber, 1 unit = 1 m, procedural furniture, SAT collision, 2D SVG fallback.
+- **RideBoard**: server-enforced state machine in `lib/pickups/state.ts`.
+- **Optional**: `ReferenceSpaceProvider` with a null default.
 
-```text
-UI -> application service -> domain workflows/agents
-                         -> provider interfaces
-                            -> Gemini | database | deployment | optional sponsor APIs
-                         -> evidence/audit log
-```
-
-Proposed boundaries: `frontend/` for the demo UI; `backend/services/` for use cases; `backend/agents/` for bounded workflows; `backend/integrations/<provider>/` for adapters; `tests/` for contract and end-to-end tests. Each provider exposes an interface and mock implementation. Configuration selects enabled providers through environment variables. The core workflow must work with mocks and degrade gracefully when credentials or network access are absent.
-
-No application modules should be created until the idea and sponsor strategy are approved.
-
+## Migration
+`backend/` and `frontend/` moved to `legacy/` with `git mv` (history preserved). Nothing was deleted.
