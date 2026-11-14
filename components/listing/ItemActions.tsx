@@ -42,7 +42,7 @@ export function ItemActions(p: Props) {
       {p.isFurniture && (
         <div className="space-y-2 rounded-2xl border border-line bg-surface p-3">
           {p.rooms.length > 1 && <Select aria-label="Which room?" value={roomId} onChange={(e) => setRoomId(e.target.value)}>{p.rooms.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}</Select>}
-          <LinkButton href={roomHref} variant="secondary" className="w-full">{p.rooms.length ? "Preview in my room" : "Set up a room to preview this"}</LinkButton>
+          <LinkButton href={roomHref} variant="secondary" className="w-full">{p.rooms.length ? "Arrange it on my floor plan" : "Make a floor plan to arrange it"}</LinkButton>
         </div>
       )}
 
