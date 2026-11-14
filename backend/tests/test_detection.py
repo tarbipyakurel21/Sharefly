@@ -82,3 +82,13 @@ def test_cluster_key_is_stable_and_order_independent():
     (first,) = detect_clusters(messages)
     (second,) = detect_clusters(list(reversed(messages)))
     assert first["key"] == second["key"] and len(first["key"]) == 12
+
+
+def test_signal_ablation_separates_text_and_link_contributions():
+    messages = [
+        msg("a", "s1", 0, SCAM + " https://jobs.example/apply"),
+        msg("b", "s2", 5, SCAM + " https://other.example/apply"),
+    ]
+    assert len(detect_clusters(messages, signals=frozenset({"similar_text"}))) == 1
+    assert len(detect_clusters(messages, signals=frozenset({"shared_url"}))) == 0
+    assert len(detect_clusters(messages)) == 1

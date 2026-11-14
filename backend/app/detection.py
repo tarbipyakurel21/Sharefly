@@ -39,8 +39,10 @@ def _level(score: int) -> str:
     return "low"
 
 
-def find_links(messages: list[Message], cfg: DetectionConfig) -> nx.Graph:
+def find_links(messages: list[Message], cfg: DetectionConfig,
+               signals: frozenset[str] | None = None) -> nx.Graph:
     """Return a graph whose nodes are message ids and whose edges carry the linking signals."""
+    signals = signals or frozenset({"shared_url", "similar_text"})
     g = nx.Graph()
     by_url: dict[str, list[Message]] = {}
     for m in messages:
@@ -49,6 +51,8 @@ def find_links(messages: list[Message], cfg: DetectionConfig) -> nx.Graph:
 
     for url, group in by_url.items():
         for a, b in combinations(group, 2):
+            if "shared_url" not in signals:
+                continue
             if a.sender_id == b.sender_id:
                 continue
             if not g.has_edge(a.message_id, b.message_id):
@@ -58,6 +62,8 @@ def find_links(messages: list[Message], cfg: DetectionConfig) -> nx.Graph:
     tokens = {m.message_id: tokenize(m.text) for m in messages}
     comparable = [m for m in messages if len(tokens[m.message_id]) >= cfg.min_tokens]
     for a, b in combinations(comparable, 2):
+        if "similar_text" not in signals:
+            continue
         if a.sender_id == b.sender_id:
             continue
         sim = jaccard(tokens[a.message_id], tokens[b.message_id])
@@ -169,10 +175,11 @@ def _build_cluster(ids: set[str], links: nx.Graph, by_id: dict[str, Message],
     }
 
 
-def detect_clusters(messages: list[Message], cfg: DetectionConfig | None = None) -> list[dict]:
+def detect_clusters(messages: list[Message], cfg: DetectionConfig | None = None,
+                    signals: frozenset[str] | None = None) -> list[dict]:
     """Return flagged clusters, highest score first, with ids C1, C2, ..."""
     cfg = cfg or DetectionConfig()
-    links = find_links(messages, cfg)
+    links = find_links(messages, cfg, signals)
     by_id = {m.message_id: m for m in messages}
     clusters = [_build_cluster(set(c), links, by_id, cfg) for c in nx.connected_components(links)]
     clusters.sort(key=lambda c: (-c["score"], c["first_seen"], c["message_ids"][0]))

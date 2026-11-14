@@ -1,8 +1,8 @@
 # Ranked project ideas
 
-## 1. Octate — trustworthy surgical-video annotation copilot
+## 1. PatternWitness — evidence-backed coordination pattern workspace
 
-Problem: surgical researchers need consistent temporal labels and explanations from video. User: clinical research teams. Novelty: uncertainty-aware, human-in-the-loop annotation with evidence clips. Feasibility: high with a small synthetic/sample video and lightweight vision pipeline. Demo: upload a short clip, review suggested phases, correct one label, export an auditable annotation. Main fit: Healthcare or Science and Discovery. Compatible: Gemini, MongoDB/Tiger Data, Vultr, possibly Physical AI. Risk: medical claims, compute, and prior-implementation reuse; only new event code may be used unless rules permit otherwise. MVP: clip upload, timestamp labels, reviewer corrections, JSON/CSV export.
+Problem: investigators and trust-and-safety teams need to identify possible coordination in message data without treating a model's suspicion as proof. User: researchers and analysts. Novelty: every flagged pattern links back to source messages, evidence, and uncertainty for human review. Feasibility: implemented prototype with deterministic analysis, optional assistant support, durable storage, and report export. Demo: load a message set, inspect a pattern cluster, review the supporting evidence, and export an auditable report. Main fit: Science and Discovery or Business and Enterprise. Compatible: Gemini, MongoDB/Tiger Data, DEV, and Vultr when independently verified. Risk: privacy, false positives, bias, and avoiding unsupported claims. MVP: message ingestion, pattern analysis, evidence panel, human review, and report export.
 
 ## 2. EvidenceGraph — forensic media provenance workspace
 
@@ -20,5 +20,5 @@ Problem: researchers need to understand how narratives evolve across public post
 
 Problem: students lose time coordinating literature, experiments, and provenance. User: research labs. Novelty: agent turns a question into a traceable plan while separating evidence from hypotheses. Feasibility: medium. Demo: ask a question, inspect cited sources, run a small analysis, export a lab notebook. Main fit: Science and Discovery or Education. Compatible: Gemini, Deepagents if confirmed, Tiger Data, Vultr. Risk: retrieval quality and agent complexity. MVP: source-backed plan, one analysis tool, notebook export.
 
-Recommendation: **Octate** if the team has genuine surgical-video expertise and can build a fresh event-window prototype; otherwise choose **EvidenceGraph** for the strongest risk-adjusted two-minute demo. No product implementation should begin until the team approves one.
+Recommendation: **PatternWitness** is the selected project and the implemented prototype. Select exactly one HackPrinceton main track after organizer confirmation; the prize matrix remains the source of truth for sponsor opportunities and does not imply eligibility without evidence.
 

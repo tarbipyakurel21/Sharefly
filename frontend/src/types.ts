@@ -77,6 +77,7 @@ export interface Analysis {
   messages: MessageRow[];
   config: { similarity_threshold: number; time_window_minutes: number; min_tokens: number };
   disclaimer: string;
+  signal_comparison: { label: string; clusters: number; flagged_messages: number }[];
   review_statuses: Record<ReviewStatus, string>;
 }
 

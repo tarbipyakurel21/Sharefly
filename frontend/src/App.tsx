@@ -224,6 +224,22 @@ export default function App() {
               <StatTile label="Messages in clusters" value={analysis.stats.flagged_messages} accent />
             </div>
 
+            <section className="rounded-xl border border-sky-400/20 bg-sky-400/5 px-4 py-3">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h2 className="text-sm font-semibold text-slate-100">Why combine signals?</h2>
+                <span className="text-xs text-sky-100/70">Deterministic ablation on this dataset</span>
+              </div>
+              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                {analysis.signal_comparison.map((item) => (
+                  <div key={item.label} className="rounded-lg border border-line bg-ink-900 px-3 py-2">
+                    <p className="text-xs text-slate-400">{item.label}</p>
+                    <p className="mt-1 font-mono text-lg text-slate-100">{item.clusters} clusters</p>
+                    <p className="text-[11px] text-slate-500">{item.flagged_messages} messages linked</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
             <div className="grid gap-4 xl:h-[600px] xl:grid-cols-[280px_minmax(0,1fr)_380px]">
               <section className="flex min-h-0 flex-col rounded-xl border border-line bg-ink-900">
                 <h2 className="border-b border-line px-4 py-3 text-sm font-semibold text-slate-100">
