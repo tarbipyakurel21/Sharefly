@@ -1,0 +1,20 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Local SQLite database (created at runtime)
+backend/data/
+
+# Node
+node_modules/
+frontend/dist/
+
+# Misc
+.DS_Store
+
+# Secrets: only the example file is tracked
+.env
+.env.*
+!.env.example
