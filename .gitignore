@@ -28,3 +28,10 @@ data/
 *.tsbuildinfo
 test-results/
 playwright-report/
+
+# CoStar track (must never be published)
+data/
+.env.local
+.cache/
+scripts/explore/.cache/
+*.costar-cache.json
