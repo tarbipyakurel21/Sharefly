@@ -1,13 +1,34 @@
 # Agent instructions
 
-1. Before proposing or implementing a major feature, inspect `docs/PRIZE_MATRIX.md`, `docs/HACKPRINCETON_TRACKS.md`, and `docs/SPONSOR_APIS.md`. Decide whether it improves legitimate eligibility; never add technology only for superficial eligibility.
-2. Prioritize a real problem, working end-to-end functionality, reliability, user experience, meaningful sponsor integrations, then documentation and polish.
-3. Every claimed sponsor integration needs actual code usage, meaningful purpose, reproducible demonstration, access/credentials, tests or validation evidence, and documentation.
-4. Update the prize matrix after major features. Use only: Not applicable, Potentially eligible, Integration planned, Implemented, Verified, Submitted. Never mark Verified without evidence.
-5. Never hardcode secrets. Use `.env.example`, validate external inputs, respect rate limits, use synthetic or licensed data, and protect private information.
-6. Record repository creation date, event-written code, reused libraries, third-party assets, attribution/licenses, and AI-generated code disclosures. Do not disguise old code as new work.
-7. Every major feature must support a compelling two-minute demo showing problem, user, solution, innovation, working functionality, and measurable benefit.
-8. Prefer a smaller reliable prototype over unrelated sponsor integrations.
-9. After each major task update `docs/IMPLEMENTATION_PLAN.md` with completed work, tests, failures, limitations, and next priorities.
-10. Never fabricate benchmarks, interviews, API functionality, deployments, eligibility, or performance gains.
+## Product
 
+ShareFly connects people giving away items with people who need them: one-photo AI-assisted listings, wishlists with two-way matching,
+a 3D room planner, and RideBoard pickup coordination. It is a hackathon MVP. (The earlier PatternWitness project lives in `legacy/`.)
+
+## Repository map and commands
+
+- `app/` Next.js App Router pages and `app/api/*` route handlers. `components/` UI. `lib/` pure logic (`matching`, `room`, `pickups`, `units`, `ai`, `db`).
+- `scripts/` seed and seed-image generation. `tests/unit` (Vitest), `tests/e2e` (Playwright). `docs/` audit, architecture, decisions, demo, plan.
+- `npm install`, `cp .env.example .env.local`, `npm run db:seed`, `npm run dev`. Checks: `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:e2e`.
+
+## Rules
+
+- Read the existing code before editing. Prefer focused, reversible changes. Do not rewrite history or force-push.
+- Never invent facts about an item (condition, brand, measurements). Unknown is `null` and shown as "not provided". Never show "fits" for unconfirmed sizes.
+- Never present deterministic templates or the mock provider as live AI. Any AI call needs timeout, schema validation, fallback, tests and an `.env.example` entry.
+- Every API input is validated with Zod; errors are `{ error: { code, message } }` with human wording. Secrets stay server-side; never commit them.
+- Photos: validate by magic bytes, cap size. Locations are neighborhoods only, never street addresses.
+- Do not claim sponsor eligibility, benchmarks, deployments or integrations without code and proof. CoStar/Matterport stay behind `lib/reference-spaces` until access is confirmed.
+- After each major task update `docs/IMPLEMENTATION_PLAN.md` (done, tests, failures, limitations, next). Record decisions in `docs/DECISIONS.md`.
+- Demo-critical path: wishlist + room -> photo listing -> match -> preview in room -> pickup request. Keep `npm run test:e2e` green.
+- Record reused libraries, assets/licenses and AI-generated code disclosures in the README.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
