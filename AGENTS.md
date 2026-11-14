@@ -22,3 +22,13 @@ a 3D room planner, and RideBoard pickup coordination. It is a hackathon MVP. (Th
 - After each major task update `docs/IMPLEMENTATION_PLAN.md` (done, tests, failures, limitations, next). Record decisions in `docs/DECISIONS.md`.
 - Demo-critical path: wishlist + room -> photo listing -> match -> preview in room -> pickup request. Keep `npm run test:e2e` green.
 - Record reused libraries, assets/licenses and AI-generated code disclosures in the README.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
