@@ -67,13 +67,10 @@ export function TourPanel({ matterport, title, stageHref = "#room-view", stageLa
   const go = (n: number) => { setI(n); setLoaded(false); };
   return (
     <section aria-label="3D tour" data-testid="tour-panel" className="space-y-2 rounded-[var(--radius-card)] border border-line bg-surface p-4 shadow-[var(--shadow-soft)]">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-display text-lg">3D tour</h2>
-        <span data-testid="tour-level" className="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent">{LEVEL_LABEL[current.level]}</span>
-      </div>
+      <span data-testid="tour-level" className="sr-only">{LEVEL_LABEL[current.level]}</span>
       {!open ? (
         <button type="button" onClick={() => setOpen(true)} className="w-full rounded-xl border border-line bg-sunken p-6 text-sm font-medium hover:bg-line/40">
-          Load the 3D tour of {title}
+          Load 3D tour
         </button>
       ) : (
           <div className="relative aspect-video overflow-hidden rounded-xl bg-sunken" data-tour-stage>
@@ -113,7 +110,6 @@ export function TourPanel({ matterport, title, stageHref = "#room-view", stageLa
           ))}
         </div>
       )}
-      <p className="text-xs text-muted">Tour: Matterport. This is the apartment reference tour; the ShareFly planner below is the editable furniture surface. Community and floor-plan tours may show a different unit than yours.</p>
     </section>
   );
 }

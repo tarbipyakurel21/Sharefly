@@ -6,7 +6,6 @@ import { getReferenceSpaceProvider } from "@/lib/reference-spaces/provider";
 import { formatLength } from "@/lib/units";
 import { SignInCard } from "@/components/layout/SignInForm";
 import { RoomForm } from "@/components/room/RoomForm";
-import { EmptyState } from "@/components/ui/EmptyState";
 
 export const metadata: Metadata = { title: "Your rooms" };
 export const dynamic = "force-dynamic";
@@ -18,10 +17,6 @@ export default async function RoomsPage({ searchParams }: { searchParams: Promis
   const rooms = await listRooms(user.id);
   return (
     <div className="mx-auto max-w-3xl space-y-8">
-      <div>
-        <h1 className="font-display text-3xl">Your rooms</h1>
-        <p className="mt-1 text-muted">{add ? "Choose a room to arrange this item in." : "Select a room to see exactly how a piece of furniture would sit in it."}</p>
-      </div>
       {rooms.length ? (
         <ul className="grid gap-3 sm:grid-cols-2">
           {rooms.map((r) => (
@@ -34,7 +29,7 @@ export default async function RoomsPage({ searchParams }: { searchParams: Promis
             </li>
           ))}
         </ul>
-      ) : <EmptyState title="No rooms yet" body="Add one below. It only takes length, width and height." />}
+      ) : null}
       <RoomForm realApartments={await getReferenceSpaceProvider().isAvailable()} addListingId={add} defaultName={rooms.length ? `Room ${rooms.length + 1}` : "Bedroom"} />
     </div>
   );

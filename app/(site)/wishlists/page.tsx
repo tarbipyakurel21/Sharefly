@@ -18,8 +18,7 @@ export default async function WishlistsPage({ searchParams }: { searchParams: Pr
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div>
-        <h1 className="font-display text-3xl">Your wishlists</h1>
-        <p className="mt-1 text-muted">Tell us what you need once. We'll keep an eye out so you don't have to.</p>
+        <p className="text-muted">Tell us what you need once. We'll keep an eye out so you don't have to.</p>
       </div>
       <WishlistComposer initialText={q ?? ""} defaultNeighborhood={user.neighborhood ?? ""} />
       {items.length ? <WishlistList items={items} counts={counts} /> : <EmptyState title="No wishlists yet" body="Describe something you're looking for above, like “a desk under $30”." />}

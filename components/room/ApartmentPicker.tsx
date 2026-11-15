@@ -66,16 +66,6 @@ export function ApartmentPicker({ onPick, pickedId }: { onPick: (s: PickedSpace)
             {results.spaces.every((s) => s.lat == null || s.lng == null) && <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-muted">Demo map preview. Exact location is not provided for this apartment record; choose it from the demo card below.</div>}
             <div className="pointer-events-none absolute bottom-3 right-3 rounded-lg bg-white/90 px-3 py-2 text-xs text-muted shadow-sm">Select a pin to preview its 3D tour</div>
           </div>}
-          {mapMode && pickedId && (() => {
-            const selected = results.spaces.find((s) => s.id === pickedId);
-            if (!selected) return null;
-            return <div className="mb-3 rounded-2xl border border-accent bg-accent-soft p-4" data-testid="selected-apartment">
-              <p className="text-xs font-semibold uppercase tracking-wide text-accent">Selected apartment</p>
-              <p className="mt-1 font-semibold">{selected.communityName ?? "Community name not provided"}</p>
-              <p className="text-sm text-muted">{selected.city}, {selected.state} · {selected.floorPlanName ?? "Floor plan not provided"} · {bedsLabel(selected.beds)} · {sqftLabel(selected)}</p>
-              <p className="mt-1 text-xs text-muted">{selected.lat}, {selected.lng} · click another map pin to change</p>
-            </div>;
-          })()}
           {!mapMode && <ul className="grid gap-2 sm:grid-cols-2" data-testid="ap-results">
             {results.spaces.map((s) => {
               const c = s.colleges[0];
@@ -104,7 +94,6 @@ export function ApartmentPicker({ onPick, pickedId }: { onPick: (s: PickedSpace)
               );
             })}
           </ul>}
-          {mapMode && !pickedId && results.spaces.some((s) => s.lat != null && s.lng != null) && <p className="rounded-xl bg-sunken p-3 text-sm text-muted">Select a pin on the map to choose an apartment and load its 3D tour.</p>}
         </div>
       )}
     </section>

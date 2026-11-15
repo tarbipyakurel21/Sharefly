@@ -1,5 +1,18 @@
 # Decisions
 
+- 2026-11-15: Render the footer navigation at every viewport size and pin it to the bottom; reserve page bottom padding so the footer does not obscure content.
+- 2026-11-15: Replace dashboard action buttons with a direct search form and expose RideBoard in the persistent footer as “Rides”.
+- 2026-11-15: Remove redundant visible headings from the footer-linked Wishlists, Rooms, Matches, and RideBoard pages; retain supporting copy and metadata titles.
+- 2026-11-15: Keep the Rooms page focused on room cards and the creation form by removing its extra instructional and empty-state copy.
+- 2026-11-15: Keep the map-based room form focused on selection and controls by removing its redundant 3D-room heading and instructional paragraph.
+- 2026-11-15: Keep map selection compact by removing the selected-apartment summary card; the selected pin remains the visual state.
+- 2026-11-15: Keep the room setup flow compact by reducing the tour panel to its load/control UI and removing repeated source and estimate copy.
+- 2026-11-15: Hide the room form until a map apartment is selected so the Rooms page does not show an empty card beneath the map.
+- 2026-11-15: Remove the browse-page “Find something you need” heading at the owner's request; keep the search form as the page's primary entry point.
+- 2026-11-15: Remove the shared HackPrinceton/photo/3D-preview footer disclosure from the global layout at the owner's request.
+- 2026-11-15: Keep the global header compact by showing only the helping-hands mark; retain the ShareFly name in the document title and landing/dashboard content.
+- 2026-11-15: Remove the duplicate landing-page hero logo and wordmark above the primary heading; keep the global header mark and accessible home link.
+
 - 2026-11-14: Keep the built-in Rabinowitz Hall record available as an explicitly labelled offline demo when live reference-space data is absent. The apartment map opens by default, but records with null coordinates show a no-location message rather than fabricated map coordinates.
 - 2026-11-14: The local demo uses the bundled `data/reference-spaces.json` dataset when available (`REFERENCE_SPACES_PROVIDER=costar`), preserving the supplied Houston/Los Angeles latitude, longitude, and Matterport ids. The lightweight map intentionally plots coordinates without claiming street-level tiles.
 
