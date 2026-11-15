@@ -21,14 +21,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const matches = user ? await newMatchCount(user.id) : 0;
   return (
     <html lang="en" className={`${body.variable} ${head.variable}`}>
-      <body className="min-h-screen pb-24 md:pb-0">
+      <body className="min-h-screen pb-24">
         <ToastProvider>
           <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2">Skip to content</a>
           <Header user={user} />
           <main id="main" className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 md:py-10">{children}</main>
-          <footer className="mx-auto max-w-6xl px-4 pb-10 pt-4 text-sm text-muted sm:px-6">
-            ShareFly · Made at HackPrinceton. Photos belong to their respective listings; generated 3D previews are clearly labelled.
-          </footer>
           <MobileNav matches={matches} />
         </ToastProvider>
       </body>

@@ -76,9 +76,7 @@ export function RoomForm({ addListingId, defaultName, realApartments = false }: 
         </div>
       )}
       {mapMode && <ApartmentPicker onPick={pick} pickedId={picked?.id ?? null} />}
-      <form id="room-form" onSubmit={submit} className="space-y-4 rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-[var(--shadow-soft)]">
-        <h2 className="font-display text-xl">{mapMode ? "Your 3D room" : "Add a room"}</h2>
-        {mapMode && !picked && <p className="text-sm text-muted">Select a pin on the map. The Matterport 3D tour becomes your room, and its size comes from the scan.</p>}
+      {(!mapMode || picked) && <form id="room-form" onSubmit={submit} className="space-y-4 rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-[var(--shadow-soft)]">
         {mapMode && picked && <>
           {picked.selectedUnitNumber && <p className="text-sm text-muted">Apartment {picked.selectedUnitNumber} selected. The exact unit scan is used when available; otherwise the floor-plan or community scan is shown.</p>}
           <TourPanel matterport={picked.matterport} title={picked.communityName ?? "this apartment"} stageHref="#room-form" stageLabel="Continue" />
@@ -99,11 +97,6 @@ export function RoomForm({ addListingId, defaultName, realApartments = false }: 
               </ul>
             </div>
           )}
-          {!measuredId && picked.estimate && (
-            <p data-testid="estimate-note" className="rounded-xl bg-warn-soft p-3 text-sm text-warn">
-              Size is estimated from a {picked.minSqft?.toLocaleString("en-US")} sq ft floor plan, not measured. Data: CoStar.
-            </p>
-          )}
           {!sizeReady && measured?.state === "done" && <p data-testid="no-size-note" className="rounded-xl bg-sunken p-3 text-sm text-muted">No size is provided for this space. Pick another apartment, or enter dimensions instead.</p>}
         </>}
         {!mapMode && <>
@@ -118,7 +111,7 @@ export function RoomForm({ addListingId, defaultName, realApartments = false }: 
         </>}
         {err && <p role="alert" className="text-sm text-bad">{err}</p>}
         {(!mapMode || (picked && sizeReady)) && <Button type="submit" loading={busy}>{mapMode ? "Use this 3D room" : "Create my room"}</Button>}
-      </form>
+      </form>}
     </div>
   );
 }

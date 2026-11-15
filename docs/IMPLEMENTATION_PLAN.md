@@ -45,6 +45,53 @@ Last updated 2026-11-14.
 3. Reference spaces (CoStar/Matterport) if access is confirmed.
 4. Deployment config (hosted DB, object storage).
 
+## Header wordmark cleanup (2026-11-15)
+- Done: removed the duplicate “ShareFly” text from the global header; the home link remains accessible via its `aria-label`, while the browser title and landing/dashboard wordmark remain unchanged.
+- Tests: `npm run typecheck` and `git diff --check` pass.
+- Limitation: none known.
+- Next: none.
+
+## Landing hero branding cleanup (2026-11-15)
+- Done: removed the duplicate ShareFly logo and wordmark directly above the “Giving something away should take seconds.” hero heading; global navigation branding is unchanged.
+- Tests: `npm run typecheck` and `git diff --check` pass.
+- Limitation: none known.
+- Next: none.
+
+## Footer disclosure cleanup (2026-11-15)
+- Done: removed the shared footer disclosure text from the global layout at the owner's request.
+- Tests: `npm run typecheck` and `git diff --check` pass.
+- Limitation: none known.
+- Next: none.
+
+## Browse heading cleanup (2026-11-15)
+- Done: removed the “Find something you need” heading from the browse page while keeping search, filters, and listing results unchanged.
+- Tests: `npm run typecheck` and `git diff --check` pass.
+- Limitation: none known.
+- Next: none.
+
+## Persistent footer navigation (2026-11-15)
+- Done: made the footer navigation visible and fixed at the bottom on fullscreen desktop as well as mobile, with page padding preventing content from being covered.
+- Tests: `npm run typecheck` and `git diff --check` pass.
+- Limitation: the desktop header navigation remains available as a second navigation path.
+- Next: none.
+
+## Redundant page heading cleanup (2026-11-15)
+- Done: removed the visible page headings from Wishlists, Rooms, Matches, and RideBoard because the persistent footer already identifies those destinations; supporting copy and browser metadata remain.
+- Done: removed the Rooms page's remaining instructional intro and empty-state copy so the room cards/form stand alone.
+- Done: removed the 3D-room form heading and map-selection instructional copy.
+- Done: removed the selected-apartment summary card and its fallback/location text.
+- Done: simplified the 3D tour panel to a single load control and removed repeated tour/source explanation and estimate copy.
+- Done: removed the map prompt and prevented the empty room form card from rendering before a map pin is selected.
+- Tests: typecheck and diff check run after the change.
+- Limitation: none known.
+- Next: none.
+
+## Dashboard search and footer rides link (2026-11-15)
+- Done: replaced the dashboard's two large action buttons with a direct item search form and added RideBoard as “Rides” in the persistent footer navigation.
+- Tests: `npm run typecheck` and `git diff --check` pass.
+- Limitation: dashboard search submits the query to Browse; neighborhood/category filters remain on Browse.
+- Next: none.
+
 ## Planner / Matterport handoff (2026-11-14)
 - Done: clarified that the Matterport iframe is view-only and added a direct “Stage furniture in ShareFly” anchor from the tour to the editable planner.
 - Done: added an in-planner hint explaining that furniture is placed against the measured room, with drag and top-down controls.

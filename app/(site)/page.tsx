@@ -1,4 +1,3 @@
-import { LinkButton } from "@/components/ui/Button";
 import { ListingCard } from "@/components/listing/ListingCard";
 import { listListings } from "@/lib/db/queries";
 
@@ -18,10 +17,11 @@ export default async function Landing() {
         <div>
           <h1 className="font-display text-4xl font-semibold leading-tight sm:text-5xl">Giving something away should take seconds.</h1>
           <p className="mt-4 max-w-xl text-lg text-muted">Finding something you need should feel effortless. ShareFly connects neighbors who have things they no longer want with people who could really use them.</p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <LinkButton href="/give" className="min-h-12 px-6 text-base">Give something away</LinkButton>
-            <LinkButton href="/browse" variant="secondary" className="min-h-12 px-6 text-base">Find something you need</LinkButton>
-          </div>
+          <form action="/browse" className="mt-7 flex max-w-xl gap-2" role="search">
+            <label htmlFor="dashboard-search" className="sr-only">Search for items</label>
+            <input id="dashboard-search" name="q" type="search" placeholder="Search for a desk, a lamp, a bookshelf…" className="min-h-12 min-w-0 flex-1 rounded-xl border border-line bg-surface px-4 text-base outline-none placeholder:text-muted focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            <button type="submit" className="min-h-12 rounded-xl bg-accent px-5 font-semibold text-white transition-colors hover:bg-accent/90">Search</button>
+          </form>
         </div>
         {recent[0]?.photoUrl && (
           <div className="relative hidden md:block">

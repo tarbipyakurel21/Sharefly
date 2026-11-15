@@ -3,7 +3,10 @@ import { test, expect, type Page } from "@playwright/test";
 async function switchTo(page: Page, name: string) {
   await page.goto("/browse");
   await page.getByLabel("Account menu").click();
-  await page.getByLabel("Demo: switch person").selectOption({ label: name });
+  // Option text carries a role suffix, e.g. "Maya Chen (Receiver)", so match on the name.
+  const select = page.getByLabel("Demo: switch person");
+  const value = await select.locator("option", { hasText: name }).first().getAttribute("value");
+  await select.selectOption(value!);
   await expect(page.getByLabel("Account menu")).toContainText(name.split(" ")[0]);
   await page.waitForTimeout(300);
 }
@@ -120,7 +123,7 @@ test("demo path: wishlist + room -> photo listing -> match -> preview -> pickup"
 });
 
 test("reverse direction: listing first, then wishlist matches", async ({ page }) => {
-  await switchTo(page, "Dana Whitfield");
+  await switchTo(page, "Sam Okafor");
   await page.goto("/wishlists");
   await page.getByLabel("What are you looking for?").fill("a tall bookshelf");
   await page.getByRole("button", { name: "Save wishlist" }).click();
@@ -131,7 +134,7 @@ test("reverse direction: listing first, then wishlist matches", async ({ page })
 
 test("AI unavailable never blocks publishing (title-only listing)", async ({ page }) => {
   await page.route("**/api/ai/describe-item", (r) => r.fulfill({ json: { status: "unavailable", reason: "timeout" } }));
-  await switchTo(page, "Alex Brooks");
+  await switchTo(page, "Jordan Rivera");
   await page.goto("/give");
   await page.locator("#file-lib").setInputFiles("public/seed/lamp.jpg");
   await expect(page.getByText("We couldn't describe this one automatically")).toBeVisible();
@@ -141,7 +144,7 @@ test("AI unavailable never blocks publishing (title-only listing)", async ({ pag
 });
 
 test("3D planner: dragging a piece moves it and keeps it inside the walls", async ({ page }) => {
-  await switchTo(page, "Priya Nair");
+  await switchTo(page, "Maya Chen");
   await page.goto("/rooms/r-priya?add=l-table");
   await expect(page.getByTestId("piece-pos")).toBeVisible({ timeout: 15_000 });
   await page.waitForTimeout(1500);
@@ -188,7 +191,7 @@ test("View in 3D: to-scale AR model for measured items, honest message otherwise
 
 test("iPhone HEIC photos work in Chrome: new listing", async ({ page }) => {
   // Chromium can't decode HEIC itself, so this exercises the on-device conversion.
-  await switchTo(page, "Alex Brooks");
+  await switchTo(page, "Jordan Rivera");
   await page.goto("/give");
   await page.locator("#file-lib").setInputFiles("tests/fixtures/desk.heic");
   await expect(page.getByLabel("Title")).toHaveValue("Desk", { timeout: 20_000 });

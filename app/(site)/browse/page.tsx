@@ -32,7 +32,6 @@ export default async function Browse({ searchParams }: { searchParams: Promise<S
   const wishText = [sp.q, category && !sp.q?.includes(category) ? category : ""].filter(Boolean).join(" ");
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl">Find something you need</h1>
       <form action="/browse" className="grid gap-3 md:grid-cols-[1fr_220px_auto_auto]" role="search">
         {category && <input type="hidden" name="category" value={category} />}
         <TextInput name="q" defaultValue={sp.q ?? ""} placeholder="Search for a desk, a lamp, a bookshelf…" aria-label="Search items" />

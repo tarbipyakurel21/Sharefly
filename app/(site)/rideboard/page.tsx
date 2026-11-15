@@ -19,7 +19,6 @@ export default async function RideBoard() {
   return (
     <div className="mx-auto max-w-3xl space-y-10">
       <div>
-        <h1 className="font-display text-3xl">RideBoard</h1>
         <p className="mt-1 text-muted">Neighbors helping neighbors get things home. Ask for a hand from any item page. No payments, no tracking, just a friendly way to coordinate.</p>
       </div>
       <section aria-labelledby="mine" className="space-y-3">

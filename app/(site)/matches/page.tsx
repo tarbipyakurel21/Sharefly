@@ -16,7 +16,6 @@ export default async function MatchesPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="font-display text-3xl">Things you might like</h1>
         <p className="mt-1 text-muted">Based on your wishlists. New ones show up here the moment they're listed.</p>
       </div>
       {matches.length ? <ul className="space-y-3" data-testid="match-list">{matches.map((m) => <MatchCard key={m.id} m={m} />)}</ul> : (
