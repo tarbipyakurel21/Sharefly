@@ -86,6 +86,12 @@ Last updated 2026-11-14.
 - Limitation: none known.
 - Next: none.
 
+## Dashboard header wordmark (2026-11-15)
+- Done: restored the ShareFly wordmark beside the helping-hands logo in the shared dashboard header.
+- Tests: typecheck and diff check pass.
+- Limitation: none known.
+- Next: none.
+
 ## Dashboard search and footer rides link (2026-11-15)
 - Done: replaced the dashboard's two large action buttons with a direct item search form and added RideBoard as “Rides” in the persistent footer navigation.
 - Tests: `npm run typecheck` and `git diff --check` pass.
@@ -141,3 +147,14 @@ Last updated 2026-11-14.
 - Tests: `npm run typecheck` and `npm test` (139) pass; seed runs against Atlas. E2E demo path result is recorded below once confirmed.
 - Limitations: no multi-document transactions (cascades are in code); existing SQLite data is not migrated; the app now requires `MONGO_URI` at runtime and in Atlas Network Access for Vercel. Matching and notification fan-out are sequential awaits.
 - Next: set env vars on Vercel (`MONGO_URI`, `SESSION_SECRET`, `STORAGE_PROVIDER=uploadthing`, `UPLOADTHING_TOKEN`), deploy, run `npm run db:seed` once against the production database.
+
+## Matterport furniture placement and gizmo fixes (2026-11-15)
+- Done in `components/room/BundleRoomStage.tsx`:
+  - Pieces are placed on the floor (sweep `puckPosition`; the old code used `position`, which is camera height, so furniture floated), straight ahead of the viewer's facing direction, near edge about 0.7 m (>= 2 ft) away, turned to face the viewer; extra pieces sit beside the first.
+  - Pieces follow the viewer to each new sweep. A piece the user moved or removed is left alone (detected by comparing its position to where it was last placed).
+  - Move/Rotate gizmo: larger (`size: 1.6`); Move shows X/Z only, Rotate shows the vertical ring only (was able to tip pieces off the floor). Tour navigation is locked while the pointer is over or dragging the gizmo, and tour clicks do not (re)select pieces during that time.
+  - Fixed `TypeError: Cannot add property visible, object is not extensible` on Select/Remove: `mp.transformControls` in this bundle has no `visible` input and sealed inputs; visibility follows `selection`. Deselecting now resets navigation lock (no hover-out fires when the gizmo disappears).
+- Tests: `npm run typecheck` and `npm test` (139) pass; eslint on the file has 0 errors (1 existing exhaustive-deps warning).
+- NOT verified: any of this in a live Matterport scene. Yaw convention (0 looks toward -z, counter-clockwise positive), model front being +z, reading node positions back, and the gizmo HOVER/DRAG events are assumptions from the SDK types/bundle source. No unit or e2e test covers `BundleRoomStage`; Remove / Put back / Select have only been reasoned about.
+- Limitations: placement is still unsaved and uncalibrated to the scan's walls; pieces can overlap scan geometry; the 400 ms re-place delay is a heuristic.
+- Next: manual live check of select, move, rotate, remove, put back and walking to a new sweep; add a mocked-SDK unit test for the select/remove/put back state; then persist placements.

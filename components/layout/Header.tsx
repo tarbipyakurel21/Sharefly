@@ -13,6 +13,7 @@ export async function Header({ user }: { user: User | null }) {
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 font-display text-2xl font-semibold tracking-tight" aria-label="ShareFly home">
           <Image src="/brand/helping-hands.svg" alt="" width={34} height={34} className="h-8 w-8 rounded-lg object-cover" priority />
+          <span>ShareFly</span>
         </Link>
         <div className="ml-auto flex items-center gap-2">
           {user && <NotificationBell />}
