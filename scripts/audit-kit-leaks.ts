@@ -2,7 +2,7 @@
  * Fails if anything that identifies a CoStar kit property appears in a tracked file or in git history:
  * Matterport model ids, community names, street addresses or photo links.
  * Needs the local kit (it builds the list of things to look for from it) and `npm run import:costar` output.
- * Usage: npm run audit:kit            Output is counts and file paths only, never the matched value.
+ * Usage: npm run audit:kit [-- --no-history]   Output is counts and file paths only, never the matched value.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -40,7 +40,7 @@ const git = (args: string) => cp.execSync(`git ${args}`, { cwd: ROOT, maxBuffer:
 const tracked = git("ls-files").split("\n").filter(Boolean);
 for (const f of tracked) { if (f.startsWith("legacy/")) continue; try { scan(`working tree ${f}`, fs.readFileSync(path.join(ROOT, f), "utf8")); } catch { /* deleted or binary */ } }
 const seen = new Set<string>();
-for (const rev of git("rev-list --all").split("\n").filter(Boolean)) {
+for (const rev of process.argv.includes("--no-history") ? [] : git("rev-list --all").split("\n").filter(Boolean)) {
   for (const line of git(`ls-tree -r ${rev}`).split("\n").filter(Boolean)) {
     const [meta, file] = line.split("\t"); const sha = meta.split(" ")[2];
     if (seen.has(sha) || file.startsWith("legacy/")) continue; seen.add(sha);

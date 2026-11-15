@@ -28,8 +28,9 @@ Last updated 2026-11-14.
 3. Reference spaces (CoStar/Matterport) if access is confirmed.
 4. Deployment config (hosted DB, object storage).
 
-## CoStar Stage 1: reference spaces (2026-11-14)
-- Done: importer (23,370 floor plans from 1,747 communities; 436 skipped: 435 no size, 1 invalid), `costar` provider with null default, `GET /api/reference-spaces`, "Start from a real apartment" picker with estimate label, source on the room, near-college filter.
-- Tests: 14 new unit tests (55 total), 2 new e2e (6 total). typecheck, lint, build, e2e green.
-- Limitations: room sizes are estimates; only Houston and Los Angeles; Matterport not shown yet (ids are stored only); JSON file store (Atlas is Stage 3).
-- Next: Stage 2 (Matterport embed, needs the connection docs from CoStar), Stage 3 (Atlas), Stage 4 (Vultr), Stage 5 (DEV post).
+## CoStar stages (2026-11-14)
+- Done: importer, estimate-labelled picker, source snapshots, near-college filter, lazy Matterport tour selection, server-side Model API room dimensions with estimate fallback, and curated Rabinowitz Hall.
+- Done: optional Atlas store with narrow documents, indexes, JSON fallback, load script, and post-hackathon collection-drop script.
+- Tests: 90 unit tests and 12 e2e tests. Typecheck, lint, and e2e pass; the build is blocked by a Turbopack worker panic in this environment.
+- Limitations: imported room sizes remain estimates unless Matterport returns positive dimensions; only Houston and Los Angeles are in the local kit; live ids could not be verified from this environment without private hackathon data/credentials. E2E uses synthetic ids and a stub.
+- Next: optional Vultr deployment and DEV post, only if access and publication rules are confirmed.

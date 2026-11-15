@@ -32,7 +32,7 @@ export default async function RoomsPage({ searchParams }: { searchParams: Promis
           ))}
         </ul>
       ) : <EmptyState title="No rooms yet" body="Add one below. It only takes length, width and height." />}
-      <RoomForm realApartments={getReferenceSpaceProvider().isAvailable()} addListingId={add} defaultName={rooms.length ? `Room ${rooms.length + 1}` : "Bedroom"} />
+      <RoomForm realApartments={await getReferenceSpaceProvider().isAvailable()} addListingId={add} defaultName={rooms.length ? `Room ${rooms.length + 1}` : "Bedroom"} />
     </div>
   );
 }

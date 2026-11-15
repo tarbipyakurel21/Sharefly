@@ -6,7 +6,7 @@ ShareFly connects neighbors giving away things they no longer want with people w
 
 - **One-photo listings.** Upload a photo, get an editable title, category and description, publish. Free by default. If AI is unavailable you can still publish.
 - **Wishlists with two-way matching.** Describe what you need in plain words. New listings search wishlists; new wishlists search listings. Every match shows plain-language reasons.
-- **3D room planner.** Enter length, width and height; preview furniture in a scaled room (Three.js / React Three Fiber). Unknown sizes are labeled "Typical size, not confirmed" and fit is never claimed.
+- **3D room planner.** Enter length, width and height; preview furniture in a scaled room (Three.js / React Three Fiber). Unknown sizes are labeled "Typical size, not confirmed" and fit is never claimed. Configured real-apartment picks can show a lazy Matterport tour and measured rooms.
 - **RideBoard.** Lightweight pickup coordination: request help, drivers offer, requester accepts, either marks it done. No payments, no GPS.
 
 Built at HackPrinceton (Fall 2026). The previous project in this repository, PatternWitness, is preserved in [`legacy/`](legacy/) and in git history.
@@ -38,7 +38,7 @@ See [docs/DEMO.md](docs/DEMO.md) for the click-by-click judging script.
 | 3D | three, @react-three/fiber, @react-three/drei (OrbitControls, Line); procedural furniture |
 | Data | SQLite via better-sqlite3, raw SQL, schema in `lib/db/schema.ts` |
 | Validation | Zod on every API input, AI output and environment |
-| Tests | Vitest (41 unit tests), Playwright (4 end-to-end tests including the demo path) |
+| Tests | Vitest (90 unit tests), Playwright (12 end-to-end tests including the demo and real-apartment paths) |
 
 Logic lives in `lib/` as pure functions (`matching`, `room`, `pickups`, `units`, `ai`). Route handlers validate, authorize, call `lib/`, and return
 `{ error: { code, message } }` with a person-readable message on failure. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/AUDIT.md](docs/AUDIT.md), [docs/DECISIONS.md](docs/DECISIONS.md).
@@ -50,7 +50,7 @@ Logic lives in `lib/` as pure functions (`matching`, `room`, `pickups`, `units`,
 - The Anthropic provider is implemented but was not exercised against a live key here. Mock and none paths are tested.
 - Matching is a rule-based score with a fixed threshold; weights are guesses, not tuned on real data.
 - Location is a neighborhood from a small static Princeton-area table, not geocoding.
-- CoStar apartment data is used for "Start from a real apartment" (`lib/reference-spaces`, `scripts/import-costar.ts`). The kit stays local and gitignored; without it the feature is hidden. Room sizes from it are **estimates** from total square footage. Matterport tours and Vexcel are **not** integrated yet.
+- CoStar apartment data is used for "Start from a real apartment" (`lib/reference-spaces`, `scripts/import-costar.ts`). The kit stays local and gitignored; without it the feature is hidden. Room sizes from it are **estimates** unless the optional server-side Matterport Model API returns usable dimensions. Atlas support is optional and removable with `npm run atlas:drop -- --yes` after the hackathon.
 - Rate limiting is in-memory and per process. Notifications refresh by polling every 25 s (no websockets).
 - Uploaded photos are stored on local disk (`data/uploads`).
 
