@@ -58,23 +58,14 @@ describe("sniffModel", () => {
   });
 });
 
-import { sniffVideo } from "@/lib/storage";
 import { ListingBody as LB } from "@/lib/validation";
-describe("sniffVideo", () => {
-  const ftyp = (brand: string) => { const b = new Uint8Array(24); b.set([0, 0, 0, 24, 0x66, 0x74, 0x79, 0x70], 0); for (let i = 0; i < 4; i++) b[8 + i] = brand.charCodeAt(i); return b; };
-  it("accepts MP4, MOV and WebM by magic bytes", () => {
-    expect(sniffVideo(ftyp("isom"))?.ext).toBe("mp4");
-    expect(sniffVideo(ftyp("qt  "))?.ext).toBe("mov");
-    expect(sniffVideo(new Uint8Array([0x1a, 0x45, 0xdf, 0xa3, ...new Array(20).fill(0)]))?.ext).toBe("webm");
-  });
-  it("rejects images, scans and junk even if named .mp4", () => {
-    expect(sniffVideo(new Uint8Array([0xff, 0xd8, 0xff, ...new Array(30).fill(0)]))).toBeNull();
-    expect(sniffVideo(new Uint8Array(40).fill(7))).toBeNull();
-  });
-  it("listing accepts a stored video url and rejects other hosts", () => {
-    const base = { title: "Chair" };
-    expect(LB.safeParse({ ...base, videoUrl: "/api/uploads/3f2a1b4c-0000-4000-8000-000000000000.mp4" }).success).toBe(true);
-    expect(LB.safeParse({ ...base, videoUrl: "https://evil.example/x.mp4" }).success).toBe(false);
-    expect(LB.safeParse({ ...base, videoUrl: null }).success).toBe(true);
+describe("listing 3D model", () => {
+  const base = { title: "Chair" };
+  it("accepts a stored .usdz or .glb and rejects other hosts, formats and mismatched shapes", () => {
+    expect(LB.safeParse({ ...base, model: { url: "/api/uploads/3f2a1b4c-0000-4000-8000-000000000000.usdz", format: "usdz" } }).success).toBe(true);
+    expect(LB.safeParse({ ...base, model: { url: "https://evil.example/x.usdz", format: "usdz" } }).success).toBe(false);
+    expect(LB.safeParse({ ...base, model: { url: "/api/uploads/3f2a1b4c-0000-4000-8000-000000000000.mp4", format: "usdz" } }).success).toBe(false);
+    expect(LB.safeParse({ ...base, model: { url: "/api/uploads/3f2a1b4c-0000-4000-8000-000000000000.glb", format: "obj" } }).success).toBe(false);
+    expect(LB.safeParse({ ...base, model: null }).success).toBe(true);
   });
 });

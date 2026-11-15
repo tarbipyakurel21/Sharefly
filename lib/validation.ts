@@ -29,7 +29,10 @@ export const ListingBody = z.object({
   photoUrl: z.string().regex(/^(\/api\/uploads\/[a-f0-9-]+\.(jpg|png|webp)|\/seed\/[\w.-]+|https:\/\/[a-z0-9]+\.ufs\.sh\/f\/[\w.-]+)$/, "That photo couldn't be used.").nullable().optional(),
   photoWidth: z.number().int().positive().max(10000).nullable().optional(),
   photoHeight: z.number().int().positive().max(10000).nullable().optional(),
-  videoUrl: z.string().regex(/^(\/api\/uploads\/[a-f0-9-]+\.(mp4|mov|webm)|https:\/\/[a-z0-9]+\.ufs\.sh\/f\/[\w.-]+)$/, "That video couldn't be used.").nullable().optional(),
+  model: z.object({
+    url: z.string().regex(/^(\/api\/uploads\/[a-f0-9-]+\.(glb|usdz)|https:\/\/[a-z0-9]+\.ufs\.sh\/f\/[\w.-]+)$/, "That 3D model couldn't be used."),
+    format: z.enum(["glb", "usdz"]),
+  }).nullable().optional(),
   clientKey: z.string().min(8).max(80).optional(),
 });
 

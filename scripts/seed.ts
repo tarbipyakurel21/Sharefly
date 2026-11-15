@@ -19,7 +19,7 @@ const USERS = [
 
 type L = { id: string; giver: string; title: string; desc: string; cat: Category; img: string; nb: string; dims?: [number, number, number]; price?: number; status?: string; note?: string; from?: string };
 const LISTINGS: L[] = [
-  { id: "l-sofa", giver: "u-hardika", title: "Grey three-seat sofa", desc: "A grey fabric sofa with removable back cushions.", cat: "sofa", img: "sofa", nb: "Downtown Los Angeles", dims: [1.9, 0.9, 0.85], note: "A few small stains on one cushion.", from: "IKEA" },
+  { id: "l-sofa", giver: "u-hardika", title: "Green three-seat sofa", desc: "A green fabric sofa with removable back cushions.", cat: "sofa", img: "sofa", nb: "Downtown Los Angeles", dims: [1.9, 0.9, 0.85], note: "A few small stains on one cushion.", from: "IKEA" },
   { id: "l-shelf", giver: "u-hardika", title: "Tall wooden bookshelf", desc: "A wooden bookshelf with four open shelves.", cat: "bookshelf", img: "bookshelf", nb: "Downtown Los Angeles" },
   { id: "l-table", giver: "u-hardika", title: "Round wooden side table", desc: "A round side table with a single center leg.", cat: "table", img: "table", nb: "Downtown Los Angeles", dims: [0.7, 0.7, 0.55] },
   { id: "l-lamp", giver: "u-hardika", title: "Floor lamp with yellow shade", desc: "A floor lamp with a thin dark stand and a yellow shade.", cat: "lamp", img: "lamp", nb: "Downtown Los Angeles" },

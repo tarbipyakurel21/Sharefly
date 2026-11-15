@@ -48,9 +48,6 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
             <img src={l.photoUrl} alt={l.title} className="aspect-[4/3] w-full object-cover" />
           ) : <div className="flex aspect-[4/3] items-center justify-center text-muted">No photo</div>}
         </div>
-        {l.videoUrl && l.status !== "removed" && (
-          <video src={l.videoUrl} controls playsInline preload="metadata" className="w-full rounded-2xl bg-black" aria-label={`Video of ${l.title}`} data-testid="listing-video" />
-        )}
         {l.model && !isOwner && l.status !== "removed" && <ScanSection url={l.model.url} format={l.model.format} title={l.title} />}
         {(FURNITURE.includes(l.category) || l.model) && l.status !== "removed" && (
           <ArViewer scan={l.model ?? null} title={l.title} category={l.category} photoUrl={l.photoUrl} widthM={l.widthM} depthM={l.depthM} heightM={l.heightM} unit={unit} roomHref={`/rooms?add=${l.id}`} />

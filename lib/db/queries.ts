@@ -63,7 +63,7 @@ export type NewListing = {
   id?: string; giverId: string; title: string; description?: string; category: Category; priceCents?: number;
   conditionNote?: string | null; purchasedFrom?: string | null; neighborhood?: string | null;
   widthM?: number | null; depthM?: number | null; heightM?: number | null; aiGenerated?: boolean; clientKey?: string | null;
-  photo?: { url: string; width?: number | null; height?: number | null } | null; videoUrl?: string | null; publishedAt?: string; createdAt?: string;
+  photo?: { url: string; width?: number | null; height?: number | null } | null; model?: { url: string; format: "glb" | "usdz" } | null; publishedAt?: string; createdAt?: string;
 };
 export async function createListing(n: NewListing): Promise<Listing> {
   const id = n.id ?? newId();
@@ -77,7 +77,7 @@ export async function createListing(n: NewListing): Promise<Listing> {
     widthM: hasDims ? n.widthM : null, depthM: hasDims ? n.depthM : null, heightM: hasDims ? n.heightM : null,
     dimensionsSource: hasDims ? "giver_provided" : "unknown", aiGenerated: !!n.aiGenerated, clientKey: n.clientKey ?? null,
     createdAt: n.createdAt ?? now, publishedAt: now,
-    videoUrl: n.videoUrl ?? null, photoUrl: n.photo?.url ?? null, photoWidth: n.photo?.width ?? null, photoHeight: n.photo?.height ?? null,
+    model: n.model ?? null, photoUrl: n.photo?.url ?? null, photoWidth: n.photo?.width ?? null, photoHeight: n.photo?.height ?? null,
   });
   return (await getListing(id))!;
 }

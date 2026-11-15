@@ -49,6 +49,8 @@ abstract class HttpVisionProvider implements AIProvider {
         return suggestion ? { status: "ok", suggestion, source: "model" } : { status: "unavailable", reason: "invalid" };
       } catch (e) {
         lastTimeout = e instanceof Error && e.name === "AbortError";
+        // Status or error name only: never the key, headers or response body. Shows up in Vercel function logs.
+        console.error(`[ai] ${this.name} describeItem failed:`, e instanceof Error ? e.message || e.name : "unknown error");
       } finally { clearTimeout(timer); }
     }
     return { status: "unavailable", reason: lastTimeout ? "timeout" : "error" };
@@ -59,7 +61,7 @@ abstract class HttpVisionProvider implements AIProvider {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), 12_000);
       try { return sanitizeMeasurements(await this.call({ imageBytes: input.imageBytes, mimeType: input.mimeType, prompt: measurePrompt(input.knownLabels) }, ctrl.signal)); }
-      catch (e) { lastTimeout = e instanceof Error && e.name === "AbortError"; }
+      catch (e) { lastTimeout = e instanceof Error && e.name === "AbortError"; console.error(`[ai] ${this.name} readMeasurements failed:`, e instanceof Error ? e.message || e.name : "unknown error"); }
       finally { clearTimeout(timer); }
     }
     return { status: "unavailable", reason: lastTimeout ? "timeout" : "error" };

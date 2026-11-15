@@ -8,6 +8,9 @@ import { Field, Select, TextArea, TextInput } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
 import { NeighborhoodInput } from "@/components/ui/NeighborhoodInput";
 import { SignInCard } from "@/components/layout/SignInForm";
+import { ScanSection } from "./ScanSection";
+import type { ScanSize } from "./ScanViewer";
+import { formatLength } from "@/lib/units";
 import type { DescribeResult } from "@/lib/ai/types";
 import { PHOTO_ACCEPT, toDisplayableBlob } from "@/lib/image-decode";
 
@@ -36,9 +39,10 @@ export function GiveFlow({ defaultNeighborhood }: { defaultNeighborhood: string 
   const [photoErr, setPhotoErr] = useState<string | null>(null);
   const [opening, setOpening] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [video, setVideo] = useState<{ url: string; preview: string } | null>(null);
-  const [videoBusy, setVideoBusy] = useState(false);
-  const [videoErr, setVideoErr] = useState<string | null>(null);
+  const [model, setModel] = useState<{ url: string; format: "glb" | "usdz" } | null>(null);
+  const [modelSize, setModelSize] = useState<ScanSize | null>(null);
+  const [modelBusy, setModelBusy] = useState(false);
+  const [modelErr, setModelErr] = useState<string | null>(null);
   const blobRef = useRef<{ blob: Blob; name: string; width: number; height: number } | null>(null);
   const [ai, setAi] = useState<Ai>("idle");
   const [aiSource, setAiSource] = useState<"model" | "mock" | null>(null);
@@ -88,24 +92,28 @@ export function GiveFlow({ defaultNeighborhood }: { defaultNeighborhood: string 
     } catch { setAi("failed"); }
   }
 
-  /** Optional short clip of the item. Uploaded straight away, like the photo; publishing never depends on it. */
-  async function onVideo(file: File | undefined | null) {
+  /** Optional 3D model of the item (e.g. a Reality Composer .usdz). Uploaded straight away; its size can fill the listing's size. */
+  async function onModel(file: File | undefined | null) {
     if (!file) return;
-    setVideoErr(null);
-    if (file.size > 30 * 1024 * 1024) { setVideoErr("That video is too big. Try a shorter clip (under 30 MB)."); return; }
-    setVideoBusy(true);
+    setModelErr(null);
+    if (file.size > 30 * 1024 * 1024) { setModelErr("That 3D model is too big. Try exporting a smaller one (under 30 MB)."); return; }
+    setModelBusy(true); setModelSize(null);
     try {
       const fd = new FormData(); fd.append("file", file);
-      const r = await api<{ url: string }>("/api/uploads/video", { method: "POST", body: fd });
-      setVideo((old) => { if (old) URL.revokeObjectURL(old.preview); return { url: r.url, preview: URL.createObjectURL(file) }; });
-    } catch (e) { setVideoErr(errMsg(e)); } finally { setVideoBusy(false); }
+      setModel(await api<{ url: string; format: "glb" | "usdz" }>("/api/uploads/model", { method: "POST", body: fd }));
+    } catch (e) { setModelErr(errMsg(e)); } finally { setModelBusy(false); }
   }
-  function removeVideo() { setVideo((old) => { if (old) URL.revokeObjectURL(old.preview); return null; }); setVideoErr(null); }
+  function removeModel() { setModel(null); setModelSize(null); setModelErr(null); }
+
+  // Size measured from the 3D model, in meters; only sent when plausible (2 cm to 10 m). The owner can change it after publishing.
+  const r2 = (m: number) => Math.round(m * 100) / 100;
+  const modelDims = modelSize && [modelSize.widthM, modelSize.depthM, modelSize.heightM].every((v) => v >= 0.02 && v <= 10)
+    ? { widthM: r2(modelSize.widthM), depthM: r2(modelSize.depthM), heightM: r2(modelSize.heightM) } : null;
 
   async function publish() {
     if (busy) return;
     if (title.trim().length < 3) { setErr("Please add a short title."); return; }
-    if (videoBusy) { setErr("Your video is still uploading. One moment."); return; }
+    if (modelBusy) { setErr("Your 3D model is still uploading. One moment."); return; }
     if (!photo) { setErr(uploading ? "Your photo is still uploading. One moment." : "Your photo didn't upload yet. Tap Try again above."); return; }
     setBusy(true); setErr(null);
     try {
@@ -114,7 +122,7 @@ export function GiveFlow({ defaultNeighborhood }: { defaultNeighborhood: string 
         json: {
           title: title.trim(), description: description.trim(), category, conditionNote: condition.trim() || null,
           purchasedFrom: from.trim() || null, neighborhood: nb.trim() || null, aiGenerated: ai === "done" && aiSource === "model",
-          photoUrl: photo.url, photoWidth: photo.width, photoHeight: photo.height, videoUrl: video?.url ?? null, clientKey: clientKey.current,
+          photoUrl: photo.url, photoWidth: photo.width, photoHeight: photo.height, model, ...(modelDims ?? {}), clientKey: clientKey.current,
         },
       });
       setDone({ id: r.listing.id, matchCount: r.matchCount, title: r.listing.title });
@@ -198,19 +206,20 @@ export function GiveFlow({ defaultNeighborhood }: { defaultNeighborhood: string 
             )}
           </div>
 
-          <section className="space-y-3 rounded-2xl border border-line bg-surface p-4" aria-label="Video">
-            <p className="font-semibold">Add a video of it (optional)</p>
-            <p className="text-sm text-muted">A short clip helps people see it from every side. MP4, MOV or WebM, under 30 MB.</p>
-            {video && <video src={video.preview} controls playsInline className="max-h-72 w-full rounded-xl bg-black" aria-label="Preview of your video" data-testid="video-preview" />}
+          <section className="space-y-3 rounded-2xl border border-line bg-surface p-4" aria-label="3D model">
+            <p className="font-semibold">Add a 3D model of it (optional)</p>
+            <p className="text-sm text-muted">Scan it with Reality Composer on your iPhone and add the .usdz file (or a .glb). Others can turn it around, and its size fills in for you.</p>
+            {model && <ScanSection url={model.url} format={model.format} title={title || "your item"} onSize={setModelSize} />}
+            {model && modelDims && <p className="text-sm text-muted" role="status" data-testid="model-size">Size read from the model: {formatLength(modelDims.widthM, "ft")} × {formatLength(modelDims.depthM, "ft")} × {formatLength(modelDims.heightM, "ft")}. You can change it after publishing.</p>}
             <div className="flex flex-wrap items-center gap-2">
               <label className="inline-flex min-h-11 cursor-pointer items-center rounded-xl border border-line px-4 text-sm font-semibold hover:bg-sunken">
-                {videoBusy ? "Uploading…" : video ? "Replace the video" : "Add a video"}
-                <input type="file" accept="video/mp4,video/quicktime,video/webm,.mp4,.mov,.webm" className="sr-only" data-testid="video-file" disabled={videoBusy}
-                  onChange={(e) => { void onVideo(e.target.files?.[0]); e.target.value = ""; }} />
+                {modelBusy ? "Uploading…" : model ? "Replace the 3D model" : "Add a 3D model"}
+                <input type="file" accept=".usdz,.glb,model/vnd.usdz+zip,model/gltf-binary" className="sr-only" data-testid="model-file" disabled={modelBusy}
+                  onChange={(e) => { void onModel(e.target.files?.[0]); e.target.value = ""; }} />
               </label>
-              {video && <Button type="button" variant="ghost" onClick={removeVideo}>Remove video</Button>}
+              {model && <Button type="button" variant="ghost" onClick={removeModel}>Remove 3D model</Button>}
             </div>
-            {videoErr && <p role="alert" className="text-sm text-bad">{videoErr}</p>}
+            {modelErr && <p role="alert" className="text-sm text-bad">{modelErr}</p>}
           </section>
 
           <details className="rounded-2xl border border-line bg-surface p-4">
