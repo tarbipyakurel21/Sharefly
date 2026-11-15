@@ -45,7 +45,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
           ) : <div className="flex aspect-[4/3] items-center justify-center text-muted">No photo</div>}
         </div>
         {FURNITURE.includes(l.category) && l.status !== "removed" && (
-          <ArViewer title={l.title} category={l.category} widthM={l.widthM} depthM={l.depthM} heightM={l.heightM} unit={unit} />
+          <ArViewer title={l.title} category={l.category} photoUrl={l.photoUrl} widthM={l.widthM} depthM={l.depthM} heightM={l.heightM} unit={unit} />
         )}
       </div>
       <div className="space-y-6">

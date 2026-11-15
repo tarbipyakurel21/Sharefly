@@ -13,6 +13,14 @@ export * from "./base";
 const FileSchema = z.object({ spaces: z.array(z.unknown()) });
 const g = globalThis as unknown as { __sfRef?: { file: string; mtime: number; spaces: ReferenceSpace[]; byId: Map<string, ReferenceSpace> } };
 
+/** Offline demo record shown when the optional CoStar kit/API is not configured. */
+class DemoReferenceSpaceProvider implements ReferenceSpaceProvider {
+  isAvailable() { return true; }
+  async search(f: Partial<SearchFilters>) { return searchSpaces(CURATED_SPACES, f); }
+  async get(id: string) { return CURATED_SPACES.find((s) => s.id === id) ?? null; }
+  async health(): Promise<StoreHealth> { return { provider: "none", store: "none", available: true, count: CURATED_SPACES.length, note: "Showing the built-in demo apartment; live reference-space data is not configured." }; }
+}
+
 function loadFile(file: string) {
   const mtime = fs.statSync(file).mtimeMs;
   if (g.__sfRef && g.__sfRef.file === file && g.__sfRef.mtime === mtime) return g.__sfRef;
@@ -38,7 +46,7 @@ export class JsonFileReferenceSpaceProvider implements ReferenceSpaceProvider {
 
 export function getReferenceSpaceProvider(): ReferenceSpaceProvider {
   const env = getEnv();
-  if (env.REFERENCE_SPACES_PROVIDER !== "costar") return new NullReferenceSpaceProvider();
+  if (env.REFERENCE_SPACES_PROVIDER !== "costar") return new DemoReferenceSpaceProvider();
   const json = new JsonFileReferenceSpaceProvider(path.resolve(process.cwd(), env.REFERENCE_SPACES_PATH));
   if (env.REFERENCE_SPACES_STORE === "atlas" && env.ATLAS_URI) {
     return new AtlasReferenceSpaceProvider(json.isAvailable() ? json : new NullReferenceSpaceProvider());

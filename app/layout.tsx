@@ -27,7 +27,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Header user={user} />
           <main id="main" className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 md:py-10">{children}</main>
           <footer className="mx-auto max-w-6xl px-4 pb-10 pt-4 text-sm text-muted sm:px-6">
-            ShareFly · Made at HackPrinceton. Item photos in the demo are illustrations.
+            ShareFly · Made at HackPrinceton. Photos belong to their respective listings; generated 3D previews are clearly labelled.
           </footer>
           <MobileNav matches={matches} />
         </ToastProvider>

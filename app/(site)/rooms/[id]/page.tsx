@@ -39,7 +39,9 @@ export default async function RoomPage({ params, searchParams }: { params: Promi
         </p>
       )}
       {room.source && <TourPanel matterport={room.source.matterport} title={room.source.communityName ?? "this apartment"} />}
-      <RoomPlannerLoader room={room} initial={placements.map(({ roomId: _r, ...p }) => p)} listings={listings} addListingId={addable} />
+      <div id="room-planner" className="scroll-mt-6">
+        <RoomPlannerLoader room={room} initial={placements.map(({ roomId: _r, ...p }) => p)} listings={listings} addListingId={addable} />
+      </div>
     </div>
   );
 }

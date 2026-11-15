@@ -18,7 +18,7 @@ export type KitProperty = {
   id?: number; attachments?: Attachment[] | null;
   propertyApartment?: {
     residentialProfile?: { colleges?: College[] | null } | null;
-    models?: { id?: number; attachments?: Attachment[] | null; units?: { attachments?: Attachment[] | null }[] | null }[] | null;
+    models?: { id?: number; attachments?: Attachment[] | null; units?: { unitNumber?: string | number | null; squareFeet?: number | null; sqft?: number | null; attachments?: Attachment[] | null }[] | null }[] | null;
   } | null;
 };
 /** Enum lookups from schemas/enums.json: value -> name. */
@@ -84,6 +84,11 @@ export function buildReferenceSpaces(listing: KitListing, property: KitProperty 
     const pm = modelsById.get(m.id ?? -1);
     const unit = new Set<string>();
     for (const u of pm?.units ?? []) for (const id of matterportIds(u.attachments)) unit.add(id);
+    const units = (pm?.units ?? []).flatMap((u) => {
+      const number = u.unitNumber == null ? null : String(u.unitNumber).trim();
+      if (!number) return [];
+      return [{ number, sqft: posIntOrNull(u.squareFeet ?? u.sqft), matterport: matterportIds(u.attachments) }];
+    }).slice(0, 500);
     const candidate = {
       id: `costar-${pid}-${m.id}`, propertyId: pid, floorPlanId: m.id,
       communityName: listing.buildingName?.trim() || null, floorPlanName: m.name?.trim() || null,
@@ -96,6 +101,7 @@ export function buildReferenceSpaces(listing: KitListing, property: KitProperty 
       lifestyle, colleges,
       photoUrl: listing.primaryPhoto?.attachmentUri?.trim() || null,
       matterport: { community, floorPlan: matterportIds(pm?.attachments), unit: [...unit].slice(0, 10) },
+      units,
     };
     const parsed = ReferenceSpaceSchema.safeParse(candidate);
     if (parsed.success) spaces.push(parsed.data);

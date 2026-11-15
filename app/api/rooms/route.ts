@@ -8,7 +8,7 @@ import { measuredRoomsForSpace } from "@/lib/matterport/resolve";
 export const GET = route(async () => ok({ rooms: listRooms((await requireUser()).id) }));
 export const POST = route(async (req) => {
   const user = await requireUser();
-  const { referenceSpaceId, measuredRoomId, ...b } = RoomBody.parse(await jsonBody(req));
+  const { referenceSpaceId, measuredRoomId, unitNumber, ...b } = RoomBody.parse(await jsonBody(req));
   if (measuredRoomId && !referenceSpaceId) throw new ApiError(400, "invalid_request", "Pick an apartment before choosing one of its measured rooms.");
   let source = null;
   if (referenceSpaceId) {
@@ -24,7 +24,7 @@ export const POST = route(async (req) => {
       roomLabel = m.label;
       kind = sameSize(b.lengthM, m.depthM) && sameSize(b.widthM, m.widthM) && sameSize(b.heightM, m.heightM) ? "matterport" : "adjusted";
     }
-    source = toRoomSource(space, { kind, roomLabel });
+    source = toRoomSource(space, { kind, roomLabel, unitNumber: unitNumber ?? null });
   }
   return ok({ room: createRoom(user.id, { ...b, source }) }, 201);
 });

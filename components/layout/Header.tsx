@@ -28,7 +28,7 @@ export function Header({ user }: { user: User | null }) {
         <div className="ml-auto flex items-center gap-2">
           {user && <NotificationBell />}
           <span className="hidden sm:block"><LinkButton href="/give">Give something away</LinkButton></span>
-          <AccountMenu user={user} demo={demo} people={demo ? listUsers() : []} />
+          <AccountMenu user={user} demo={demo} people={demo ? listUsers().filter((p) => ["u-jordan", "u-maya", "u-sam"].includes(p.id)) : []} />
         </div>
       </div>
     </header>

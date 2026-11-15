@@ -60,7 +60,7 @@ export function RoomForm({ addListingId, defaultName, realApartments = false }: 
     if (h < ROOM_LIMITS.minH || h > ROOM_LIMITS.maxH) { setErr("Ceiling height should be between 1.8 m (6 ft) and 6 m (19.7 ft)."); return; }
     setBusy(true);
     try {
-      const r = await api<{ room: { id: string } }>("/api/rooms", { method: "POST", json: { name: name.trim() || defaultName, lengthM: l, widthM: w, heightM: h, displayUnit: unit, ...(picked ? { referenceSpaceId: picked.id, ...(measuredId ? { measuredRoomId: measuredId } : {}) } : {}) } });
+      const r = await api<{ room: { id: string } }>("/api/rooms", { method: "POST", json: { name: name.trim() || defaultName, lengthM: l, widthM: w, heightM: h, displayUnit: unit, ...(picked ? { referenceSpaceId: picked.id, ...(picked.selectedUnitNumber ? { unitNumber: picked.selectedUnitNumber } : {}), ...(measuredId ? { measuredRoomId: measuredId } : {}) } : {}) } });
       router.push(`/rooms/${r.room.id}${addListingId ? `?add=${addListingId}` : ""}`);
     } catch (e) { setErr(errMsg(e)); setBusy(false); }
   }
@@ -69,7 +69,11 @@ export function RoomForm({ addListingId, defaultName, realApartments = false }: 
       {realApartments && <ApartmentPicker onPick={pick} pickedId={picked?.id ?? null} />}
       <form onSubmit={submit} className="space-y-4 rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-[var(--shadow-soft)]">
         <h2 className="font-display text-xl">{picked ? "Your room" : "Add a room"}</h2>
-        {picked && <TourPanel matterport={picked.matterport} title={picked.communityName ?? "this apartment"} />}
+        {picked && <>
+          {picked.selectedUnitNumber && <p className="text-sm text-muted">Apartment {picked.selectedUnitNumber} selected. The exact unit Matterport scan is used when available; otherwise the floor-plan or community scan is shown.</p>}
+          <p className="rounded-xl bg-accent-soft p-3 text-sm">Preview the apartment in the tour, choose a measured room when available, then create it below. Matterport is view-only; after creating the room, ShareFly’s planner lets you place the selected furniture in the matching measured space.</p>
+          <TourPanel matterport={picked.matterport} title={picked.communityName ?? "this apartment"} />
+        </>}
         {picked && measured?.state === "loading" && <p className="text-sm text-muted">Checking for measured rooms…</p>}
         {picked && measured?.state === "done" && measured.rooms.length > 0 && (
           <div data-testid="measured-rooms" className="space-y-2">

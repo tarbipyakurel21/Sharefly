@@ -9,7 +9,7 @@ import type { ReferenceSpace } from "@/lib/reference-spaces/types";
 const space: ReferenceSpace = {
   id: "costar-1-2", propertyId: 1, floorPlanId: 2, communityName: "Fixture Flats", floorPlanName: "1x1", city: "Houston", state: "TX", lat: 29.76, lng: -95.37,
   beds: 1, baths: 1, minSqft: 700, maxSqft: 700, minRentUsd: 1000, maxRentUsd: 1200, rentBasis: "unit", unitsAvailable: 3, lifestyle: "student",
-  colleges: [{ name: "Fixture University", campus: null, feetToCampus: 900 }], photoUrl: "https://example.com/p.jpg", matterport: { community: ["COMM0001"], floorPlan: [], unit: [] },
+  colleges: [{ name: "Fixture University", campus: null, feetToCampus: 900 }], photoUrl: "https://example.com/p.jpg", matterport: { community: ["COMM0001"], floorPlan: [], unit: [] }, units: [],
 };
 
 describe("Atlas documents", () => {

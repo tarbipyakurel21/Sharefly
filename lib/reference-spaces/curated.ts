@@ -18,5 +18,6 @@ export const CURATED_SPACES: ReferenceSpace[] = [
     colleges: [{ name: "Princeton University", campus: null, feetToCampus: null }],
     photoUrl: null,
     matterport: { community: ["2K7G7cdukZV"], floorPlan: [], unit: [] },
+    units: [],
   },
 ];

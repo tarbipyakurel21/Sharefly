@@ -6,12 +6,14 @@ import type { ReferenceSpace } from "@/lib/reference-spaces/types";
 import type { RoomEstimate } from "@/lib/reference-spaces/estimate";
 import { Chip } from "@/components/ui/Chip";
 import { Field, Select, TextInput } from "@/components/ui/Field";
+import { StreetMap } from "./StreetMap";
 
-export type PickedSpace = ReferenceSpace & { estimate: RoomEstimate | null };
+export type PickedSpace = ReferenceSpace & { estimate: RoomEstimate | null; selectedUnitNumber?: string | null };
 
 export function ApartmentPicker({ onPick, pickedId }: { onPick: (s: PickedSpace) => void; pickedId: string | null }) {
   const [city, setCity] = useState(""), [beds, setBeds] = useState(""), [maxRent, setMaxRent] = useState(""), [q, setQ] = useState("");
   const [student, setStudent] = useState(false);
+  const [mapMode, setMapMode] = useState(true);
   const [results, setResults] = useState<{ spaces: PickedSpace[]; total: number } | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -46,13 +48,34 @@ export function ApartmentPicker({ onPick, pickedId }: { onPick: (s: PickedSpace)
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <Chip active={student} onClick={() => setStudent((v) => !v)}>Near a college (move-in / move-out)</Chip>
+        <Chip active={mapMode} onClick={() => setMapMode((v) => !v)}>Map view</Chip>
         {maxRent && <span className="text-sm text-muted">Spaces without a listed rent are hidden while a max rent is set.</span>}
       </div>
       {err && <p role="alert" className="text-sm text-bad">{err}</p>}
       {results && (
         <div aria-busy={busy}>
           <p className="mb-2 text-sm text-muted" data-testid="ap-count">{results.total === 0 ? "No floor plans match. Try loosening a filter." : `${results.total.toLocaleString("en-US")} floor plans${results.total > results.spaces.length ? `, showing ${results.spaces.length}` : ""}`}</p>
-          <ul className="grid gap-2 sm:grid-cols-2" data-testid="ap-results">
+          {mapMode && <div className="relative mb-3 overflow-hidden rounded-2xl border border-line bg-[#eaf1ed]" aria-label="Apartment map">
+            <StreetMap spaces={results.spaces} pickedId={pickedId} onPick={onPick} />
+            <div className="absolute left-3 top-3 rounded-xl bg-white/90 px-3 py-2 shadow-sm backdrop-blur">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">Apartment map</p>
+              <p className="text-sm font-semibold text-ink">{city || "Houston · Los Angeles"}</p>
+              <p className="text-xs text-muted">Coordinates from the apartment dataset</p>
+            </div>
+            {results.spaces.every((s) => s.lat == null || s.lng == null) && <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-muted">Demo map preview. Exact location is not provided for this apartment record; choose it from the demo card below.</div>}
+            <div className="pointer-events-none absolute bottom-3 right-3 rounded-lg bg-white/90 px-3 py-2 text-xs text-muted shadow-sm">Select a pin to preview its 3D tour</div>
+          </div>}
+          {mapMode && pickedId && (() => {
+            const selected = results.spaces.find((s) => s.id === pickedId);
+            if (!selected) return null;
+            return <div className="mb-3 rounded-2xl border border-accent bg-accent-soft p-4" data-testid="selected-apartment">
+              <p className="text-xs font-semibold uppercase tracking-wide text-accent">Selected apartment</p>
+              <p className="mt-1 font-semibold">{selected.communityName ?? "Community name not provided"}</p>
+              <p className="text-sm text-muted">{selected.city}, {selected.state} · {selected.floorPlanName ?? "Floor plan not provided"} · {bedsLabel(selected.beds)} · {sqftLabel(selected)}</p>
+              <p className="mt-1 text-xs text-muted">{selected.lat}, {selected.lng} · click another map pin to change</p>
+            </div>;
+          })()}
+          {!mapMode && <ul className="grid gap-2 sm:grid-cols-2" data-testid="ap-results">
             {results.spaces.map((s) => {
               const c = s.colleges[0];
               return (
@@ -62,13 +85,25 @@ export function ApartmentPicker({ onPick, pickedId }: { onPick: (s: PickedSpace)
                     <span className="block font-semibold">{s.communityName ?? "Community name not provided"}</span>
                     <span className="block text-sm text-muted">{s.floorPlanName ? `${s.floorPlanName} · ` : ""}{bedsLabel(s.beds)}{s.baths != null ? ` · ${s.baths} bath` : ""} · {sqftLabel(s)}</span>
                     <span className="block text-sm text-muted">{s.city}, {s.state} · {rentLabel(s)}</span>
+                    {s.units.length > 0 && <span className="block text-sm text-muted">{s.units.length} unit number{s.units.length === 1 ? "" : "s"} available{ s.units.some((u) => u.matterport.length > 0) ? " · some with exact 3D tours" : ""}</span>}
+                    {s.units.length > 0 && <label className="mt-2 block text-sm" onClick={(e) => e.stopPropagation()}>
+                      <span className="mr-2 text-muted">Apartment number</span>
+                      <select className="rounded border border-line bg-surface px-2 py-1" defaultValue="" onChange={(e) => {
+                        const u = s.units.find((x) => x.number === e.target.value);
+                        onPick(u ? { ...s, selectedUnitNumber: u.number, matterport: { ...s.matterport, unit: u.matterport } } : { ...s, selectedUnitNumber: null });
+                      }}>
+                        <option value="">Choose a unit (optional)</option>
+                        {s.units.map((u) => <option key={u.number} value={u.number}>{u.number}{u.matterport.length ? " · 3D scan" : ""}</option>)}
+                      </select>
+                    </label>}
                     {c && <span className="block text-sm text-muted">{c.feetToCampus != null ? `${milesFromFeet(c.feetToCampus)} mi from ` : "Near "}{c.name}</span>}
                     {s.lifestyle === "student" && <span className="mt-1 inline-block rounded-full bg-accent-soft px-2 text-xs font-medium text-accent">Student housing</span>}
                   </button>
                 </li>
               );
             })}
-          </ul>
+          </ul>}
+          {mapMode && !pickedId && results.spaces.some((s) => s.lat != null && s.lng != null) && <p className="rounded-xl bg-sunken p-3 text-sm text-muted">Select a pin on the map to choose an apartment and load its 3D tour.</p>}
         </div>
       )}
     </section>

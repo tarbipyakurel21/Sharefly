@@ -20,15 +20,18 @@ export default async function RoomsPage({ searchParams }: { searchParams: Promis
     <div className="mx-auto max-w-3xl space-y-8">
       <div>
         <h1 className="font-display text-3xl">Your rooms</h1>
-        <p className="mt-1 text-muted">Add a room's measurements and see exactly how a piece of furniture would sit in it.</p>
+        <p className="mt-1 text-muted">{add ? "Choose a room to arrange this item in." : "Select a room to see exactly how a piece of furniture would sit in it."}</p>
       </div>
       {rooms.length ? (
         <ul className="grid gap-3 sm:grid-cols-2">
           {rooms.map((r) => (
-            <li key={r.id}><Link href={`/rooms/${r.id}${add ? `?add=${add}` : ""}`} className="block rounded-2xl border border-line bg-surface p-4 transition-shadow hover:shadow-[var(--shadow-soft)]">
+            <li key={r.id} className="rounded-2xl border border-line bg-surface p-4 transition-shadow hover:shadow-[var(--shadow-soft)]">
               <h2 className="font-semibold">{r.name}</h2>
               <p className="text-sm text-muted">{formatLength(r.lengthM, r.displayUnit)} × {formatLength(r.widthM, r.displayUnit)} · {formatLength(r.heightM, r.displayUnit)} ceiling</p>
-            </Link></li>
+              <Link href={`/rooms/${r.id}${add ? `?add=${add}` : ""}`} className="mt-4 inline-flex rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+                {add ? "Select this room" : "Select room"}
+              </Link>
+            </li>
           ))}
         </ul>
       ) : <EmptyState title="No rooms yet" body="Add one below. It only takes length, width and height." />}

@@ -59,9 +59,9 @@ async function makeGlb(category: Category, w: number, d: number, h: number): Pro
   } finally { disposeFurniture(obj); }
 }
 
-type Props = { title: string; category: Category; widthM: number | null; depthM: number | null; heightM: number | null; unit: Unit };
+type Props = { title: string; category: Category; photoUrl?: string | null; widthM: number | null; depthM: number | null; heightM: number | null; unit: Unit };
 
-export function ArViewer({ title, category, widthM, depthM, heightM, unit }: Props) {
+export function ArViewer({ title, category, photoUrl, widthM, depthM, heightM, unit }: Props) {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"3d" | "photo">("3d");
   const [src, setSrc] = useState<string | null>(null);
@@ -162,6 +162,13 @@ export function ArViewer({ title, category, widthM, depthM, heightM, unit }: Pro
               {state === "error" && <p role="alert" className="absolute inset-0 flex items-center justify-center p-6 text-center text-bad">We couldn't load the 3D viewer. Check your connection and try again.</p>}
               {state === "ready" && src && (
                 <>
+                  {photoUrl && (
+                    <aside className="absolute bottom-3 left-3 z-10 w-28 overflow-hidden rounded-xl border border-white/80 bg-surface/95 shadow-lg sm:bottom-4 sm:left-4 sm:w-40" data-testid="source-photo">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={photoUrl} alt={`Original photo of ${title}`} className="aspect-[4/3] w-full object-cover" />
+                      <p className="px-2 py-1.5 text-[11px] font-semibold text-ink">Original photo</p>
+                    </aside>
+                  )}
                   <model-viewer ref={mv} src={src} alt={`To-scale model of ${title}`} ar="" ar-modes="webxr quick-look" ar-scale="fixed" ar-placement="floor"
                     camera-controls="" disable-pan="" touch-action="pan-y" interaction-prompt="none"
                     camera-orbit={HOME_ORBIT} min-camera-orbit="auto 20deg 60%" max-camera-orbit="auto 88deg 220%" field-of-view="30deg" interpolation-decay="90"
@@ -206,7 +213,7 @@ export function ArViewer({ title, category, widthM, depthM, heightM, unit }: Pro
               )}
               {arSupported && !arFailed && <p>Tap <strong>Place it in my room</strong>, then point your camera at the floor and move the phone slowly until it finds the floor. Drag to move it, twist with two fingers to turn it.</p>}
               {arFailed && <p role="alert" className="text-bad">Your phone couldn't start AR. Try more light, or a floor with some texture.</p>}
-              <p className="text-muted">This is a stand-in model built from the giver's measurements, not a 3D scan of the actual item. Its size is locked to the real size; colour and styling are illustrative, so check the photo for how it really looks.</p>
+              <p className="text-muted">The original listing photo is the visual reference. This generated 3D preview is dimension-locked to the giver's confirmed measurements, but it is not a scan, so use the photo for the item's exact shape, finish and condition.</p>
             </div>
             </>}
           </div>

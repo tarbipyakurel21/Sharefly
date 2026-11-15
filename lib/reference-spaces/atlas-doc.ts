@@ -2,7 +2,7 @@ import { ReferenceSpaceSchema, type ReferenceSpace, type SearchFilters } from ".
 
 /**
  * What goes into MongoDB Atlas. Deliberately smaller than ReferenceSpace: only what search and the room flow read.
- * Left out on purpose: photo links, unit counts, and the kit's property / floor plan numbers.
+ * Left out on purpose: photo links and the kit's property / floor plan numbers.
  */
 export type AtlasDoc = {
   _id: string;
@@ -12,6 +12,7 @@ export type AtlasDoc = {
   lifestyle: ReferenceSpace["lifestyle"];
   colleges: ReferenceSpace["colleges"];
   matterport: ReferenceSpace["matterport"];
+  units: ReferenceSpace["units"];
   /** GeoJSON point, [lng, lat]. Absent when the space has no coordinates. */
   loc?: { type: "Point"; coordinates: [number, number] };
 };
@@ -20,7 +21,7 @@ export function toAtlasDoc(s: ReferenceSpace): AtlasDoc {
   const d: AtlasDoc = {
     _id: s.id, communityName: s.communityName, floorPlanName: s.floorPlanName, city: s.city, state: s.state,
     beds: s.beds, baths: s.baths, minSqft: s.minSqft, maxSqft: s.maxSqft, minRentUsd: s.minRentUsd, maxRentUsd: s.maxRentUsd,
-    rentBasis: s.rentBasis, lifestyle: s.lifestyle, colleges: s.colleges, matterport: s.matterport,
+    rentBasis: s.rentBasis, lifestyle: s.lifestyle, colleges: s.colleges, matterport: s.matterport, units: s.units,
   };
   if (s.lat != null && s.lng != null) d.loc = { type: "Point", coordinates: [s.lng, s.lat] };
   return d;

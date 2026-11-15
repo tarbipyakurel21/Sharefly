@@ -149,6 +149,9 @@ export function RoomPlanner({ room, initial, listings, addListingId }: { room: R
           <span className="ml-auto text-sm text-muted" role="status" data-testid="save-state">{save === "saving" ? "Saving…" : save === "saved" ? "Saved" : save === "error" ? "Couldn't save" : "Changes save automatically"}</span>
           {save === "error" && <Button variant="secondary" onClick={persist}>Try again</Button>}
         </div>
+        <p className="rounded-xl bg-accent-soft p-3 text-sm text-muted" data-testid="planner-hint">
+          This is the editable furniture layer for the tour above. Add a piece on the right, then drag it in the room or switch to the top-down plan for precise placement.
+        </p>
       </div>
 
       <aside className="space-y-5">

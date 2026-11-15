@@ -9,6 +9,11 @@ const MatterportIds = z.object({
   floorPlan: z.array(z.string().min(1)),
   unit: z.array(z.string().min(1)),
 });
+const UnitReference = z.object({
+  number: z.string().min(1),
+  sqft: z.number().int().positive().nullable(),
+  matterport: z.array(z.string().min(1)),
+});
 
 export const ReferenceSpaceSchema = z.object({
   id: z.string().min(1),
@@ -36,6 +41,8 @@ export const ReferenceSpaceSchema = z.object({
   colleges: z.array(z.object({ name: z.string().min(1), campus: z.string().nullable(), feetToCampus: z.number().min(0).nullable() })).max(5),
   photoUrl: z.string().url().nullable(),
   matterport: MatterportIds,
+  /** Unit numbers are optional: the kit may expose only a floor-plan aggregate. */
+  units: z.array(UnitReference).max(500).default([]),
 });
 export type ReferenceSpace = z.infer<typeof ReferenceSpaceSchema>;
 
@@ -55,6 +62,7 @@ export const RoomSourceSchema = z.object({
   /** How the saved size was obtained. Missing on rooms saved before measured sizes existed (those are estimates). */
   dimensions: z.enum(["estimate", "matterport", "adjusted"]).optional(),
   matterportRoomLabel: z.string().nullable().optional(),
+  unitNumber: z.string().nullable().optional(),
   matterport: MatterportIds,
 });
 export type RoomSource = z.infer<typeof RoomSourceSchema>;
