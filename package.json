@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "bash scripts/install-matterport-bundle.sh || echo 'Matterport bundle download failed; room tours fall back to view-only.'",
     "dev": "next dev",
+    "prebuild": "bash scripts/install-matterport-bundle.sh || echo 'Matterport bundle download failed; room tours fall back to view-only.'",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",

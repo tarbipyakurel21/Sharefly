@@ -19,6 +19,7 @@ Requires Node 20.19+ (tested on 22.12).
 npm install
 cp .env.example .env.local      # DEMO_MODE=true shows the "switch person" menu
 npm run db:seed                 # deterministic demo data (needs MONGO_URI in .env.local)
+npm run matterport:bundle       # Matterport Bundle SDK (also runs automatically before `npm run dev`; needs curl + unzip)
 npm run dev                     # http://localhost:3000
 ```
 
@@ -40,6 +41,15 @@ Both are off by default and the app falls back to local files if they are unset 
 | UploadThing | `STORAGE_PROVIDER=uploadthing`, `UPLOADTHING_TOKEN` | Stores listing photos on UploadThing's CDN. Uploads still go through `/api/uploads`, so the magic-byte check and 10 MB cap apply first. Falls back to local disk without a token. |
 
 On Vercel: add the same variables under Settings, Environment Variables, allow `0.0.0.0/0` in Atlas Network Access, and run `atlas:load` first because the local JSON file is gitignored.
+
+## Deploy on Vercel
+
+1. Import the repo in Vercel (framework: Next.js, defaults are fine). `npm run build` first runs `prebuild`, which downloads the Matterport Bundle SDK into `public/matterport-bundle/` (not committed, SDK license).
+2. Set these environment variables, then redeploy (`NEXT_PUBLIC_*` is inlined at build time): `MONGO_URI` (Atlas; allow Vercel's IPs, e.g. 0.0.0.0/0, in Network Access), `SESSION_SECRET`, `STORAGE_PROVIDER=uploadthing`, `UPLOADTHING_TOKEN`, `NEXT_PUBLIC_MATTERPORT_SDK_KEY`, `MATTERPORT_SDK_KEY`, plus `GEMINI_API_KEY` / `AI_PROVIDER` if using AI. Leave `REFERENCE_SPACES_PROVIDER` unset or `none` (the CoStar kit is local only).
+3. In the Matterport developer dashboard, add the Vercel domain to the SDK key's allowed domains.
+4. Seed the Atlas database once from your machine: `npm run db:seed`.
+
+Not verified on a live deployment yet.
 
 ## How it is built
 
