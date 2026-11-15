@@ -6,19 +6,15 @@ Upload file: `public/seed/demo-desk.jpg`. Switch people from the account menu (t
 
 | Step | Who | Do | Expect |
 |---|---|---|---|
-| 1 | Maya Chen | Wishlists → type "a desk for my bedroom, under $30, within 5 miles" → Save | "Saved. Nothing matches yet…" and chips: desk, Up to $30, Within 5 mi |
-| 2 | Maya | Rooms → Length 12, Width 10, Height 8 (feet) → Create my room | 3D room appears; reload keeps it |
-| 3 | Jordan Rivera | Give something away → choose `demo-desk.jpg` | Title "Desk", category Desk, short description. No condition, brand or size invented |
-| 4 | Jordan | Publish (nothing else filled in) | "Thank you! It's up." and "1 person nearby is looking for something like this" |
-| 5 | Maya | Bell shows 1 → Matches | Card for Desk, reasons: Matches "desk", Free, within your budget, Just listed |
-| 6 | Maya | Open it → Preview in my room | Desk in her room, dashed/transparent, "Typical desk size. Actual size not confirmed.", fit "Can't confirm fit yet" |
-| 7 | Maya | Drag, rotate (R), nudge arrows, Remove → Undo | Cannot leave the walls; overlap warning appears when pieces collide; "Saved" |
-| 8 | Maya | Request measurements; then Request pickup help (drop-off: Princeton University Campus) | Notification to Jordan; open RideBoard request |
-| 9 | Jordan | Open the desk → add Width 4, Depth 2, Height 2'6" → Save size | Maya is notified; her desk becomes confirmed, fit reads "Fits your room" |
-| 10 | Sam Okafor | RideBoard → I can help → Send offer | Request moves to "A driver offered" |
-| 11 | Maya | RideBoard → Accept Sam → Mark as picked up | "Driver confirmed" then "Picked up". Jordan can then Mark as given away |
+| 1 | Priya | Rooms → pick a 3D apartment (or enter Length 12, Width 10, Height 8 ft) → Use this 3D room | Her room exists; reload keeps it |
+| 2 | Priya | Browse: no dressing table. Wishlists → "a dressing table for my room" → Save | "Saved. Nothing matches yet…" (items already listed are not matched; only new uploads will be) |
+| 3 | Hardika | Give something away → upload a photo of the dressing table (or chair) → Publish | Title and category suggested, nothing else invented; "1 person nearby is looking for something like this" |
+| 4 | Hardika | Open the listing → 3D scan → add the Reality Composer `.usdz` | Scan shows; width, depth and height fill in from it (check them) |
+| 5 | Priya | Bell shows 1 → Matches → open it | Card with reasons; the owner's 3D scan and size are shown |
+| 6 | Priya | Choose a room to arrange it in | The scan sits in her room; fit reads "Fits your room" only because the size is confirmed |
+| 7 | Priya | I'm interested | Hardika gets "Someone is interested". There is no in-app chat yet: they arrange the handover outside the app |
 
-Reverse direction: as Dana Whitfield, save a wishlist "a tall bookshelf". It immediately finds Jordan's existing bookshelf.
+Reverse direction: as Dana Whitfield, save a wishlist "a tall bookshelf". It immediately finds Hardika's existing bookshelf.
 
 Automated version of steps 1-11: `npm run test:e2e` (runs against its own database `data/e2e.db`).
 

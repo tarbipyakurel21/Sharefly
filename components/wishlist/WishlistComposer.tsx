@@ -10,7 +10,6 @@ import { NeighborhoodInput } from "@/components/ui/NeighborhoodInput";
 export function WishlistComposer({ initialText = "", defaultNeighborhood = "" }: { initialText?: string; defaultNeighborhood?: string }) {
   const router = useRouter();
   const [text, setText] = useState(initialText);
-  const [budget, setBudget] = useState("");
   const [miles, setMiles] = useState("");
   const [nb, setNb] = useState(defaultNeighborhood);
   const [busy, setBusy] = useState(false);
@@ -22,22 +21,21 @@ export function WishlistComposer({ initialText = "", defaultNeighborhood = "" }:
     setBusy(true); setErr(null); setResult(null);
     try {
       const num = (s: string) => (s.trim() === "" ? undefined : Number(s));
-      const b = num(budget), m = num(miles);
-      if ((b !== undefined && Number.isNaN(b)) || (m !== undefined && Number.isNaN(m))) throw new Error("Please enter budget and distance as numbers, like 30 and 5.");
-      const r = await api<{ matchCount: number; understood: boolean }>("/api/wishlists", { method: "POST", json: { rawText: text, maxPriceDollars: b ?? null, maxDistanceMiles: m ?? null, neighborhood: nb || null } });
+      const m = num(miles);
+      if (m !== undefined && Number.isNaN(m)) throw new Error("Please enter the distance as a number, like 5.");
+      const r = await api<{ matchCount: number; understood: boolean }>("/api/wishlists", { method: "POST", json: { rawText: text, maxDistanceMiles: m ?? null, neighborhood: nb || null } });
       setResult({ count: r.matchCount, understood: r.understood });
-      setText(""); setBudget(""); setMiles("");
+      setText(""); setMiles("");
       router.refresh();
     } catch (e) { setErr(errMsg(e)); } finally { setBusy(false); }
   }
 
   return (
     <form onSubmit={save} className="space-y-4 rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-[var(--shadow-soft)]">
-      <Field label="What are you looking for?" htmlFor="wl-text" hint="Try: “A sturdy desk for a small bedroom, under $30, within 5 miles.”">
+      <Field label="What are you looking for?" htmlFor="wl-text" hint="Try: “A sturdy desk for a small bedroom, within 5 miles.”">
         <TextArea id="wl-text" rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder="Describe it in your own words" maxLength={400} required />
       </Field>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Field label="Budget (optional)" htmlFor="wl-b"><TextInput id="wl-b" inputMode="decimal" placeholder="$ max" value={budget} onChange={(e) => setBudget(e.target.value)} /></Field>
+      <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Distance in miles (optional)" htmlFor="wl-m"><TextInput id="wl-m" inputMode="decimal" placeholder="e.g. 5" value={miles} onChange={(e) => setMiles(e.target.value)} /></Field>
         <Field label="Your neighborhood" htmlFor="wl-nb"><NeighborhoodInput id="wl-nb" value={nb} onChange={(e) => setNb(e.target.value)} /></Field>
       </div>

@@ -30,7 +30,6 @@ export function AccountMenu({ user, demo, people }: { user: User | null; demo: b
       </summary>
       <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-line bg-surface p-3 shadow-[var(--shadow-soft)]">
         {user ? <p className="px-2 pb-2 text-sm text-muted">Signed in as <span className="font-semibold text-ink">{user.name}</span></p> : <Link href="/signin" className="block px-2 py-2 font-semibold">Sign in</Link>}
-        <Link href="/rideboard" className="block rounded-lg px-2 py-2.5 hover:bg-sunken md:hidden">RideBoard</Link>
         <Link href="/rooms" className="block rounded-lg px-2 py-2.5 hover:bg-sunken md:hidden">My rooms</Link>
         {demo && (
           <div className="mt-2 border-t border-line px-2 pt-3">

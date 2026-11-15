@@ -21,9 +21,10 @@ export const POST = route(async (req) => {
     if (existing && existing.giverId === user.id) return ok({ listing: existing, matchCount: await countMatchesForListing(existing.id) });
   }
   const listing = await createListing({
-    giverId: user.id, title: b.title, description: b.description, category: b.category, priceCents: b.priceCents,
+    giverId: user.id, title: b.title, description: b.description, category: b.category,
     conditionNote: b.conditionNote, purchasedFrom: b.purchasedFrom, neighborhood: b.neighborhood ?? user.neighborhood,
     widthM: b.widthM ?? null, depthM: b.depthM ?? null, heightM: b.heightM ?? null, aiGenerated: b.aiGenerated, clientKey: b.clientKey ?? null,
+    videoUrl: b.videoUrl ?? null,
     photo: b.photoUrl ? { url: b.photoUrl, width: b.photoWidth, height: b.photoHeight } : null,
   });
   try { await runMatchingForListing(listing.id); } catch (e) { console.error("[matching] listing", e instanceof Error ? e.message : e); }

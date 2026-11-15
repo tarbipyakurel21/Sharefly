@@ -3,12 +3,16 @@ import type { Category } from "@/lib/categories";
 
 export type User = { id: string; name: string; email: string; neighborhood: string | null };
 export type ListingStatus = "draft" | "available" | "pending" | "claimed" | "removed";
+/** A measurement the giver named themselves (seat height, diameter...). Meters. Informational: fit checks only use width, depth and height. */
+export type ExtraMeasurement = { label: string; valueM: number };
 export type Listing = {
   id: string; giverId: string; giverName: string; title: string; description: string; category: Category; status: ListingStatus;
   priceCents: number; conditionNote: string | null; purchasedFrom: string | null; neighborhood: string | null;
   lat: number | null; lng: number | null; widthM: number | null; depthM: number | null; heightM: number | null;
   dimensionsSource: "unknown" | "giver_provided"; aiGenerated: boolean; createdAt: string; publishedAt: string | null;
-  photoUrl: string | null;
+  photoUrl: string | null; videoUrl?: string | null; extraMeasurements?: ExtraMeasurement[];
+  /** A 3D scan the giver uploaded (iPhone Reality Composer / Object Capture). Their own file, never AI-generated. */
+  model?: { url: string; format: "glb" | "usdz" } | null;
 };
 export type Wishlist = {
   id: string; userId: string; rawText: string; categories: Category[]; keywords: string[]; maxPriceCents: number | null;

@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { api } from "@/lib/client";
 import type { MatchRow } from "@/lib/db/types";
 import { Chip } from "@/components/ui/Chip";
-import { formatPrice } from "@/lib/format";
 
 export function MatchCard({ m }: { m: MatchRow }) {
   const router = useRouter();
@@ -26,7 +25,7 @@ export function MatchCard({ m }: { m: MatchRow }) {
           {!available && <Chip tone="warn">No longer available</Chip>}
         </div>
         <Link href={`/items/${l.id}`} className="mt-1 block font-semibold leading-snug hover:underline">{l.title}</Link>
-        <p className="text-sm text-muted">{formatPrice(l.priceCents)} · {l.neighborhood ?? "Neighborhood not shared"}</p>
+        <p className="text-sm text-muted">Free · {l.neighborhood ?? "Neighborhood not shared"}</p>
         <p className="mt-1 text-sm text-muted">For your wishlist: “{m.wishlistText}”</p>
         <ul className="mt-2 flex flex-wrap gap-1.5">{m.reasons.map((r) => <li key={r}><Chip tone="good">{r}</Chip></li>)}</ul>
         <div className="mt-2"><button onClick={dismiss} className="min-h-11 text-sm text-muted underline">Not for me</button></div>

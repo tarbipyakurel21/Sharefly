@@ -4,9 +4,9 @@ import { parseWishlistText } from "@/lib/matching/parse";
 import { lookupNeighborhood } from "@/lib/geo/neighborhoods";
 
 const now = new Date("2026-11-14T12:00:00Z");
-const campus = lookupNeighborhood("Princeton University Campus")!;
-const downtown = lookupNeighborhood("Downtown Princeton")!;
-const lawrenceville = lookupNeighborhood("Lawrenceville")!;
+const campus = lookupNeighborhood("USC / Exposition Park")!;
+const downtown = lookupNeighborhood("Downtown Los Angeles")!;
+const katy = lookupNeighborhood("Pasadena")!;
 
 const listing = (o: Partial<MatchListing> = {}): MatchListing => ({
   id: "l1", giverId: "jordan", title: "Wooden desk", description: "A plain wooden desk with two drawers.",
@@ -54,7 +54,7 @@ describe("evaluate", () => {
     expect(evaluate(listing({ priceCents: 5000 }), wish("desk under $30"), now)).toBeNull();
   });
   it("out of range is excluded", () => {
-    expect(evaluate(listing({ lat: lawrenceville.lat, lng: lawrenceville.lng }), wish("desk within 3 km"), now)).toBeNull();
+    expect(evaluate(listing({ lat: katy.lat, lng: katy.lng }), wish("desk within 3 km"), now)).toBeNull();
   });
   it("unknown distance passes with half points and a reason", () => {
     const known = evaluate(listing({ lat: campus.lat, lng: campus.lng }), wish("desk"), now)!;
@@ -75,5 +75,14 @@ describe("evaluate", () => {
   it("is deterministic (no duplicates by construction)", () => {
     const a = evaluate(listing(), wish("desk"), now), b = evaluate(listing(), wish("desk"), now);
     expect(a).toEqual(b);
+  });
+});
+
+import { categoriesIn } from "@/lib/matching/text";
+describe("dressing furniture words", () => {
+  it("understands a dressing table or vanity as a table, and a dressing chair as a chair", () => {
+    expect(categoriesIn("a dressing table for my room")).toEqual(["table"]);
+    expect(categoriesIn("vanity")).toEqual(["table"]);
+    expect(categoriesIn("a dressing chair")).toEqual(["chair"]);
   });
 });

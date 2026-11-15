@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Listing } from "@/lib/db/types";
 import type { FitStatus } from "@/lib/room/geometry";
 import { FitBadge } from "./FitBadge";
-import { formatPrice } from "@/lib/format";
 
 export function ListingCard({ l, fit }: { l: Listing; fit?: FitStatus | null }) {
   return (
@@ -15,7 +14,7 @@ export function ListingCard({ l, fit }: { l: Listing; fit?: FitStatus | null }) 
       </div>
       <div className="mt-3 flex items-start justify-between gap-3">
         <h3 className="font-semibold leading-snug">{l.title}</h3>
-        <span className={`shrink-0 text-sm font-semibold ${l.priceCents === 0 ? "text-good" : ""}`}>{formatPrice(l.priceCents)}</span>
+        <span className="shrink-0 text-sm font-semibold text-good">Free</span>
       </div>
       <p className="text-sm text-muted">{l.neighborhood ?? "Neighborhood not shared"}</p>
       {fit && <div className="mt-2"><FitBadge status={fit} /></div>}

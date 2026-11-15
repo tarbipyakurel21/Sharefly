@@ -5,11 +5,14 @@ import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { OrbitControls as OrbitImpl } from "three-stdlib";
 import { Furniture } from "./Furniture";
+import type { ScanRef } from "@/lib/room/scan-model";
 import { corners, clampToRoom, type Dims } from "@/lib/room/geometry";
 import { formatLength, type Unit } from "@/lib/units";
 import type { PlacedPiece } from "./types";
 
 type Props = {
+  /** Giver-provided 3D scans by listing id; pieces without one use the measurement-based stand-in. */
+  scans?: Record<string, ScanRef>;
   room: Dims; unit: Unit; pieces: PlacedPiece[]; selectedId: string | null; collidingIds: Set<string>;
   onSelect: (id: string | null) => void; onMove: (id: string, x: number, z: number) => void;
 };
@@ -92,7 +95,7 @@ function Labels({ room, unit }: { room: Dims; unit: Unit }) {
   );
 }
 
-function Piece({ p, selected, colliding, onSelect, onDragStart }: { p: PlacedPiece; selected: boolean; colliding: boolean; onSelect: () => void; onDragStart: (e: { point: THREE.Vector3 }) => void }) {
+function Piece({ p, scan, selected, colliding, onSelect, onDragStart }: { p: PlacedPiece; scan?: ScanRef | null; selected: boolean; colliding: boolean; onSelect: () => void; onDragStart: (e: { point: THREE.Vector3 }) => void }) {
   const outline = useMemo(() => corners(p).map((c) => [c.x - p.x, 0.012, c.z - p.z] as [number, number, number]), [p.x, p.z, p.rotationY, p.widthM, p.depthM]); // eslint-disable-line react-hooks/exhaustive-deps
   const closed = useMemo(() => [...outline, outline[0]], [outline]);
   return (
@@ -100,7 +103,7 @@ function Piece({ p, selected, colliding, onSelect, onDragStart }: { p: PlacedPie
       <group rotation={[0, p.rotationY, 0]}
         onPointerDown={(e) => { e.stopPropagation(); onSelect(); onDragStart({ point: e.point }); }}
         onPointerOver={() => { document.body.style.cursor = "grab"; }} onPointerOut={() => { document.body.style.cursor = ""; }}>
-        <Furniture category={p.category} w={p.widthM} d={p.depthM} h={p.heightM} ghost={!p.dimensionsConfirmed} tint={colliding ? "#d4574a" : null} />
+        <Furniture category={p.category} w={p.widthM} d={p.depthM} h={p.heightM} ghost={!p.dimensionsConfirmed} tint={colliding ? "#d4574a" : null} scan={scan} />
       </group>
       {!p.dimensionsConfirmed && <Line points={closed} color="#8a5a0b" lineWidth={2} dashed dashSize={0.1} gapSize={0.08} />}
       {selected && <Line points={closed} color="#a94a28" lineWidth={3} />}
@@ -151,7 +154,7 @@ function Scene(props: Props & { controls: React.RefObject<OrbitImpl | null> }) {
       <Walls room={room} />
       <Labels room={room} unit={props.unit} />
       {pieces.map((p) => (
-        <Piece key={p.id} p={p} selected={p.id === selectedId} colliding={collidingIds.has(p.id)} onSelect={() => onSelect(p.id)}
+        <Piece key={p.id} p={p} scan={p.listingId ? props.scans?.[p.listingId] : null} selected={p.id === selectedId} colliding={collidingIds.has(p.id)} onSelect={() => onSelect(p.id)}
           onDragStart={(e) => { if (controls.current) controls.current.enabled = false; drag.current = { id: p.id, dx: e.point.x - p.x, dz: e.point.z - p.z }; }} />
       ))}
     </>

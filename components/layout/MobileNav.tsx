@@ -9,7 +9,6 @@ const ITEMS = [
   { href: "/give", label: "Give", icon: "plus", primary: true },
   { href: "/rooms", label: "Rooms", icon: "room" },
   { href: "/matches", label: "Matches", icon: "bell" },
-  { href: "/rideboard", label: "Rides", icon: "truck" },
 ];
 
 export function MobileNav({ matches }: { matches: number }) {
@@ -17,7 +16,7 @@ export function MobileNav({ matches }: { matches: number }) {
   return (
     <footer className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
       <nav aria-label="Main">
-        <ul className="mx-auto grid max-w-2xl grid-cols-6 items-end px-2 py-1.5">
+        <ul className="mx-auto grid max-w-2xl grid-cols-5 items-end px-2 py-1.5">
           {ITEMS.map((i) => {
             const active = path === i.href || path.startsWith(i.href + "/");
             return (

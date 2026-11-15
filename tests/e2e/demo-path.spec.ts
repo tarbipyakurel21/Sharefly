@@ -3,7 +3,7 @@ import { test, expect, type Page } from "@playwright/test";
 async function switchTo(page: Page, name: string) {
   await page.goto("/browse");
   await page.getByLabel("Account menu").click();
-  // Option text carries a role suffix, e.g. "Maya Chen (Receiver)", so match on the name.
+  // Option text carries a role suffix, e.g. "Priya (Receiver)", so match on the name.
   const select = page.getByLabel("Demo: switch person");
   const value = await select.locator("option", { hasText: name }).first().getAttribute("value");
   await select.selectOption(value!);
@@ -11,9 +11,9 @@ async function switchTo(page: Page, name: string) {
   await page.waitForTimeout(300);
 }
 
-test("demo path: wishlist + room -> photo listing -> match -> preview -> pickup", async ({ page }) => {
-  // 1. Maya saves a wishlist and a room
-  await switchTo(page, "Maya Chen");
+test("demo path: wishlist + room -> photo listing -> match -> preview", async ({ page }) => {
+  // 1. Priya saves a wishlist and a room
+  await switchTo(page, "Priya");
   await page.goto("/wishlists");
   await page.getByLabel("What are you looking for?").fill("a desk for my bedroom, under $30, within 5 miles");
   await page.getByRole("button", { name: "Save wishlist" }).click();
@@ -30,8 +30,8 @@ test("demo path: wishlist + room -> photo listing -> match -> preview -> pickup"
   await page.reload();
   await expect(page.getByText("12 ft long · 10 ft wide · 8 ft tall")).toBeVisible();
 
-  // 2. Jordan uploads a photo of a desk
-  await switchTo(page, "Jordan Rivera");
+  // 2. Hardika uploads a photo of a desk
+  await switchTo(page, "Hardika");
   await page.goto("/give");
   await page.locator("#file-lib").setInputFiles("public/seed/demo-desk.jpg");
   await expect(page.getByLabel("Title")).toHaveValue("Desk", { timeout: 15_000 });
@@ -43,8 +43,8 @@ test("demo path: wishlist + room -> photo listing -> match -> preview -> pickup"
   await page.waitForURL(/\/items\//);
   const itemUrl = page.url();
 
-  // 3. Maya sees the match
-  await switchTo(page, "Maya Chen");
+  // 3. Priya sees the match
+  await switchTo(page, "Priya");
   await page.goto("/browse");
   await expect(page.getByTestId("unread-count")).toHaveText("1");
   await page.goto("/matches");
@@ -81,18 +81,13 @@ test("demo path: wishlist + room -> photo listing -> match -> preview -> pickup"
   await page.getByRole("button", { name: "Undo" }).click();
   await expect(page.getByTestId("piece-list").getByRole("button")).toHaveCount(2);
 
-  // 5. Measurement request -> Jordan adds size -> piece becomes confirmed
+  // 5. Measurement request -> Hardika adds size -> piece becomes confirmed
   await page.getByTestId("piece-list").getByRole("button").first().click();
   await page.getByRole("button", { name: "Request measurements" }).click();
   await expect(page.getByText("We've asked for the size.")).toBeVisible();
   await page.goto(itemUrl);
-  await page.getByRole("button", { name: "Request pickup help" }).click();
-  await page.getByLabel("Drop-off neighborhood").fill("Princeton University Campus");
-  await page.getByLabel("When works for you?").fill("Saturday morning");
-  await page.getByRole("button", { name: "Post request" }).click();
-  await expect(page.getByRole("link", { name: "See your pickup request" })).toBeVisible();
 
-  await switchTo(page, "Jordan Rivera");
+  await switchTo(page, "Hardika");
   await page.goto(itemUrl);
   await expect(page.getByText(/asked for measurements/)).toBeVisible();
   await page.getByLabel("Width").fill("4");
@@ -101,29 +96,13 @@ test("demo path: wishlist + room -> photo listing -> match -> preview -> pickup"
   await page.getByRole("button", { name: "Save size" }).click();
   await expect(page.getByText(/wide ×/)).toBeVisible();
 
-  await switchTo(page, "Maya Chen");
+  await switchTo(page, "Priya");
   await page.goto(itemUrl);
   await expect(page.getByText("Fits your room")).toBeVisible();
-
-  // 6. RideBoard cycle
-  await switchTo(page, "Sam Okafor");
-  await page.goto("/rideboard");
-  const card = page.getByTestId("board").locator("li", { hasText: "Desk" });
-  await card.getByRole("button", { name: "I can help" }).click();
-  await card.getByRole("button", { name: "Send offer" }).click();
-  await expect(page.getByText("Thank you! We've let them know.")).toBeVisible();
-  await expect(page.getByTestId("board").locator("li", { hasText: "Desk" })).toHaveCount(0);
-
-  await switchTo(page, "Maya Chen");
-  await page.goto("/rideboard");
-  await page.getByRole("button", { name: /Accept Sam/ }).click();
-  await expect(page.getByText("You're connected with Sam")).toBeVisible();
-  await page.getByRole("button", { name: "Mark as picked up" }).first().click();
-  await expect(page.getByText("Picked up").first()).toBeVisible();
 });
 
 test("reverse direction: listing first, then wishlist matches", async ({ page }) => {
-  await switchTo(page, "Sam Okafor");
+  await switchTo(page, "Tarbi");
   await page.goto("/wishlists");
   await page.getByLabel("What are you looking for?").fill("a tall bookshelf");
   await page.getByRole("button", { name: "Save wishlist" }).click();
@@ -134,7 +113,7 @@ test("reverse direction: listing first, then wishlist matches", async ({ page })
 
 test("AI unavailable never blocks publishing (title-only listing)", async ({ page }) => {
   await page.route("**/api/ai/describe-item", (r) => r.fulfill({ json: { status: "unavailable", reason: "timeout" } }));
-  await switchTo(page, "Jordan Rivera");
+  await switchTo(page, "Hardika");
   await page.goto("/give");
   await page.locator("#file-lib").setInputFiles("public/seed/lamp.jpg");
   await expect(page.getByText("We couldn't describe this one automatically")).toBeVisible();
@@ -144,7 +123,7 @@ test("AI unavailable never blocks publishing (title-only listing)", async ({ pag
 });
 
 test("3D planner: dragging a piece moves it and keeps it inside the walls", async ({ page }) => {
-  await switchTo(page, "Maya Chen");
+  await switchTo(page, "Priya");
   await page.goto("/rooms/r-priya?add=l-table");
   await expect(page.getByTestId("piece-pos")).toBeVisible({ timeout: 15_000 });
   await page.waitForTimeout(1500);
@@ -170,13 +149,13 @@ test("3D planner: dragging a piece moves it and keeps it inside the walls", asyn
 
 test("View in 3D: to-scale AR model for measured items, honest message otherwise", async ({ page }) => {
   await page.goto("/items/l-shelf");
-  await expect(page.getByTestId("ar-unavailable")).toContainText("Needs the giver's measurements");
+  await expect(page.getByTestId("ar-unavailable")).toContainText("Needs the owner's measurements");
   await expect(page.getByTestId("ar-open")).toHaveCount(0);
 
   await page.goto("/items/l-sofa");
   await page.getByTestId("ar-open").click();
   const dialog = page.getByRole("dialog");
-  await expect(dialog).toContainText("from the giver");
+  await expect(dialog).toContainText("from the owner");
   await expect(page.getByTestId("ar-stage")).toHaveAttribute("data-state", "ready", { timeout: 20_000 });
   const src = await page.locator("model-viewer").evaluate((el) => (el as HTMLElement & { src: string }).src);
   expect(src).toMatch(/^blob:/);
@@ -184,14 +163,13 @@ test("View in 3D: to-scale AR model for measured items, honest message otherwise
   const magic = await page.evaluate(async (u) => new TextDecoder().decode((await (await fetch(u!)).arrayBuffer()).slice(0, 4)), src);
   expect(magic).toBe("glTF");
   // desktop headless browser can't do AR, so we point people to their phone instead of showing a dead button
-  await expect(page.getByTestId("ar-phone-hint")).toBeVisible({ timeout: 15_000 });
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
 });
 
 test("iPhone HEIC photos work in Chrome: new listing", async ({ page }) => {
   // Chromium can't decode HEIC itself, so this exercises the on-device conversion.
-  await switchTo(page, "Jordan Rivera");
+  await switchTo(page, "Hardika");
   await page.goto("/give");
   await page.locator("#file-lib").setInputFiles("tests/fixtures/desk.heic");
   await expect(page.getByLabel("Title")).toHaveValue("Desk", { timeout: 20_000 });

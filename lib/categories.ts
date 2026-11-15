@@ -16,8 +16,8 @@ export const CATEGORY_LABEL: Record<Category, string> = {
 /** word -> category. Words are lowercase singular. */
 export const SYNONYMS: Record<string, Category> = {
   desk: "desk", "writing table": "desk", workstation: "desk", "study table": "desk",
-  chair: "chair", stool: "chair", "office chair": "chair", armchair: "chair",
-  table: "table", "dining table": "table", "coffee table": "table", nightstand: "table",
+  chair: "chair", "dressing chair": "chair", stool: "chair", "office chair": "chair", armchair: "chair",
+  table: "table", "dressing table": "table", vanity: "table", "vanity table": "table", "dining table": "table", "coffee table": "table", nightstand: "table",
   sofa: "sofa", couch: "sofa", loveseat: "sofa", sectional: "sofa",
   bed: "bed", "bed frame": "bed", bedframe: "bed",
   mattress: "mattress",

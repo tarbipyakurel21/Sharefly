@@ -6,6 +6,12 @@ const text = (max: number) => z.string().trim().max(max);
 const optText = (max: number) => text(max).optional().nullable().transform((v) => (v ? v : null));
 const dim = z.number().positive().max(10).nullable().optional();
 
+export const ExtraMeasurementsInput = z.array(z.object({
+  label: z.string().trim().min(2, "Give each measurement a name, like seat height.").max(30, "Measurement names can be up to 30 characters.")
+    .regex(/^[\p{L}\p{N} ()\-/.']+$/u, "Measurement names can use letters, numbers and spaces."),
+  valueM: z.number().positive("Each measurement needs a size above zero.").max(10, "That measurement looks too big."),
+})).max(8, "You can add up to 8 extra measurements.").refine((a) => new Set(a.map((x) => x.label.toLowerCase())).size === a.length, "Each measurement name can only be used once.");
+
 export const SessionBody = z.union([
   z.object({ name: text(60).min(1, "Please tell us your name."), email: z.string().trim().email("That email doesn't look right.").max(120) }),
   z.object({ userId: z.string().min(1) }),
@@ -15,7 +21,6 @@ export const ListingBody = z.object({
   title: text(80).min(3, "Please add a short title."),
   description: text(600).optional().default(""),
   category: z.enum(CATEGORIES).default("other"),
-  priceCents: z.number().int().min(0).max(100000).default(0),
   conditionNote: optText(400),
   purchasedFrom: optText(60),
   neighborhood: optText(80),
@@ -24,6 +29,7 @@ export const ListingBody = z.object({
   photoUrl: z.string().regex(/^(\/api\/uploads\/[a-f0-9-]+\.(jpg|png|webp)|\/seed\/[\w.-]+|https:\/\/[a-z0-9]+\.ufs\.sh\/f\/[\w.-]+)$/, "That photo couldn't be used.").nullable().optional(),
   photoWidth: z.number().int().positive().max(10000).nullable().optional(),
   photoHeight: z.number().int().positive().max(10000).nullable().optional(),
+  videoUrl: z.string().regex(/^(\/api\/uploads\/[a-f0-9-]+\.(mp4|mov|webm)|https:\/\/[a-z0-9]+\.ufs\.sh\/f\/[\w.-]+)$/, "That video couldn't be used.").nullable().optional(),
   clientKey: z.string().min(8).max(80).optional(),
 });
 
@@ -31,10 +37,10 @@ export const ListingPatch = z.object({
   title: text(80).min(3).optional(),
   description: text(600).optional(),
   category: z.enum(CATEGORIES).optional(),
-  priceCents: z.number().int().min(0).max(100000).optional(),
   conditionNote: optText(400),
   neighborhood: optText(80),
   widthM: dim, depthM: dim, heightM: dim,
+  extraMeasurements: ExtraMeasurementsInput.optional(),
   status: z.enum(["available", "claimed", "removed"]).optional(),
 });
 

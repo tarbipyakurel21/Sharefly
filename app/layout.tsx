@@ -12,7 +12,7 @@ const head = Fraunces({ subsets: ["latin"], variable: "--font-head", display: "s
 
 export const metadata: Metadata = {
   title: { default: "ShareFly: give it away, find what you need", template: "%s · ShareFly" },
-  description: "Give things away in seconds. Find what you need nearby, check it fits your room, and get help picking it up.",
+  description: "Give things away. Find what you need nearby, check it fits your room, and get help picking it up.",
 };
 export const viewport: Viewport = { themeColor: "#faf7f2", width: "device-width", initialScale: 1 };
 

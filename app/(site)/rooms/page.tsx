@@ -5,6 +5,7 @@ import { listRooms } from "@/lib/db/queries";
 import { getReferenceSpaceProvider } from "@/lib/reference-spaces/provider";
 import { formatLength } from "@/lib/units";
 import { SignInCard } from "@/components/layout/SignInForm";
+import { DeleteRoomButton } from "@/components/room/DeleteRoomButton";
 import { RoomForm } from "@/components/room/RoomForm";
 
 export const metadata: Metadata = { title: "Your rooms" };
@@ -23,9 +24,12 @@ export default async function RoomsPage({ searchParams }: { searchParams: Promis
             <li key={r.id} className="rounded-2xl border border-line bg-surface p-4 transition-shadow hover:shadow-[var(--shadow-soft)]">
               <h2 className="font-semibold">{r.name}</h2>
               <p className="text-sm text-muted">{formatLength(r.lengthM, r.displayUnit)} × {formatLength(r.widthM, r.displayUnit)} · {formatLength(r.heightM, r.displayUnit)} ceiling</p>
-              <Link href={`/rooms/${r.id}${add ? `?add=${add}` : ""}`} className="mt-4 inline-flex rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
-                {add ? "Select this room" : "Select room"}
-              </Link>
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <Link href={`/rooms/${r.id}${add ? `?add=${add}` : ""}`} className="inline-flex rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+                  {add ? "Select this room" : "Select room"}
+                </Link>
+                <DeleteRoomButton id={r.id} name={r.name} />
+              </div>
             </li>
           ))}
         </ul>

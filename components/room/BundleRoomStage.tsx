@@ -3,10 +3,14 @@ import { useEffect, useRef, useState } from "react";
 import type { Category } from "@/lib/categories";
 import { makeGlb } from "@/lib/room/glb";
 import { embedUrl } from "@/lib/matterport/tour";
+import { fitStatus } from "@/lib/room/geometry";
+import { api, errMsg } from "@/lib/client";
+import { Button } from "@/components/ui/Button";
+import { useToast } from "@/components/ui/Toast";
 
 const BUNDLE_PATH = "/matterport-bundle/showcase.html";
 
-export type StageItem = { id: string; title: string; category: Category; widthM: number | null; depthM: number | null; heightM: number | null };
+export type StageItem = { own?: boolean; interested?: boolean; available?: boolean; model?: { url: string; format: "glb" | "usdz" } | null; id: string; title: string; category: Category; widthM: number | null; depthM: number | null; heightM: number | null };
 type Vec = { x: number; y: number; z: number };
 type Comp = { inputs: Record<string, unknown>; events: Record<string, boolean> };
 type Node3 = { position: { x?: number; y?: number; z?: number; set: (x: number, y: number, z: number) => void }; obj3D?: { rotation: { y: number } }; rotation?: { y: number }; addComponent: (name: string, inputs: object) => Comp };
@@ -25,7 +29,7 @@ type Placed = { item: StageItem; node: Node3 };
  * exported to a to-scale GLB and added to the scene. Items without confirmed measurements are never drawn.
  * Placement is a runtime overlay: nothing is saved and it is not calibrated to the scan's walls.
  */
-export function BundleRoomStage({ modelId, sdkKey, title, items }: { modelId: string; sdkKey: string; title: string; items: StageItem[] }) {
+export function BundleRoomStage({ modelId, sdkKey, title, items, roomDims }: { modelId: string; sdkKey: string; title: string; items: StageItem[]; roomDims?: { lengthM: number; widthM: number; heightM: number } | null }) {
   const frame = useRef<HTMLIFrameElement | null>(null);
   const sdkRef = useRef<BundleSdk | null>(null);
   const placed = useRef<Placed[]>([]);
@@ -38,6 +42,15 @@ export function BundleRoomStage({ modelId, sdkKey, title, items }: { modelId: st
   const selectRef = useRef<(id: string | null) => void>(() => {});
   const [selected, setSelected] = useState<string | null>(null);
   const [gizmoMode, setGizmoMode] = useState<"translate" | "rotate">("translate");
+  const toast = useToast();
+  const [asked, setAsked] = useState<Set<string>>(new Set());
+  const [asking, setAsking] = useState(false);
+  async function requestItem(id: string) {
+    setAsking(true);
+    try { await api(`/api/listings/${id}/interest`, { method: "POST" }); setAsked((s) => new Set(s).add(id)); toast({ message: "We've let them know you'd like it." }); }
+    catch (e) { toast({ message: errMsg(e), tone: "error" }); } finally { setAsking(false); }
+  }
+  const [panel, setPanel] = useState(true);
   const [gone, setGone] = useState<Set<string>>(new Set());
   const [status, setStatus] = useState<{ state: "loading" | "ready" | "error"; text: string }>({ state: "loading", text: "Starting the Matterport player…" });
   const [shown, setShown] = useState<string[]>([]);
@@ -144,7 +157,11 @@ export function BundleRoomStage({ modelId, sdkKey, title, items }: { modelId: st
         });
         tools.start();
         for (const item of sized) {
-          const url = URL.createObjectURL(await makeGlb(item.category, item.widthM!, item.depthM!, item.heightM!));
+          const standIn = () => makeGlb(item.category, item.widthM!, item.depthM!, item.heightM!);
+          let blob: Blob;
+          try { blob = item.model ? await (await import("@/lib/room/scan-model")).scanToSizedGlb(item.model, item.widthM!, item.depthM!, item.heightM!) : await standIn(); }
+          catch { blob = await standIn(); } // scan can't be opened: use the measurement-based model
+          const url = URL.createObjectURL(blob);
           urls.push(url);
           const [obj] = await sdk.Scene.createObjects(1);
           const node = obj.addNode();
@@ -211,32 +228,40 @@ export function BundleRoomStage({ modelId, sdkKey, title, items }: { modelId: st
       <h2 className="font-display text-lg">Your 3D room</h2>
       <div ref={stage} data-testid="bundle-viewer" className={`relative overflow-hidden rounded-xl bg-sunken ${full ? "h-screen w-screen rounded-none" : "aspect-video"}`}>
         <iframe ref={frame} src={src} title={`3D room: ${title}`} allow="fullscreen; xr-spatial-tracking" allowFullScreen className="absolute inset-0 h-full w-full border-0" />
-        <button type="button" onClick={toggleFull} aria-pressed={full} data-testid="fullscreen-toggle" className="absolute right-2 top-2 z-10 rounded-lg bg-black/70 px-3 py-1.5 text-sm font-semibold text-white hover:bg-black/85">{full ? "Exit full screen" : "Full screen"}</button>
+        <div className="pointer-events-none absolute right-2 top-2 z-10 flex max-w-[calc(100%-1rem)] flex-col items-end gap-1.5">
+        <button type="button" onClick={toggleFull} aria-pressed={full} data-testid="fullscreen-toggle" className="pointer-events-auto rounded-lg border border-white/25 bg-black px-3 py-1.5 text-sm font-semibold text-white hover:bg-neutral-800">{full ? "Exit full screen" : "Full screen"}</button>
         {status.state === "ready" && sized.length > 0 && (
-          <div data-testid="piece-controls" className="absolute inset-x-2 bottom-2 z-10 max-h-[45%] space-y-1 overflow-y-auto rounded-xl bg-black/70 p-2 text-white">
-            <p className="text-xs text-white/80">Click a piece in the tour (or its name), then drag the arrows to move it or the ring to turn it.</p>
-            <ul className="flex flex-wrap gap-x-4 gap-y-1.5">
-              {sized.map((i) => {
-                const removed = gone.has(i.id), on = selected === i.id;
-                const b = "rounded-lg border border-white/30 px-2.5 py-1 text-sm hover:bg-white/15";
-                return (
-                  <li key={i.id} className="flex flex-wrap items-center gap-1.5">
-                    <button type="button" aria-pressed={on} disabled={removed} onClick={() => select(on ? null : i.id)} className={`${b} font-medium ${on ? "border-white bg-white/25" : ""}`}>{i.title}</button>
-                    {removed ? <button type="button" className={b} onClick={() => putBack(i.id)}>Put back</button> : on && (<>
-                      <button type="button" aria-pressed={gizmoMode === "translate"} className={`${b} aria-pressed:bg-white/25`} onClick={() => setMode("translate")}>Move</button>
-                      <button type="button" aria-pressed={gizmoMode === "rotate"} className={`${b} aria-pressed:bg-white/25`} onClick={() => setMode("rotate")}>Rotate</button>
-                      <button type="button" className={`${b} text-red-300`} onClick={() => remove(i.id)}>Remove</button>
-                    </>)}
-                  </li>
-                );
-              })}
-            </ul>
+          <div data-testid="piece-controls" className="pointer-events-none flex flex-wrap items-start justify-end gap-1.5">
+            {/* No backing panel: only the buttons catch clicks, so the tour underneath stays usable. */}
+            {!selected && <button type="button" aria-expanded={panel} onClick={() => setPanel(!panel)} className="pointer-events-auto rounded-lg border border-white/25 bg-black px-3 py-1.5 text-sm font-semibold text-white hover:bg-neutral-800">Will it fit?</button>}
+            {(panel || !!selected) && sized.map((i) => {
+              const removed = gone.has(i.id), on = selected === i.id;
+              const b = "pointer-events-auto rounded-lg border border-white/25 bg-black px-2.5 py-1.5 text-sm text-white hover:bg-neutral-800 aria-pressed:border-white aria-pressed:bg-white aria-pressed:text-black aria-pressed:hover:bg-white";
+              return (
+                <span key={i.id} className="flex flex-wrap items-center gap-1.5">
+                  <button type="button" aria-pressed={on} disabled={removed} onClick={() => select(on ? null : i.id)} className={`${b} font-medium disabled:opacity-60`}>{i.title}</button>
+                  {removed ? <button type="button" className={b} onClick={() => putBack(i.id)}>Put back</button> : on && (<>
+                    <button type="button" aria-pressed={gizmoMode === "translate"} className={b} onClick={() => setMode("translate")}>Move</button>
+                    <button type="button" aria-pressed={gizmoMode === "rotate"} className={b} onClick={() => setMode("rotate")}>Rotate</button>
+                    <button type="button" className={`${b} !text-red-400`} onClick={() => remove(i.id)}>Remove</button>
+                  </>)}
+                </span>
+              );
+            })}
           </div>
         )}
+        </div>
       </div>
-      <p role="status" data-testid="bundle-status" className={`text-sm ${status.state === "error" ? "text-bad" : "text-muted"}`}>{status.text}</p>
+      {(() => {
+        const it = items.find((i) => i.id === selected);
+        // Only for someone else's available listing with a confirmed size that fits this room's measurements.
+        if (!it || it.own || it.available === false || !roomDims || fitStatus(it, roomDims) !== "fits") return null;
+        return it.interested || asked.has(it.id)
+          ? <p className="rounded-xl bg-good-soft p-3 text-sm font-medium text-good" role="status" data-testid="requested">You've asked for {it.title}. The owner knows.</p>
+          : <Button className="w-full sm:w-auto" loading={asking} onClick={() => requestItem(it.id)} data-testid="request-item">It fits. Request {it.title}</Button>;
+      })()}
+      <p role="status" data-testid="bundle-status" className={status.state === "error" ? "text-sm text-bad" : "sr-only"}>{status.text}</p>
       {unsized.length > 0 && <p className="text-sm text-muted">Not shown, measurements not provided: {unsized.map((i) => i.title).join(", ")}.</p>}
-      <p className="text-xs text-muted">Furniture is a to-scale stand-in built from the giver’s measurements, not a scan. Placement is not saved. Tour: Matterport. Data: CoStar. <a className="underline" href={embedUrl(modelId)} target="_blank" rel="noopener noreferrer">Open the plain tour</a></p>
     </section>
   );
 }

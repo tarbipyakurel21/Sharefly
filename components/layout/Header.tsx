@@ -17,9 +17,17 @@ export async function Header({ user }: { user: User | null }) {
         </Link>
         <div className="ml-auto flex items-center gap-2">
           {user && <NotificationBell />}
-          <AccountMenu user={user} demo={demo} people={demo ? (await listUsers()).filter((p) => ["u-jordan", "u-maya", "u-sam"].includes(p.id)) : []} />
+          <AccountMenu user={user} demo={demo} people={demo ? await demoPeople() : []} />
         </div>
       </div>
     </header>
   );
 }
+
+/** The three demo people; if the database hasn't been reseeded yet (old ids), list whoever exists so a person can still be chosen. */
+async function demoPeople() {
+  const all = await listUsers();
+  const demo = all.filter((p) => ["u-hardika", "u-priya", "u-tarbi"].includes(p.id));
+  return demo.length ? demo : all.slice(0, 10);
+}
+

@@ -4,7 +4,7 @@ import { BundleRoomStage, type StageItem } from "./BundleRoomStage";
 import { TourPanel } from "./TourPanel";
 
 /** A room made from a map-picked apartment: the Matterport scan is the room. Falls back to the view-only tour without an SDK key. */
-export function MatterportRoom({ matterport, title, items }: { matterport: MatterportIdSet; title: string; items: StageItem[] }) {
+export function MatterportRoom({ matterport, title, items, roomDims }: { matterport: MatterportIdSet; title: string; items: StageItem[]; roomDims?: { lengthM: number; widthM: number; heightM: number } | null }) {
   const key = process.env.NEXT_PUBLIC_MATTERPORT_SDK_KEY;
   const first = tourCandidates(matterport)[0];
   if (!first) return <p data-testid="tour-none" className="rounded-xl bg-sunken p-3 text-sm text-muted">No 3D tour is available for this space.</p>;
@@ -16,5 +16,5 @@ export function MatterportRoom({ matterport, title, items }: { matterport: Matte
       </div>
     );
   }
-  return <BundleRoomStage modelId={first.modelId} sdkKey={key} title={title} items={items} />;
+  return <BundleRoomStage modelId={first.modelId} sdkKey={key} title={title} items={items} roomDims={roomDims ?? null} />;
 }

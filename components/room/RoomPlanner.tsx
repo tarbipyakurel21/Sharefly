@@ -19,7 +19,7 @@ import type { PlacedPiece } from "./types";
 
 const RoomCanvas = dynamic(() => import("./RoomCanvas"), { ssr: false, loading: () => <Skeleton className="h-full w-full" /> });
 
-export type ListingMeta = { title: string; status: string; hasSize: boolean; category: Category; widthM: number | null; depthM: number | null; heightM: number | null };
+export type ListingMeta = { own?: boolean; interested?: boolean; model?: { url: string; format: "glb" | "usdz" } | null; title: string; status: string; hasSize: boolean; category: Category; widthM: number | null; depthM: number | null; heightM: number | null };
 const PALETTE: Category[] = ["bed", "desk", "chair", "sofa", "table", "dresser", "bookshelf", "storage", "lamp", "rug"];
 const NUDGE = 0.05;
 
@@ -132,6 +132,14 @@ export function RoomPlanner({ room, initial, listings, addListingId }: { room: R
     else { const { hx, hz } = halfExtents(p); if (hx * 2 > room.widthM + 1e-6 || hz * 2 > room.lengthM + 1e-6) w.push("This piece doesn't fit in this direction. Try turning it."); }
     return w;
   };
+  const scans = useMemo(() => Object.fromEntries(Object.entries(listings).flatMap(([k, v]) => (v.model ? [[k, v.model]] : []))), [listings]);
+  const [asked, setAsked] = useState<Set<string>>(new Set());
+  const [asking, setAsking] = useState(false);
+  async function requestItem(listingId: string) {
+    setAsking(true);
+    try { await api(`/api/listings/${listingId}/interest`, { method: "POST" }); setAsked((s) => new Set(s).add(listingId)); toast({ message: "We've let them know you'd like it." }); }
+    catch (e) { toast({ message: errMsg(e), tone: "error" }); } finally { setAsking(false); }
+  }
   const meta = selected?.listingId ? listings[selected.listingId] : undefined;
   const pieceFit = (p: PlacedPiece) => (p.dimensionsConfirmed ? fitStatus({ widthM: p.widthM, depthM: p.depthM, heightM: p.heightM }, dims) : "cant_confirm");
   const show3d = view === "3d" && webgl;
@@ -140,7 +148,7 @@ export function RoomPlanner({ room, initial, listings, addListingId }: { room: R
     <div className="grid gap-5 lg:grid-cols-[1fr_340px]" onKeyDown={onKey}>
       <div className="space-y-2">
         <div id="room-view" tabIndex={0} aria-label="Room view. Select a piece, then use R to rotate, arrow keys to move, Delete to remove." className="relative h-[55vh] min-h-[340px] overflow-hidden rounded-3xl border border-line bg-sunken lg:h-[68vh]" data-testid="room-view">
-          {show3d ? <RoomCanvas room={dims} unit={unit} pieces={pieces} selectedId={selectedId} collidingIds={collidingIds} onSelect={setSelectedId} onMove={onMove} />
+          {show3d ? <RoomCanvas scans={scans} room={dims} unit={unit} pieces={pieces} selectedId={selectedId} collidingIds={collidingIds} onSelect={setSelectedId} onMove={onMove} />
             : <PlanView room={dims} pieces={pieces} selectedId={selectedId} collidingIds={collidingIds} onSelect={setSelectedId} onMove={onMove} />}
         </div>
         {!webgl && <p className="text-sm text-muted" role="status">3D isn't available on this device, so here's a top-down plan instead. Everything works the same.</p>}
@@ -149,9 +157,6 @@ export function RoomPlanner({ room, initial, listings, addListingId }: { room: R
           <span className="ml-auto text-sm text-muted" role="status" data-testid="save-state">{save === "saving" ? "Saving…" : save === "saved" ? "Saved" : save === "error" ? "Couldn't save" : "Changes save automatically"}</span>
           {save === "error" && <Button variant="secondary" onClick={persist}>Try again</Button>}
         </div>
-        <p className="rounded-xl bg-accent-soft p-3 text-sm text-muted" data-testid="planner-hint">
-          This is the editable furniture layer for the tour above. Add a piece on the right, then drag it in the room or switch to the top-down plan for precise placement.
-        </p>
       </div>
 
       <aside className="space-y-5">
@@ -168,6 +173,11 @@ export function RoomPlanner({ room, initial, listings, addListingId }: { room: R
             {!selected.dimensionsConfirmed && <p className="rounded-lg bg-warn-soft p-2 text-sm text-warn" data-testid="unconfirmed-note">Typical {CATEGORY_LABEL[selected.category].toLowerCase()} size. Actual size not confirmed.</p>}
             {meta && !meta.hasSize && <Button variant="secondary" onClick={async () => { try { await api(`/api/listings/${selected.listingId}/measurement-request`, { method: "POST" }); toast({ message: "We've asked for the size." }); } catch (e) { toast({ message: errMsg(e), tone: "error" }); } }}>Request measurements</Button>}
             {meta && meta.status !== "available" && <p className="text-sm text-warn">No longer available.</p>}
+            {selected.listingId && meta && !meta.own && meta.status === "available" && pieceFit(selected) === "fits" && (
+              meta.interested || asked.has(selected.listingId)
+                ? <p className="rounded-xl bg-good-soft p-3 text-sm font-medium text-good" role="status" data-testid="requested">You've asked for this. The owner knows.</p>
+                : <Button className="w-full" loading={asking} onClick={() => requestItem(selected.listingId!)} data-testid="request-item">It fits. Request this item</Button>
+            )}
             <div className="flex flex-wrap gap-2">
               <Button variant="secondary" onClick={() => rotate(90)} aria-label="Rotate 90 degrees"><Icon name="rotate" size={18} /> 90°</Button>
               <Button variant="secondary" onClick={() => rotate(15)} aria-label="Rotate 15 degrees"><Icon name="rotate" size={18} /> 15°</Button>
