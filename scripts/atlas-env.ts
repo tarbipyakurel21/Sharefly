@@ -7,7 +7,7 @@ export function loadLocalEnv() {
 
 export function atlasConfig() {
   loadLocalEnv();
-  const uri = process.env.ATLAS_URI;
-  if (!uri) { console.error("ATLAS_URI is not set. Put it in .env.local (never commit it)."); process.exit(1); }
+  const uri = process.env.ATLAS_URI ?? process.env.MONGO_URI;
+  if (!uri) { console.error("ATLAS_URI or MONGO_URI is not set. Put it in .env.local (never commit it)."); process.exit(1); }
   return { uri, db: process.env.ATLAS_DB || "sharefly", collection: process.env.ATLAS_COLLECTION || "reference_spaces" };
 }

@@ -51,6 +51,7 @@ Logic lives in `lib/` as pure functions (`matching`, `room`, `pickups`, `units`,
 - Matching is a rule-based score with a fixed threshold; weights are guesses, not tuned on real data.
 - Location is a neighborhood from a small static Princeton-area table, not geocoding.
 - CoStar apartment data is used for "Start from a real apartment" (`lib/reference-spaces`, `scripts/import-costar.ts`). The kit stays local and gitignored; without it the feature is hidden. Room sizes from it are **estimates** unless the optional server-side Matterport Model API returns usable dimensions. Atlas support is optional and removable with `npm run atlas:drop -- --yes` after the hackathon.
+- Teammates can run everything without private data: seed photos are committed in `public/seed/`, and the CoStar kit, `.env.local`, `data/` and the Matterport SDK bundle (`public/matterport-bundle/`, proprietary, local only) are gitignored. With `REFERENCE_SPACES_PROVIDER=none` and empty Matterport/Atlas keys, the app uses built-in demo spaces and a sq ft estimate; `cp .env.example .env.local && npm run db:seed && npm run dev` is enough.
 - Rate limiting is in-memory and per process. Notifications refresh by polling every 25 s (no websockets).
 - Uploaded photos are stored on local disk (`data/uploads`).
 

@@ -12,8 +12,9 @@ const g = globalThis as unknown as { __sfMongo?: MongoClient };
 /** One shared client. Short timeouts so a down cluster fails fast and the JSON fallback takes over. */
 export function atlasCollection(): Collection<AtlasDoc> {
   const env = getEnv();
-  if (!env.ATLAS_URI) throw new Error("ATLAS_URI is not set.");
-  g.__sfMongo ??= new MongoClient(env.ATLAS_URI, { serverSelectionTimeoutMS: 3000, connectTimeoutMS: 3000, socketTimeoutMS: 5000, appName: "sharefly" });
+  const uri = env.ATLAS_URI ?? env.MONGO_URI;
+  if (!uri) throw new Error("ATLAS_URI or MONGO_URI is not set.");
+  g.__sfMongo ??= new MongoClient(uri, { serverSelectionTimeoutMS: 3000, connectTimeoutMS: 3000, socketTimeoutMS: 5000, appName: "sharefly" });
   return g.__sfMongo.db(env.ATLAS_DB).collection<AtlasDoc>(env.ATLAS_COLLECTION);
 }
 

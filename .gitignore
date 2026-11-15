@@ -39,3 +39,7 @@ scripts/explore/.cache/
 
 costar-hackathon-kit/
 .next-e2e/
+
+# Local-only assets: proprietary Matterport SDK bundle (license: do not redistribute freely) and unreferenced model
+public/matterport-bundle/
+public/models/

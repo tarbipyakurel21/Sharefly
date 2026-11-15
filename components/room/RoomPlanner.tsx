@@ -139,7 +139,7 @@ export function RoomPlanner({ room, initial, listings, addListingId }: { room: R
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_340px]" onKeyDown={onKey}>
       <div className="space-y-2">
-        <div tabIndex={0} aria-label="Room view. Select a piece, then use R to rotate, arrow keys to move, Delete to remove." className="relative h-[55vh] min-h-[340px] overflow-hidden rounded-3xl border border-line bg-sunken lg:h-[68vh]" data-testid="room-view">
+        <div id="room-view" tabIndex={0} aria-label="Room view. Select a piece, then use R to rotate, arrow keys to move, Delete to remove." className="relative h-[55vh] min-h-[340px] overflow-hidden rounded-3xl border border-line bg-sunken lg:h-[68vh]" data-testid="room-view">
           {show3d ? <RoomCanvas room={dims} unit={unit} pieces={pieces} selectedId={selectedId} collidingIds={collidingIds} onSelect={setSelectedId} onMove={onMove} />
             : <PlanView room={dims} pieces={pieces} selectedId={selectedId} collidingIds={collidingIds} onSelect={setSelectedId} onMove={onMove} />}
         </div>
@@ -199,8 +199,12 @@ export function RoomPlanner({ room, initial, listings, addListingId }: { room: R
           {pieces.length === 0 ? <p className="text-sm text-muted">Nothing here yet. Add a piece above, or preview an item from the browse page.</p> : (
             <ul className="space-y-1.5" data-testid="piece-list">
               {pieces.map((p) => (
-                <li key={p.id}><button onClick={() => setSelectedId(p.id)} aria-pressed={p.id === selectedId} className={`flex min-h-11 w-full items-center justify-between rounded-xl px-3 text-left text-sm ${p.id === selectedId ? "bg-accent-soft" : "hover:bg-sunken"}`}>
-                  <span>{p.label}</span><span className="text-xs text-muted">{p.dimensionsConfirmed ? "Size confirmed" : "Typical size"}{collidingIds.has(p.id) ? " · Overlaps" : ""}</span></button></li>
+                <li key={p.id} className={`flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm ${p.id === selectedId ? "bg-accent-soft" : "hover:bg-sunken"}`}>
+                  <button type="button" onClick={() => setSelectedId(p.id)} aria-pressed={p.id === selectedId} className="min-w-0 flex-1 text-left">
+                    <span className="block truncate">{p.label}</span><span className="text-xs text-muted">{p.dimensionsConfirmed ? "Size confirmed" : "Typical size"}{collidingIds.has(p.id) ? " · Overlaps" : ""}</span>
+                  </button>
+                  <button type="button" aria-label={`Remove ${p.label}`} onClick={() => remove(p.id)} className="shrink-0 rounded-lg px-2 py-1 text-xs font-semibold text-bad hover:bg-bad/10">Remove</button>
+                </li>
               ))}
             </ul>
           )}

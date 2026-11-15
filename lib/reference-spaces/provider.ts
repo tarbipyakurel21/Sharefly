@@ -48,7 +48,8 @@ export function getReferenceSpaceProvider(): ReferenceSpaceProvider {
   const env = getEnv();
   if (env.REFERENCE_SPACES_PROVIDER !== "costar") return new DemoReferenceSpaceProvider();
   const json = new JsonFileReferenceSpaceProvider(path.resolve(process.cwd(), env.REFERENCE_SPACES_PATH));
-  if (env.REFERENCE_SPACES_STORE === "atlas" && env.ATLAS_URI) {
+  const atlasUri = env.ATLAS_URI ?? env.MONGO_URI;
+  if ((env.REFERENCE_SPACES_STORE === "atlas" || atlasUri) && atlasUri) {
     return new AtlasReferenceSpaceProvider(json.isAvailable() ? json : new NullReferenceSpaceProvider());
   }
   return json.isAvailable() ? json : new NullReferenceSpaceProvider();

@@ -67,12 +67,12 @@ export function RoomForm({ addListingId, defaultName, realApartments = false }: 
   return (
     <div className="space-y-6">
       {realApartments && <ApartmentPicker onPick={pick} pickedId={picked?.id ?? null} />}
-      <form onSubmit={submit} className="space-y-4 rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-[var(--shadow-soft)]">
+      <form id="room-form" onSubmit={submit} className="space-y-4 rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-[var(--shadow-soft)]">
         <h2 className="font-display text-xl">{picked ? "Your room" : "Add a room"}</h2>
         {picked && <>
           {picked.selectedUnitNumber && <p className="text-sm text-muted">Apartment {picked.selectedUnitNumber} selected. The exact unit Matterport scan is used when available; otherwise the floor-plan or community scan is shown.</p>}
           <p className="rounded-xl bg-accent-soft p-3 text-sm">Preview the apartment in the tour, choose a measured room when available, then create it below. Matterport is view-only; after creating the room, ShareFly’s planner lets you place the selected furniture in the matching measured space.</p>
-          <TourPanel matterport={picked.matterport} title={picked.communityName ?? "this apartment"} />
+          <TourPanel matterport={picked.matterport} title={picked.communityName ?? "this apartment"} stageHref="#room-form" stageLabel="Continue to room setup" />
         </>}
         {picked && measured?.state === "loading" && <p className="text-sm text-muted">Checking for measured rooms…</p>}
         {picked && measured?.state === "done" && measured.rooms.length > 0 && (

@@ -4,8 +4,6 @@ import { embedUrl, LEVEL_LABEL, tourCandidates, type MatterportIdSet } from "@/l
 
 const LOAD_TIMEOUT_MS = 12000;
 const SDK_URL = "https://static.matterport.com/showcase-sdk/bootstrap/3.1.0-0-g1cd7e0997a/sdk.js";
-const OVERLAY_PALETTE = ["Bed", "Desk", "Chair", "Sofa", "Table", "Rug"] as const;
-type OverlayPiece = { id: string; label: string; x: number; y: number; rotation: number };
 
 type MatterportSdk = { Model?: { getData?: () => Promise<{ sid?: string }> } };
 type MatterportWindow = Window & { MP_SDK?: { connect: (iframe: HTMLIFrameElement, applicationKey?: string) => Promise<MatterportSdk> } };
@@ -15,7 +13,7 @@ type MatterportWindow = Window & { MP_SDK?: { connect: (iframe: HTMLIFrameElemen
  * so the page costs nothing until then. Candidates are ordered unit, floor plan, community.
  * Fallbacks: no model id -> short note; load not confirmed in 12 s -> link that opens the tour in a new tab.
  */
-export function TourPanel({ matterport, title }: { matterport: MatterportIdSet; title: string }) {
+export function TourPanel({ matterport, title, stageHref = "#room-view", stageLabel = "Stage furniture in ShareFly" }: { matterport: MatterportIdSet; title: string; stageHref?: string; stageLabel?: string }) {
   const cands = tourCandidates(matterport);
   const [open, setOpen] = useState(false);
   const [i, setI] = useState(0);
@@ -23,9 +21,6 @@ export function TourPanel({ matterport, title }: { matterport: MatterportIdSet; 
   const [slow, setSlow] = useState(false);
   const [sdkState, setSdkState] = useState<"off" | "connecting" | "connected" | "unavailable">("off");
   const [sdkModelId, setSdkModelId] = useState<string | null>(null);
-  const [overlay, setOverlay] = useState<OverlayPiece[]>([]);
-  const [overlayMode, setOverlayMode] = useState(false);
-  const drag = useRef<{ id: string; dx: number; dy: number } | null>(null);
   const frame = useRef<HTMLIFrameElement | null>(null);
   const current = cands[i];
 
@@ -64,24 +59,6 @@ export function TourPanel({ matterport, title }: { matterport: MatterportIdSet; 
     return () => { cancelled = true; };
   }, [open, loaded, current.modelId]);
 
-  useEffect(() => {
-    function move(e: PointerEvent) {
-      const d = drag.current;
-      if (!d) return;
-      const host = document.querySelector<HTMLElement>("[data-tour-stage]");
-      if (!host) return;
-      const r = host.getBoundingClientRect();
-      setOverlay((items) => items.map((p) => p.id === d.id ? { ...p, x: Math.max(4, Math.min(96, ((e.clientX - r.left) / r.width) * 100 - d.dx)), y: Math.max(8, Math.min(92, ((e.clientY - r.top) / r.height) * 100 - d.dy)) } : p));
-    }
-    const up = () => { drag.current = null; };
-    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
-    return () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
-  }, []);
-
-  function addOverlay(label: string) {
-    setOverlay((items) => [...items, { id: crypto.randomUUID(), label, x: 50, y: 52, rotation: 0 }]);
-    setOverlayMode(true);
-  }
 
   if (!current) {
     return <p data-testid="tour-none" className="rounded-xl bg-sunken p-3 text-sm text-muted">No 3D tour is available for this space.</p>;
@@ -105,11 +82,6 @@ export function TourPanel({ matterport, title }: { matterport: MatterportIdSet; 
             allow="fullscreen; xr-spatial-tracking" referrerPolicy="strict-origin-when-cross-origin"
             onLoad={() => setLoaded(true)} className="absolute inset-0 h-full w-full border-0"
           />
-          {overlayMode && <div className="pointer-events-none absolute inset-0 z-10">
-            {overlay.map((p) => <div key={p.id} className="pointer-events-auto absolute flex -translate-x-1/2 -translate-y-1/2 touch-none select-none items-center gap-1 rounded-lg border-2 border-accent bg-white/90 px-2 py-1 text-xs font-semibold shadow-lg" style={{ left: `${p.x}%`, top: `${p.y}%`, transform: `translate(-50%, -50%) rotate(${p.rotation}deg)` }} onPointerDown={(e) => { e.preventDefault(); const r = (e.currentTarget.parentElement?.parentElement as HTMLElement).getBoundingClientRect(); drag.current = { id: p.id, dx: ((e.clientX - r.left) / r.width) * 100 - p.x, dy: ((e.clientY - r.top) / r.height) * 100 - p.y }; }}>
-              <span>{p.label}</span><button type="button" aria-label={`Rotate ${p.label}`} className="rounded px-1 hover:bg-line" onClick={() => setOverlay((items) => items.map((x) => x.id === p.id ? { ...x, rotation: x.rotation + 15 } : x))}>↻</button><button type="button" aria-label={`Remove ${p.label}`} className="rounded px-1 hover:bg-line" onClick={() => setOverlay((items) => items.filter((x) => x.id !== p.id))}>×</button>
-            </div>)}
-          </div>}
           {!loaded && <p className="absolute inset-x-0 bottom-0 bg-surface/90 p-2 text-center text-xs text-muted">Loading tour…</p>}
         </div>
       )}
@@ -121,16 +93,9 @@ export function TourPanel({ matterport, title }: { matterport: MatterportIdSet; 
               : sdkState === "connecting" ? "Connecting to the Matterport SDK…"
               : "Tour is available. Add NEXT_PUBLIC_MATTERPORT_SDK_KEY to enable SDK metadata."}
           </p>
-          <a href="#room-planner" className="mt-3 inline-flex min-h-10 items-center rounded-xl bg-accent px-3 py-2 font-semibold text-white hover:opacity-90">
-            Stage furniture in ShareFly
+          <a href={stageHref} className="mt-3 inline-flex min-h-10 items-center rounded-xl bg-accent px-3 py-2 font-semibold text-white hover:opacity-90">
+            {stageLabel}
           </a>
-          <div className="mt-3 border-t border-accent/20 pt-3" data-testid="tour-overlay-controls">
-            <div className="flex flex-wrap items-center gap-2">
-              <button type="button" onClick={() => setOverlayMode((v) => !v)} className="rounded-lg border border-accent px-3 py-2 text-xs font-semibold">{overlayMode ? "Hide visual staging" : "Try visual staging"}</button>
-              {overlayMode && OVERLAY_PALETTE.map((label) => <button key={label} type="button" onClick={() => addOverlay(label)} className="rounded-lg border border-line bg-surface px-2 py-1 text-xs hover:bg-line/40">+ {label}</button>)}
-            </div>
-            {overlayMode && <p className="mt-2 text-xs text-muted">Approximate 2D overlay only. Drag, rotate, or remove pieces; camera movement in the tour can change alignment. For saved, dimension-aware placement use the ShareFly planner.</p>}
-          </div>
         </div>
       )}
       {open && slow && !loaded && (
@@ -148,7 +113,7 @@ export function TourPanel({ matterport, title }: { matterport: MatterportIdSet; 
           ))}
         </div>
       )}
-      <p className="text-xs text-muted">Tour: Matterport. This iframe is a view-only apartment reference; browser security prevents ShareFly from inserting objects into it. Use the ShareFly planner below to place, move, and rotate furniture against the same room dimensions. Community and floor-plan tours may show a different unit than yours.</p>
+      <p className="text-xs text-muted">Tour: Matterport. This is the apartment reference tour; the ShareFly planner below is the editable furniture surface. Community and floor-plan tours may show a different unit than yours.</p>
     </section>
   );
 }

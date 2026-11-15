@@ -13,6 +13,8 @@ const schema = z.object({
   REFERENCE_SPACES_PATH: z.string().default("data/reference-spaces.json"),
   REFERENCE_SPACES_STORE: z.enum(["json", "atlas"]).default("json"),
   ATLAS_URI: z.string().optional(),
+  // MONGO_URI is accepted as an alias for Atlas deployments that use the conventional name.
+  MONGO_URI: z.string().optional(),
   ATLAS_DB: z.string().min(1).default("sharefly"),
   ATLAS_COLLECTION: z.string().min(1).default("reference_spaces"),
   MATTERPORT_API_KEY: z.string().optional(),
