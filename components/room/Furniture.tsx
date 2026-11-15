@@ -5,7 +5,7 @@ import { buildFurniture, disposeFurniture } from "@/lib/room/model";
 
 type Props = { category: Category; w: number; d: number; h: number; ghost?: boolean; tint?: string | null };
 
-/** Procedural furniture, scaled to real meters. Same geometry as the AR "View in your room" model. */
+/** Procedural furniture, scaled to real meters. Same geometry as the AR "View in 3D" model. */
 export function Furniture({ category, w, d, h, ghost, tint }: Props) {
   const obj = useMemo(() => buildFurniture(category, w, d, h, { ghost, tint }), [category, w, d, h, ghost, tint]);
   useEffect(() => () => disposeFurniture(obj), [obj]);

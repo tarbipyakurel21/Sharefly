@@ -13,9 +13,9 @@ export const dynamic = "force-dynamic";
 export default async function RideBoard() {
   const user = await getSessionUser();
   if (!user) return <SignInCard title="Sign in to use RideBoard" body="Ask neighbors for a hand carrying something home, or offer a ride." />;
-  const mine = listMyPickups(user.id);
+  const mine = await listMyPickups(user.id);
   const mineIds = new Set(mine.map((p) => p.id));
-  const board = listOpenPickups().filter((p) => !mineIds.has(p.id));
+  const board = (await listOpenPickups()).filter((p) => !mineIds.has(p.id));
   return (
     <div className="mx-auto max-w-3xl space-y-10">
       <div>
@@ -32,7 +32,7 @@ export default async function RideBoard() {
         <h2 id="board" className="font-display text-xl">Pickups that need a driver</h2>
         {board.length ? <ul className="space-y-3" data-testid="board">{board.map((p) => <PickupCard key={p.id} p={p} userId={user.id} />)}</ul> : <EmptyState title="All caught up" body="No one is waiting for a ride right now." />}
       </section>
-      <section aria-label="Driver availability"><DriverForm driver={getDriver(user.id)} defaultNeighborhood={user.neighborhood ?? ""} /></section>
+      <section aria-label="Driver availability"><DriverForm driver={await getDriver(user.id)} defaultNeighborhood={user.neighborhood ?? ""} /></section>
     </div>
   );
 }

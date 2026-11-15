@@ -23,7 +23,22 @@ export class LocalStorage implements StorageProvider {
     return { bytes: fs.readFileSync(file), contentType: TYPES[name.split(".").pop()!] };
   }
 }
-export const getStorage = (): StorageProvider => new LocalStorage();
+/** UploadThing: files live on UploadThing's CDN, so it works on read-only hosts like Vercel. Bytes are already validated by magic bytes and size before they get here. */
+export class UploadThingStorage implements StorageProvider {
+  async save(bytes: Uint8Array, ext: string) {
+    const { UTApi, UTFile } = await import("uploadthing/server");
+    const name = `${crypto.randomUUID()}.${ext}`;
+    const file = new UTFile([bytes as BlobPart], name, { type: TYPES[ext] });
+    const res = await new UTApi().uploadFiles(file);
+    if (res.error || !res.data) throw new Error("UploadThing upload failed");
+    return { url: res.data.ufsUrl };
+  }
+  /** Files are served straight from the UploadThing CDN, never through /api/uploads. */
+  async read() { return null; }
+}
+
+export const getStorage = (): StorageProvider =>
+  process.env.STORAGE_PROVIDER === "uploadthing" && process.env.UPLOADTHING_TOKEN ? new UploadThingStorage() : new LocalStorage();
 
 /** Content-type by magic bytes, never by the client's claim. */
 export function sniffImage(b: Uint8Array): { ext: "jpg" | "png" | "webp"; mime: string } | null {

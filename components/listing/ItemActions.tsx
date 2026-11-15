@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api, errMsg } from "@/lib/client";
 import { Button, LinkButton } from "@/components/ui/Button";
-import { Field, Select, TextArea, TextInput } from "@/components/ui/Field";
+import { Field, TextArea, TextInput } from "@/components/ui/Field";
 import { NeighborhoodInput } from "@/components/ui/NeighborhoodInput";
 import { useToast } from "@/components/ui/Toast";
 
@@ -18,7 +18,6 @@ export function ItemActions(p: Props) {
   const toast = useToast();
   const [busy, setBusy] = useState<string | null>(null);
   const [showPickup, setShowPickup] = useState(false);
-  const [roomId, setRoomId] = useState(p.rooms[0]?.id ?? "");
   const [to, setTo] = useState(p.defaultTo);
   const [win, setWin] = useState("");
   const [note, setNote] = useState("");
@@ -33,7 +32,8 @@ export function ItemActions(p: Props) {
   if (!p.signedIn) {
     return <div className="space-y-3"><LinkButton href={`/signin?next=${next}`} className="w-full">Sign in to get this</LinkButton><p className="text-sm text-muted">Signing in takes a few seconds. No password.</p></div>;
   }
-  const roomHref = p.rooms.length ? `/rooms/${roomId}?add=${p.listingId}` : `/rooms?add=${p.listingId}`;
+  // Never assume a room: the chooser page lets the user pick one.
+  const roomHref = `/rooms?add=${p.listingId}`;
   return (
     <div className="space-y-3">
       {p.interested ? <p className="rounded-xl bg-good-soft p-3 font-medium text-good" role="status">You've let them know you're interested.</p>
@@ -41,8 +41,7 @@ export function ItemActions(p: Props) {
 
       {p.isFurniture && (
         <div className="space-y-2 rounded-2xl border border-line bg-surface p-3">
-          {p.rooms.length > 1 && <Select aria-label="Which room?" value={roomId} onChange={(e) => setRoomId(e.target.value)}>{p.rooms.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}</Select>}
-          <LinkButton href={roomHref} variant="secondary" className="w-full">{p.rooms.length ? "Arrange it on my floor plan" : "Make a floor plan to arrange it"}</LinkButton>
+          <LinkButton href={roomHref} variant="secondary" className="w-full">{p.rooms.length ? "Choose a room to arrange it in" : "Make a 3D room to arrange it"}</LinkButton>
         </div>
       )}
 

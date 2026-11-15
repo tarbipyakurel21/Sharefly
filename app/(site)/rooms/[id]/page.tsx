@@ -6,7 +6,7 @@ import { getListing, getRoom, listPlacements } from "@/lib/db/queries";
 import { SignInCard } from "@/components/layout/SignInForm";
 import { RoomPlannerLoader } from "@/components/room/RoomPlannerLoader";
 import type { ListingMeta } from "@/components/room/RoomPlanner";
-import { TourPanel } from "@/components/room/TourPanel";
+import { MatterportRoom } from "@/components/room/MatterportRoom";
 
 export const metadata: Metadata = { title: "Room planner" };
 export const dynamic = "force-dynamic";
@@ -16,14 +16,14 @@ export default async function RoomPage({ params, searchParams }: { params: Promi
   if (!user) return <SignInCard title="Sign in to see your room" />;
   const { id } = await params;
   const { add } = await searchParams;
-  const room = getRoom(id);
+  const room = await getRoom(id);
   if (!room || room.userId !== user.id) notFound();
-  const placements = listPlacements(room.id);
+  const placements = await listPlacements(room.id);
   const ids = new Set(placements.map((p) => p.listingId).filter(Boolean) as string[]);
   if (add) ids.add(add);
   const listings: Record<string, ListingMeta> = {};
   for (const lid of ids) {
-    const l = getListing(lid);
+    const l = await getListing(lid);
     if (l) listings[lid] = { title: l.title, status: l.status, category: l.category, widthM: l.widthM, depthM: l.depthM, heightM: l.heightM, hasSize: l.widthM != null };
   }
   const addable = add && listings[add] && listings[add].status === "available" ? add : null;
@@ -38,10 +38,14 @@ export default async function RoomPage({ params, searchParams }: { params: Promi
             : room.source.sqft ? ` Room size estimated from a ${room.source.sqft.toLocaleString("en-US")} sq ft floor plan; adjust it to your room.` : ""} Data: CoStar.
         </p>
       )}
-      {room.source && <TourPanel matterport={room.source.matterport} title={room.source.communityName ?? "this apartment"} />}
-      <div id="room-planner" className="scroll-mt-6">
-        <RoomPlannerLoader room={room} initial={placements.map(({ roomId: _r, ...p }) => p)} listings={listings} addListingId={addable} />
-      </div>
+      {room.source ? (
+        <MatterportRoom matterport={room.source.matterport} title={room.source.communityName ?? "this apartment"}
+          items={[...ids].filter((i) => listings[i]).map((i) => ({ id: i, title: listings[i].title, category: listings[i].category, widthM: listings[i].widthM, depthM: listings[i].depthM, heightM: listings[i].heightM }))} />
+      ) : (
+        <div id="room-planner" className="scroll-mt-6">
+          <RoomPlannerLoader room={room} initial={placements.map(({ roomId: _r, ...p }) => p)} listings={listings} addListingId={addable} />
+        </div>
+      )}
     </div>
   );
 }

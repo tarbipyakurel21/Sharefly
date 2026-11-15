@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      # No secrets here: the build and tests use local fallbacks (local photos, demo reference spaces).
+      - run: npm run build
+        env:
+          AI_PROVIDER: none
+          REFERENCE_SPACES_PROVIDER: none
+          STORAGE_PROVIDER: local

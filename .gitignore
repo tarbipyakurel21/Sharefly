@@ -43,3 +43,6 @@ costar-hackathon-kit/
 # Local-only assets: proprietary Matterport SDK bundle (license: do not redistribute freely) and unreferenced model
 public/matterport-bundle/
 public/models/
+
+# Matterport Bundle SDK (downloaded by `npm run matterport:bundle`; subject to Matterport's SDK license)
+public/matterport-bundle/

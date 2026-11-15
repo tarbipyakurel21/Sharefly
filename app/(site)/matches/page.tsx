@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function MatchesPage() {
   const user = await getSessionUser();
   if (!user) return <SignInCard title="Sign in to see your matches" body="We'll show items that fit what you're looking for." />;
-  const matches = matchesForUser(user.id);
+  const matches = await matchesForUser(user.id);
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>

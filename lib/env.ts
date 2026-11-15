@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 const schema = z.object({
-  DATABASE_PATH: z.string().default("data/sharefly.db"),
   SESSION_SECRET: z.string().min(16).default("dev-only-secret-change-me-please"),
   DEMO_MODE: z.enum(["true", "false"]).default("false"),
   AI_PROVIDER: z.enum(["anthropic", "gemini", "mock", "none"]).default("none"),

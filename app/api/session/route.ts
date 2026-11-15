@@ -8,12 +8,12 @@ export const POST = route(async (req) => {
   const body = SessionBody.parse(await jsonBody(req));
   if ("userId" in body) {
     if (!isDemoMode()) throw new ApiError(403, "forbidden", "Switching people is only available in demo mode.");
-    const u = getUser(body.userId);
+    const u = await getUser(body.userId);
     if (!u) throw new ApiError(404, "not_found", "We couldn't find that person.");
     await setSessionCookie(u.id);
     return ok({ user: u });
   }
-  const u = upsertUserByEmail(body.name, body.email);
+  const u = await upsertUserByEmail(body.name, body.email);
   await setSessionCookie(u.id);
   return ok({ user: u });
 });

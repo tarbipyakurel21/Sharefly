@@ -19,9 +19,9 @@ type SP = { q?: string; category?: string; neighborhood?: string; free?: string 
 export default async function Browse({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
   const user = await getSessionUser();
-  const rooms = user ? listRooms(user.id) : [];
+  const rooms = user ? await listRooms(user.id) : [];
   const category = CATEGORIES.includes(sp.category as never) ? sp.category : undefined;
-  const items = listListings({ q: sp.q, category, neighborhood: sp.neighborhood || undefined, freeOnly: sp.free === "1" });
+  const items = await listListings({ q: sp.q, category, neighborhood: sp.neighborhood || undefined, freeOnly: sp.free === "1" });
   const qs = (o: Partial<SP>) => {
     const p = new URLSearchParams();
     const m = { ...sp, ...o };

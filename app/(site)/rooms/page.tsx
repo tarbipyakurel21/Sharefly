@@ -15,7 +15,7 @@ export default async function RoomsPage({ searchParams }: { searchParams: Promis
   const user = await getSessionUser();
   const { add } = await searchParams;
   if (!user) return <SignInCard title="Sign in to plan your room" body="Save your room and try furniture in it before you pick it up." />;
-  const rooms = listRooms(user.id);
+  const rooms = await listRooms(user.id);
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div>

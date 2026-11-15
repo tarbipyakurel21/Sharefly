@@ -2,7 +2,7 @@
    Not seeded on purpose: the demo desk listing and Maya's desk wishlist/room (the demo creates them live). */
 import fs from "node:fs";
 for (const f of [".env.local", ".env"]) { try { if (fs.existsSync(f)) process.loadEnvFile(f); } catch { /* optional */ } }
-import { getDb } from "../lib/db/client";
+import { getDb, getMongoClient } from "../lib/db/client";
 import { createListing, createPickup, createRoom, createWishlist, replacePlacements, upsertDriver, upsertUserByEmail } from "../lib/db/queries";
 import { runMatchingForListing, runMatchingForWishlist } from "../lib/matching/run";
 import { parseWishlistText } from "../lib/matching/parse";
@@ -10,7 +10,6 @@ import { ftToM } from "../lib/units";
 import type { Category } from "../lib/categories";
 
 const reset = process.argv.includes("--reset");
-const db = getDb();
 
 const USERS = [
   { id: "u-maya", name: "Maya Chen (Receiver)", email: "maya@example.com", nb: "Princeton University Campus" },
@@ -36,51 +35,61 @@ const LISTINGS: L[] = [
   { id: "l-armchair", giver: "u-jordan", title: "Blue armchair", desc: "A blue armchair with wide arms.", cat: "sofa", img: "sofa", nb: "Downtown Princeton", status: "claimed" },
 ];
 
-const tables = ["notifications", "matches", "pickup_requests", "driver_availability", "measurement_requests", "interests", "room_placements", "rooms", "wishlists", "listing_photos", "listings", "users"];
-db.transaction(() => {
-  if (reset) for (const t of tables) db.prepare(`DELETE FROM ${t}`).run();
-  else {
-    // upsert semantics: remove only the rows this seed owns, then re-insert
-    for (const l of LISTINGS) db.prepare("DELETE FROM listings WHERE id=?").run(l.id);
-    for (const id of ["w-receiver", "w-maya", "w-jordan"]) db.prepare("DELETE FROM wishlists WHERE id=?").run(id);
-    db.prepare("DELETE FROM rooms WHERE id='r-maya'").run();
-    db.prepare("DELETE FROM pickup_requests WHERE id LIKE 'pk-%'").run();
-  }
-})();
+const tables = ["notifications", "matches", "pickups", "drivers", "measurementRequests", "interests", "rooms", "wishlists", "listings", "users"];
 
-for (const u of USERS) upsertUserByEmail(u.name, u.email, u.nb, u.id);
+async function main() {
+const db = await getDb();
+console.log(`Seeding MongoDB database "${db.databaseName}"${reset ? " (RESET: wiping app collections)" : ""}.`);
+if (reset) for (const t of tables) await db.collection(t).deleteMany({});
+else {
+  // upsert semantics: remove only the rows this seed owns, then re-insert
+  const lids = LISTINGS.map((l) => l.id);
+  await db.collection("matches").deleteMany({ listingId: { $in: lids } });
+  for (const t of ["interests", "measurementRequests"]) await db.collection(t).deleteMany({ listingId: { $in: lids } });
+  await db.collection("listings").deleteMany({ _id: { $in: lids as never[] } });
+  const wids = ["w-receiver", "w-maya", "w-jordan"];
+  await db.collection("matches").deleteMany({ wishlistId: { $in: wids } });
+  await db.collection("wishlists").deleteMany({ _id: { $in: wids as never[] } });
+  await db.collection("rooms").deleteOne({ _id: "r-maya" as never });
+  await db.collection("pickups").deleteMany({ _id: { $regex: "^pk-" } as never });
+}
+
+for (const u of USERS) await upsertUserByEmail(u.name, u.email, u.nb, u.id);
 
 const base = Date.now();
-LISTINGS.forEach((l, i) => {
+for (const [i, l] of LISTINGS.entries()) {
   const at = new Date(base - (i + 1) * 3 * 3600_000).toISOString();
-  const row = createListing({
+  const row = await createListing({
     id: l.id, giverId: l.giver, title: l.title, description: l.desc, category: l.cat, priceCents: l.price ?? 0, conditionNote: l.note ?? null,
     purchasedFrom: l.from ?? null, neighborhood: l.nb, widthM: l.dims?.[0] ?? null, depthM: l.dims?.[1] ?? null, heightM: l.dims?.[2] ?? null,
     photo: { url: `/seed/${l.img}.jpg`, width: 800, height: 600 }, publishedAt: at,
   });
-  if (l.status) db.prepare("UPDATE listings SET status=? WHERE id=?").run(l.status, row.id);
-});
+  if (l.status) await db.collection("listings").updateOne({ _id: row.id as never }, { $set: { status: l.status } });
+}
 
 for (const [id, user, text, nb] of [
   ["w-receiver", "u-maya", "a bookshelf under $20 within 5 miles", "Princeton University Campus"],
 ] as const) {
   const p = parseWishlistText(text);
-  createWishlist(user, { rawText: text, ...p, neighborhood: nb }, id);
+  await createWishlist(user, { rawText: text, ...p, neighborhood: nb }, id);
 }
 
-createRoom("u-maya", { name: "Receiver room", lengthM: ftToM(12), widthM: ftToM(10), heightM: ftToM(8), displayUnit: "ft" }, "r-maya");
-replacePlacements("r-maya", [
+await createRoom("u-maya", { name: "Receiver room", lengthM: ftToM(12), widthM: ftToM(10), heightM: ftToM(8), displayUnit: "ft" }, "r-maya");
+await replacePlacements("r-maya", [
   { id: "pl-bed", listingId: null, label: "My bed", category: "bed", x: -1.0, z: -0.9, rotationY: 0, widthM: 1.0, depthM: 2.0, heightM: 0.5, dimensionsConfirmed: true },
 ]);
 
-upsertDriver("u-sam", { neighborhood: "Downtown Princeton", days: ["Mon", "Wed", "Sat"], vehicleNote: "Hatchback" });
-createPickup({ id: "pk-open", listingId: "l-shelf", requesterId: "u-maya", fromNeighborhood: "Downtown Princeton", toNeighborhood: "Princeton University Campus", preferredWindow: "Weekday evening" });
-createPickup({ id: "pk-offered", listingId: "l-table", requesterId: "u-maya", fromNeighborhood: "Downtown Princeton", toNeighborhood: "Princeton University Campus", preferredWindow: "Saturday morning", status: "offered", driverId: "u-sam" });
-createPickup({ id: "pk-accepted", listingId: "l-lamp", requesterId: "u-maya", fromNeighborhood: "Downtown Princeton", toNeighborhood: "Princeton University Campus", status: "accepted", driverId: "u-sam" });
-createPickup({ id: "pk-completed", listingId: "l-armchair", requesterId: "u-maya", fromNeighborhood: "Downtown Princeton", toNeighborhood: "Princeton University Campus", status: "completed", driverId: "u-sam" });
+await upsertDriver("u-sam", { neighborhood: "Downtown Princeton", days: ["Mon", "Wed", "Sat"], vehicleNote: "Hatchback" });
+await createPickup({ id: "pk-open", listingId: "l-shelf", requesterId: "u-maya", fromNeighborhood: "Downtown Princeton", toNeighborhood: "Princeton University Campus", preferredWindow: "Weekday evening" });
+await createPickup({ id: "pk-offered", listingId: "l-table", requesterId: "u-maya", fromNeighborhood: "Downtown Princeton", toNeighborhood: "Princeton University Campus", preferredWindow: "Saturday morning", status: "offered", driverId: "u-sam" });
+await createPickup({ id: "pk-accepted", listingId: "l-lamp", requesterId: "u-maya", fromNeighborhood: "Downtown Princeton", toNeighborhood: "Princeton University Campus", status: "accepted", driverId: "u-sam" });
+await createPickup({ id: "pk-completed", listingId: "l-armchair", requesterId: "u-maya", fromNeighborhood: "Downtown Princeton", toNeighborhood: "Princeton University Campus", status: "completed", driverId: "u-sam" });
 
-for (const l of LISTINGS) runMatchingForListing(l.id);
-runMatchingForWishlist("w-receiver");
+for (const l of LISTINGS) await runMatchingForListing(l.id);
+await runMatchingForWishlist("w-receiver");
 
-const count = (t: string) => (db.prepare(`SELECT COUNT(*) c FROM ${t}`).get() as { c: number }).c;
-console.log(`Seeded${reset ? " (reset)" : ""}: ${count("users")} people, ${count("listings")} listings, ${count("wishlists")} wishlists, ${count("matches")} matches, ${count("pickup_requests")} pickups.`);
+const count = (t: string) => db.collection(t).countDocuments();
+console.log(`Seeded${reset ? " (reset)" : ""}: ${await count("users")} people, ${await count("listings")} listings, ${await count("wishlists")} wishlists, ${await count("matches")} matches, ${await count("pickups")} pickups.`);
+}
+
+main().then(() => getMongoClient().close()).catch((e) => { console.error(e instanceof Error ? e.message : e); process.exit(1); });

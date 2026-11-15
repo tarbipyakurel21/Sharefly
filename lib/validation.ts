@@ -21,7 +21,7 @@ export const ListingBody = z.object({
   neighborhood: optText(80),
   widthM: dim, depthM: dim, heightM: dim,
   aiGenerated: z.boolean().default(false),
-  photoUrl: z.string().regex(/^(\/api\/uploads\/[a-f0-9-]+\.(jpg|png|webp)|\/seed\/[\w.-]+)$/, "That photo couldn't be used.").nullable().optional(),
+  photoUrl: z.string().regex(/^(\/api\/uploads\/[a-f0-9-]+\.(jpg|png|webp)|\/seed\/[\w.-]+|https:\/\/[a-z0-9]+\.ufs\.sh\/f\/[\w.-]+)$/, "That photo couldn't be used.").nullable().optional(),
   photoWidth: z.number().int().positive().max(10000).nullable().optional(),
   photoHeight: z.number().int().positive().max(10000).nullable().optional(),
   clientKey: z.string().min(8).max(80).optional(),

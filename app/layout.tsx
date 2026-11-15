@@ -18,7 +18,7 @@ export const viewport: Viewport = { themeColor: "#faf7f2", width: "device-width"
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getSessionUser();
-  const matches = user ? newMatchCount(user.id) : 0;
+  const matches = user ? await newMatchCount(user.id) : 0;
   return (
     <html lang="en" className={`${body.variable} ${head.variable}`}>
       <body className="min-h-screen pb-24 md:pb-0">
