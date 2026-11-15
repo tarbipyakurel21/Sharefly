@@ -29,6 +29,12 @@ export default async function RoomPage({ params, searchParams }: { params: Promi
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 text-sm"><Link href="/rooms" className="text-muted underline">All rooms</Link></div>
+      {room.source && (
+        <p data-testid="room-source" className="rounded-xl bg-sunken p-3 text-sm text-muted">
+          Based on {room.source.communityName ?? "a community (name not provided)"}{room.source.floorPlanName ? `, floor plan ${room.source.floorPlanName}` : ""} in {room.source.city}, {room.source.state}.
+          {room.source.sqft ? ` Room size estimated from a ${room.source.sqft.toLocaleString("en-US")} sq ft floor plan; adjust it to your room.` : ""} Data: CoStar.
+        </p>
+      )}
       <RoomPlannerLoader room={room} initial={placements.map(({ roomId: _r, ...p }) => p)} listings={listings} addListingId={addable} />
     </div>
   );

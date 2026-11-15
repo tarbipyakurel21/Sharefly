@@ -1,0 +1,10 @@
+{
+  "source": "SYNTHETIC TEST FIXTURE. Not CoStar data.",
+  "generatedAt": "2026-11-14T00:00:00.000Z",
+  "count": 3,
+  "spaces": [
+    { "id": "test-1-10", "propertyId": 1, "floorPlanId": 10, "communityName": "Fixture Flats", "floorPlanName": "1x1", "city": "Houston", "state": "TX", "lat": 29.76, "lng": -95.37, "beds": 1, "baths": 1, "minSqft": 700, "maxSqft": 700, "minRentUsd": 1000, "maxRentUsd": 1200, "rentBasis": "unit", "unitsAvailable": 2, "lifestyle": "all", "colleges": [], "photoUrl": null, "matterport": { "community": [], "floorPlan": [], "unit": [] } },
+    { "id": "test-2-20", "propertyId": 2, "floorPlanId": 20, "communityName": "Fixture Commons", "floorPlanName": "2x2", "city": "Los Angeles", "state": "CA", "lat": 34.02, "lng": -118.28, "beds": 2, "baths": 2, "minSqft": 950, "maxSqft": 980, "minRentUsd": null, "maxRentUsd": null, "rentBasis": null, "unitsAvailable": null, "lifestyle": "student", "colleges": [{ "name": "Fixture University", "campus": null, "feetToCampus": 1500 }], "photoUrl": null, "matterport": { "community": [], "floorPlan": [], "unit": [] } },
+    { "id": "test-3-30", "propertyId": 3, "floorPlanId": 30, "communityName": null, "floorPlanName": null, "city": "Houston", "state": "TX", "lat": 29.7, "lng": -95.4, "beds": 0, "baths": 1, "minSqft": 450, "maxSqft": 450, "minRentUsd": 800, "maxRentUsd": 800, "rentBasis": "unit", "unitsAvailable": 0, "lifestyle": "all", "colleges": [], "photoUrl": null, "matterport": { "community": [], "floorPlan": [], "unit": [] } }
+  ]
+}

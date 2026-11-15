@@ -10,6 +10,6 @@ export default defineConfig({
     url: "http://localhost:3100",
     reuseExistingServer: false,
     timeout: 120_000,
-    env: { AI_PROVIDER: "mock", DEMO_MODE: "true", DATABASE_PATH: "data/e2e.db", SESSION_SECRET: "e2e-secret-e2e-secret-e2e-secret" },
+    env: { AI_PROVIDER: "mock", DEMO_MODE: "true", DATABASE_PATH: "data/e2e.db", SESSION_SECRET: "e2e-secret-e2e-secret-e2e-secret", REFERENCE_SPACES_PROVIDER: "costar", REFERENCE_SPACES_PATH: "tests/fixtures/reference-spaces.sample.json" },
   },
 });

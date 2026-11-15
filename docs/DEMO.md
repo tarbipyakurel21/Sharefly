@@ -25,3 +25,8 @@ Automated version of steps 1-11: `npm run test:e2e` (runs against its own databa
 ## If something breaks live
 - No network / AI slow: restart with `AI_PROVIDER=mock`, or just type a title; publishing never depends on AI.
 - Messy state: `npm run demo:reset`.
+
+## Real apartment path (needs `npm run import:costar` and `REFERENCE_SPACES_PROVIDER=costar`)
+1. Open Rooms, under "Start from a real apartment" filter by city, bedrooms, max rent, or "Near a college".
+2. Pick a floor plan. The form fills with an estimated size and the note "Estimated from a X sq ft floor plan, adjust to your room".
+3. Edit the numbers if you know them, then create the room. The room page shows the community, floor plan and "Data: CoStar".

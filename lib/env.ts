@@ -9,6 +9,8 @@ const schema = z.object({
   ANTHROPIC_MODEL: z.string().default("claude-sonnet-5-5"),
   GEMINI_API_KEY: z.string().optional(),
   GEMINI_MODEL: z.string().default("gemini-3.5-flash"),
+  REFERENCE_SPACES_PROVIDER: z.enum(["none", "costar"]).default("none"),
+  REFERENCE_SPACES_PATH: z.string().default("data/reference-spaces.json"),
 });
 
 export function getEnv() {

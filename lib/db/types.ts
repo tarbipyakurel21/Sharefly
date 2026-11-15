@@ -1,3 +1,4 @@
+import type { RoomSource } from "@/lib/reference-spaces/types";
 import type { Category } from "@/lib/categories";
 
 export type User = { id: string; name: string; email: string; neighborhood: string | null };
@@ -17,7 +18,7 @@ export type MatchRow = {
   id: string; listingId: string; wishlistId: string; score: number; reasons: string[]; status: "new" | "seen" | "dismissed"; createdAt: string;
   listing: Listing; wishlistText: string;
 };
-export type Room = { id: string; userId: string; name: string; lengthM: number; widthM: number; heightM: number; displayUnit: "ft" | "m"; createdAt: string; updatedAt: string };
+export type Room = { id: string; userId: string; name: string; lengthM: number; widthM: number; heightM: number; displayUnit: "ft" | "m"; source: RoomSource | null; createdAt: string; updatedAt: string };
 export type Placement = {
   id: string; roomId: string; listingId: string | null; label: string; category: Category; x: number; z: number; rotationY: number;
   widthM: number; depthM: number; heightM: number; dimensionsConfirmed: boolean;

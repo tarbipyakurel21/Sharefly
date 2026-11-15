@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "import:costar": "tsx scripts/import-costar.ts",
     "db:seed": "tsx scripts/seed.ts",
     "demo:reset": "tsx scripts/seed.ts --reset"
   },
