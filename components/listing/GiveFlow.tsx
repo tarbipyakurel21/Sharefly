@@ -9,13 +9,15 @@ import { Icon } from "@/components/ui/Icon";
 import { NeighborhoodInput } from "@/components/ui/NeighborhoodInput";
 import { SignInCard } from "@/components/layout/SignInForm";
 import type { DescribeResult } from "@/lib/ai/types";
+import { PHOTO_ACCEPT, toDisplayableBlob } from "@/lib/image-decode";
 
 type Ai = "idle" | "working" | "done" | "failed";
 const STORES = ["IKEA", "Amazon", "Walmart", "Target", "Wayfair", "Other"];
 
 async function compress(file: File): Promise<{ blob: Blob; width: number; height: number }> {
   let bmp: ImageBitmap;
-  try { bmp = await createImageBitmap(file); } catch { throw new Error("We couldn't open that photo. Try a JPEG or PNG instead."); }
+  const readable = await toDisplayableBlob(file); // converts iPhone HEIC on browsers that can't read it
+  try { bmp = await createImageBitmap(readable); } catch { throw new Error("We couldn't open that photo. Please try another."); }
   const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
   const w = Math.round(bmp.width * scale), h = Math.round(bmp.height * scale);
   const canvas = document.createElement("canvas");
@@ -32,6 +34,7 @@ export function GiveFlow({ defaultNeighborhood }: { defaultNeighborhood: string 
   const [preview, setPreview] = useState<string | null>(null);
   const [photo, setPhoto] = useState<{ url: string; width: number; height: number } | null>(null);
   const [photoErr, setPhotoErr] = useState<string | null>(null);
+  const [opening, setOpening] = useState(false);
   const [uploading, setUploading] = useState(false);
   const blobRef = useRef<{ blob: Blob; name: string; width: number; height: number } | null>(null);
   const [ai, setAi] = useState<Ai>("idle");
@@ -65,7 +68,8 @@ export function GiveFlow({ defaultNeighborhood }: { defaultNeighborhood: string 
     if (!file) return;
     setPhotoErr(null); setPhoto(null); setAi("idle");
     let c;
-    try { c = await compress(file); } catch (e) { setPhotoErr(errMsg(e)); return; }
+    setOpening(true);
+    try { c = await compress(file); } catch (e) { setPhotoErr(errMsg(e)); return; } finally { setOpening(false); }
     blobRef.current = { ...c, name: file.name };
     setPreview(URL.createObjectURL(c.blob));
     upload();
@@ -121,8 +125,8 @@ export function GiveFlow({ defaultNeighborhood }: { defaultNeighborhood: string 
 
   const pickers = (
     <>
-      <input id="file-lib" type="file" accept="image/*" className="sr-only" onChange={(e) => onFile(e.target.files?.[0])} />
-      <input id="file-cam" type="file" accept="image/*" capture="environment" className="sr-only" onChange={(e) => onFile(e.target.files?.[0])} />
+      <input id="file-lib" type="file" accept={PHOTO_ACCEPT} className="sr-only" onChange={(e) => onFile(e.target.files?.[0])} />
+      <input id="file-cam" type="file" accept={PHOTO_ACCEPT} capture="environment" className="sr-only" onChange={(e) => onFile(e.target.files?.[0])} />
     </>
   );
 
@@ -144,6 +148,7 @@ export function GiveFlow({ defaultNeighborhood }: { defaultNeighborhood: string 
             <label htmlFor="file-lib" className="inline-flex min-h-11 cursor-pointer items-center rounded-xl border border-line bg-surface px-5 font-semibold hover:bg-sunken md:bg-accent md:text-white md:hover:bg-accent-hover md:border-transparent">Choose a photo</label>
           </div>
           <p className="hidden text-sm text-muted md:block">or drag it here</p>
+          {opening && <p role="status" className="text-sm text-muted">Opening your photo…</p>}
           {photoErr && <p role="alert" className="text-sm text-bad">{photoErr}</p>}
         </div>
       ) : (

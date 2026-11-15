@@ -8,6 +8,7 @@ import { fitForRooms } from "@/lib/fit";
 import { formatPrice, timeAgo } from "@/lib/format";
 import { formatLength } from "@/lib/units";
 import { ItemActions } from "@/components/listing/ItemActions";
+import { ArViewer } from "@/components/listing/ArViewer";
 import { OwnerPanel } from "@/components/listing/OwnerPanel";
 import { FitBadge } from "@/components/listing/FitBadge";
 import { LinkButton } from "@/components/ui/Button";
@@ -43,6 +44,9 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
             <img src={l.photoUrl} alt={l.title} className="aspect-[4/3] w-full object-cover" />
           ) : <div className="flex aspect-[4/3] items-center justify-center text-muted">No photo</div>}
         </div>
+        {FURNITURE.includes(l.category) && l.status !== "removed" && (
+          <ArViewer title={l.title} category={l.category} widthM={l.widthM} depthM={l.depthM} heightM={l.heightM} unit={unit} />
+        )}
       </div>
       <div className="space-y-6">
         {!available && (
