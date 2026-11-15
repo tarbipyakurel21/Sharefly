@@ -3,6 +3,7 @@ import path from "node:path";
 import { z } from "zod";
 import { getEnv } from "@/lib/env";
 import { searchSpaces } from "./filter";
+import { CURATED_SPACES } from "./curated";
 import { ReferenceSpaceSchema, type ReferenceSpace, type SearchFilters } from "./types";
 
 export type { ReferenceSpace } from "./types";
@@ -43,8 +44,8 @@ export class JsonFileReferenceSpaceProvider implements ReferenceSpaceProvider {
   constructor(private file: string) {}
   private data() { try { return loadFile(this.file); } catch { return null; } }
   isAvailable() { return !!this.data()?.spaces.length; }
-  async search(f: Partial<SearchFilters>) { return searchSpaces(this.data()?.spaces ?? [], f); }
-  async get(id: string) { return this.data()?.byId.get(id) ?? null; }
+  async search(f: Partial<SearchFilters>) { return searchSpaces([...(this.data()?.spaces ?? []), ...CURATED_SPACES], f); }
+  async get(id: string) { return this.data()?.byId.get(id) ?? CURATED_SPACES.find((s) => s.id === id) ?? null; }
   async health(): Promise<StoreHealth> {
     const d = this.data();
     return d ? { provider: "costar", store: "json", available: d.spaces.length > 0, count: d.spaces.length } : { provider: "costar", store: "none", available: false, count: 0, note: "Reference space file not found. Run npm run import:costar." };

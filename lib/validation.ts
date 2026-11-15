@@ -54,6 +54,8 @@ export const RoomBody = z.object({
   displayUnit: z.enum(["ft", "m"]).default("ft"),
   /** Optional: id of a reference space. The server looks it up; the client never supplies source details. */
   referenceSpaceId: z.string().min(1).max(60).optional(),
+  /** Optional: id of a Matterport room of that space. The server re-reads its size; the client never claims it is measured. */
+  measuredRoomId: z.string().min(1).max(80).optional(),
 });
 
 export const PlacementsBody = z.object({

@@ -36,10 +36,10 @@ export function ApartmentPicker({ onPick, pickedId }: { onPick: (s: PickedSpace)
     <section aria-label="Start from a real apartment" className="space-y-3 rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-[var(--shadow-soft)]">
       <div>
         <h2 className="font-display text-xl">Start from a real apartment</h2>
-        <p className="text-sm text-muted">Pick a real floor plan in Houston or Los Angeles and plan free furniture into it. Data: CoStar.</p>
+        <p className="text-sm text-muted">Pick a real floor plan in Houston or Los Angeles, or Rabinowitz Hall in Princeton and plan free furniture into it. Data: CoStar.</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-4">
-        <Field label="City" htmlFor="ap-city"><Select id="ap-city" value={city} onChange={(e) => setCity(e.target.value)}><option value="">Any</option><option value="Houston">Houston</option><option value="Los Angeles">Los Angeles</option></Select></Field>
+        <Field label="City" htmlFor="ap-city"><Select id="ap-city" value={city} onChange={(e) => setCity(e.target.value)}><option value="">Any</option><option value="Houston">Houston</option><option value="Los Angeles">Los Angeles</option><option value="Princeton">Princeton</option></Select></Field>
         <Field label="Bedrooms" htmlFor="ap-beds"><Select id="ap-beds" value={beds} onChange={(e) => setBeds(e.target.value)}><option value="">Any</option><option value="0">Studio</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4+</option></Select></Field>
         <Field label="Max rent ($/mo)" htmlFor="ap-rent"><TextInput id="ap-rent" value={maxRent} onChange={(e) => setMaxRent(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="1500" /></Field>
         <Field label="Name or college" htmlFor="ap-q"><TextInput id="ap-q" value={q} onChange={(e) => setQ(e.target.value)} placeholder="USC, Rice…" maxLength={60} /></Field>

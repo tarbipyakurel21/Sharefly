@@ -1042,7 +1042,7 @@ components:
         buildingName:
           type: "string"
           nullable: true
-          description: "Marketing name of the community, such as `City Lights on Fig`. Empty on 59 records."
+          description: "Marketing name of the community. Empty on 59 records."
         address:
           allOf:
             - "$ref": "#/components/schemas/ApartmentListingAddress"
@@ -7229,7 +7229,7 @@ components:
         name:
           type: "string"
           nullable: true
-          description: "Name of the floor plan, such as `1x1` or `The Madison`. Empty on 277 plans."
+          description: "Name of the floor plan, such as `1x1`. Empty on 277 plans."
         numUnits:
           type: "integer"
           format: "int32"

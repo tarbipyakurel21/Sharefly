@@ -11,6 +11,9 @@ const schema = z.object({
   GEMINI_MODEL: z.string().default("gemini-3.5-flash"),
   REFERENCE_SPACES_PROVIDER: z.enum(["none", "costar"]).default("none"),
   REFERENCE_SPACES_PATH: z.string().default("data/reference-spaces.json"),
+  MATTERPORT_API_KEY: z.string().optional(),
+  MATTERPORT_API_SECRET: z.string().optional(),
+  MATTERPORT_API_URL: z.string().url().default("https://api.matterport.com/api/models/graph"),
 });
 
 export function getEnv() {

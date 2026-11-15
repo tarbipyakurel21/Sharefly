@@ -12,14 +12,16 @@ const MatterportIds = z.object({
 
 export const ReferenceSpaceSchema = z.object({
   id: z.string().min(1),
-  propertyId: z.number().int(),
-  floorPlanId: z.number().int(),
+  /** null for hand-curated spaces that are not in the CoStar listing data. */
+  propertyId: z.number().int().nullable(),
+  floorPlanId: z.number().int().nullable(),
   communityName: z.string().nullable(),
   floorPlanName: z.string().nullable(),
   city: z.string().min(1),
   state: z.string().min(1),
-  lat: z.number().min(-90).max(90),
-  lng: z.number().min(-180).max(180),
+  /** null = not provided. Such spaces never match a distance filter. */
+  lat: z.number().min(-90).max(90).nullable(),
+  lng: z.number().min(-180).max(180).nullable(),
   beds: z.number().int().min(0).max(20).nullable(),
   baths: z.number().min(0).max(20).nullable(),
   minSqft: z.number().int().positive().nullable(),
@@ -48,7 +50,11 @@ export const RoomSourceSchema = z.object({
   beds: z.number().nullable(),
   baths: z.number().nullable(),
   sqft: z.number().nullable(),
-  estimated: z.literal(true),
+  /** true = room size is a sq ft estimate. false = it came from Matterport (possibly adjusted). */
+  estimated: z.boolean(),
+  /** How the saved size was obtained. Missing on rooms saved before measured sizes existed (those are estimates). */
+  dimensions: z.enum(["estimate", "matterport", "adjusted"]).optional(),
+  matterportRoomLabel: z.string().nullable().optional(),
   matterport: MatterportIds,
 });
 export type RoomSource = z.infer<typeof RoomSourceSchema>;

@@ -48,7 +48,7 @@ Each record is one JSON object. Field names are camelCase. Enum fields are store
 |---|---|---|---|
 | `id` | integer | Id of the listing: one apartment community's rental listing. It is unique in the file, and so is `propertyId`. |  |
 | `propertyId` | integer (nullable) | Id of the community, the `id` of its commercial-property record. |  |
-| `buildingName` | text (nullable) | Marketing name of the community, such as `City Lights on Fig`. Empty on 59 records. |  |
+| `buildingName` | text (nullable) | Marketing name of the community. Empty on 59 records. |  |
 | `address` | ApartmentListingAddress object (nullable) | Street address of the community: the property's primary address, with latitude and longitude. |  |
 | `yearBuilt` | integer (nullable) | Year the community was built. |  |
 | `totalNumUnits` | integer (nullable) | Number of units in the community. |  |
@@ -109,7 +109,7 @@ Found at: `apartmentModels[]`
 | Field | Type | Description | Values |
 |---|---|---|---|
 | `id` | integer | Id of the floor plan; equals `propertyApartment.models[].id` on the property record, which carries the plan's amenities, attachments and units. |  |
-| `name` | text (nullable) | Name of the floor plan, such as `1x1` or `The Madison`. Empty on 277 plans. |  |
+| `name` | text (nullable) | Name of the floor plan, such as `1x1`. Empty on 277 plans. |  |
 | `numUnits` | integer | Number of units with this floor plan. |  |
 | `numUnitsAvailable` | integer (nullable) | Number of those units that can be rented now. Null on 679 plans. |  |
 | `numBeds` | integer (nullable) | Bedrooms; 0 is a studio. |  |
