@@ -9,7 +9,7 @@ ShareFly connects neighbors giving away things they no longer want with people w
 - **3D room planner.** Enter length, width and height; preview furniture in a scaled room (Three.js / React Three Fiber). Unknown sizes are labeled "Typical size, not confirmed" and fit is never claimed. Configured real-apartment picks can show a lazy Matterport tour and measured rooms.
 - **RideBoard.** Lightweight pickup coordination: request help, drivers offer, requester accepts, either marks it done. No payments, no GPS.
 
-Built at HackPrinceton (Fall 2026). The previous project in this repository, PatternWitness, is preserved in [`legacy/`](legacy/) and in git history.
+Built at HackPrinceton (Fall 2026). The previous project in this repository, PatternWitness, was removed and remains in git history.
 
 ## Run it
 

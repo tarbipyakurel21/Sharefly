@@ -3,7 +3,7 @@
 ## Product
 
 ShareFly connects people giving away items with people who need them: one-photo AI-assisted listings, wishlists with two-way matching,
-a 3D room planner, and RideBoard pickup coordination. It is a hackathon MVP. (The earlier PatternWitness project lives in `legacy/`.)
+a 3D room planner, and RideBoard pickup coordination. It is a hackathon MVP.
 
 ## Repository map and commands
 

@@ -39,7 +39,6 @@
   ],
   "exclude": [
     "node_modules",
-    "legacy",
     "tests/e2e"
   ]
 }
