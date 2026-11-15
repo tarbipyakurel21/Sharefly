@@ -213,7 +213,10 @@ export function createRoom(userId: string, r: { name: string; lengthM: number; w
 }
 export function updateRoom(id: string, r: Partial<{ name: string; lengthM: number; widthM: number; heightM: number; displayUnit: "ft" | "m" }>) {
   const c = getRoom(id); if (!c) return null; const m = { ...c, ...r };
-  getDb().prepare("UPDATE rooms SET name=?,length_m=?,width_m=?,height_m=?,display_unit=?,updated_at=? WHERE id=?").run(m.name, m.lengthM, m.widthM, m.heightM, m.displayUnit, nowIso(), id);
+  // A size that was measured by Matterport stops being labelled as such once it is edited.
+  const edited = m.lengthM !== c.lengthM || m.widthM !== c.widthM || m.heightM !== c.heightM;
+  const source = c.source && c.source.dimensions === "matterport" && edited ? { ...c.source, dimensions: "adjusted" as const } : c.source;
+  getDb().prepare("UPDATE rooms SET name=?,length_m=?,width_m=?,height_m=?,display_unit=?,source=?,updated_at=? WHERE id=?").run(m.name, m.lengthM, m.widthM, m.heightM, m.displayUnit, source ? JSON.stringify(source) : null, nowIso(), id);
   return getRoom(id);
 }
 export const deleteRoom = (id: string) => { getDb().prepare("DELETE FROM rooms WHERE id=?").run(id); };

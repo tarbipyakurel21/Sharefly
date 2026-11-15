@@ -19,13 +19,14 @@ export function matchesFilters(s: ReferenceSpace, f: Partial<SearchFilters>): bo
     const hay = [s.communityName, s.floorPlanName, s.city, ...s.colleges.map((c) => c.name)].filter(Boolean).join(" ").toLowerCase();
     if (!hay.includes(q)) return false;
   }
-  if (f.lat != null && f.lng != null && haversineKm({ lat: f.lat, lng: f.lng }, s) > (f.radiusKm ?? 10)) return false;
+  if (f.lat != null && f.lng != null && (s.lat == null || s.lng == null || haversineKm({ lat: f.lat, lng: f.lng }, { lat: s.lat, lng: s.lng }) > (f.radiusKm ?? 10))) return false;
   return true;
 }
 
 export function searchSpaces(all: ReferenceSpace[], f: Partial<SearchFilters>): { spaces: ReferenceSpace[]; total: number } {
   const hits = all.filter((s) => matchesFilters(s, f));
   const near = f.lat != null && f.lng != null ? { lat: f.lat, lng: f.lng } : null;
-  hits.sort((a, b) => (near ? haversineKm(near, a) - haversineKm(near, b) : 0) || (a.communityName ?? "~").localeCompare(b.communityName ?? "~") || (a.beds ?? 99) - (b.beds ?? 99));
+  const dist = (s: ReferenceSpace) => (near && s.lat != null && s.lng != null ? haversineKm(near, { lat: s.lat, lng: s.lng }) : 0);
+  hits.sort((a, b) => (near ? dist(a) - dist(b) : 0) || (a.communityName ?? "~").localeCompare(b.communityName ?? "~") || (a.beds ?? 99) - (b.beds ?? 99));
   return { spaces: hits.slice(0, f.limit ?? 24), total: hits.length };
 }

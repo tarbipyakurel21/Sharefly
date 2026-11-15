@@ -38,3 +38,4 @@ scripts/explore/.cache/
 *.costar-cache.json
 
 costar-hackathon-kit/
+.next-e2e/
