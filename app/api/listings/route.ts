@@ -24,7 +24,7 @@ export const POST = route(async (req) => {
     giverId: user.id, title: b.title, description: b.description, category: b.category,
     conditionNote: b.conditionNote, purchasedFrom: b.purchasedFrom, neighborhood: b.neighborhood ?? user.neighborhood,
     widthM: b.widthM ?? null, depthM: b.depthM ?? null, heightM: b.heightM ?? null, aiGenerated: b.aiGenerated, clientKey: b.clientKey ?? null,
-    videoUrl: b.videoUrl ?? null,
+    model: b.model ?? null,
     photo: b.photoUrl ? { url: b.photoUrl, width: b.photoWidth, height: b.photoHeight } : null,
   });
   try { await runMatchingForListing(listing.id); } catch (e) { console.error("[matching] listing", e instanceof Error ? e.message : e); }

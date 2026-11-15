@@ -7,7 +7,7 @@ export interface StorageProvider {
 }
 
 const DIR = () => path.resolve(process.cwd(), "data/uploads");
-const TYPES: Record<string, string> = { jpg: "image/jpeg", png: "image/png", webp: "image/webp", glb: "model/gltf-binary", usdz: "model/vnd.usdz+zip", mp4: "video/mp4", mov: "video/quicktime", webm: "video/webm" };
+const TYPES: Record<string, string> = { jpg: "image/jpeg", png: "image/png", webp: "image/webp", glb: "model/gltf-binary", usdz: "model/vnd.usdz+zip" };
 
 export class LocalStorage implements StorageProvider {
   async save(bytes: Uint8Array, ext: string) {
@@ -17,7 +17,7 @@ export class LocalStorage implements StorageProvider {
     return { url: `/api/uploads/${name}` };
   }
   async read(name: string) {
-    if (!/^[a-f0-9-]+\.(jpg|png|webp|glb|usdz|mp4|mov|webm)$/.test(name)) return null;
+    if (!/^[a-f0-9-]+\.(jpg|png|webp|glb|usdz)$/.test(name)) return null;
     const file = path.join(DIR(), name);
     if (!fs.existsSync(file)) return null;
     return { bytes: fs.readFileSync(file), contentType: TYPES[name.split(".").pop()!] };
@@ -61,16 +61,5 @@ export function sniffModel(b: Uint8Array): { ext: "glb" | "usdz"; mime: string }
     const name = String.fromCharCode(...b.slice(30, 30 + Math.min(nameLen, 200))).toLowerCase();
     if (/\.(usdc|usda|usd)$/.test(name)) return { ext: "usdz", mime: "model/vnd.usdz+zip" };
   }
-  return null;
-}
-
-export const MAX_VIDEO_BYTES = 30 * 1024 * 1024;
-/** Short videos by magic bytes: MP4/MOV ("ftyp" box, iPhone clips are MOV or MP4) and WebM (EBML header). */
-export function sniffVideo(b: Uint8Array): { ext: "mp4" | "mov" | "webm"; mime: string } | null {
-  if (b.length > 16 && b[4] === 0x66 && b[5] === 0x74 && b[6] === 0x79 && b[7] === 0x70) {
-    const brand = String.fromCharCode(...b.slice(8, 12));
-    return brand === "qt  " ? { ext: "mov", mime: "video/quicktime" } : { ext: "mp4", mime: "video/mp4" };
-  }
-  if (b.length > 16 && b[0] === 0x1a && b[1] === 0x45 && b[2] === 0xdf && b[3] === 0xa3) return { ext: "webm", mime: "video/webm" };
   return null;
 }

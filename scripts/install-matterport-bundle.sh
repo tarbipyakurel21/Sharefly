@@ -8,5 +8,10 @@ if [ -f "$DEST/showcase.html" ] && [ "${1:-}" != "--force" ]; then
 fi
 TMP="$(mktemp -d)"
 curl -fsSL -o "$TMP/bundle.zip" "https://static.matterport.com/showcase-sdk/bundle/$VERSION/showcase-bundle.zip"
-mkdir -p "$DEST" && unzip -qo "$TMP/bundle.zip" -d "$DEST"
+mkdir -p "$DEST"
+# Build machines (such as Vercel's) don't always ship `unzip`; fall back to Python's zipfile.
+if command -v unzip >/dev/null 2>&1; then unzip -qo "$TMP/bundle.zip" -d "$DEST"
+elif command -v python3 >/dev/null 2>&1; then python3 -m zipfile -e "$TMP/bundle.zip" "$DEST"
+else echo "Neither unzip nor python3 is available to extract the Matterport bundle." >&2; exit 1; fi
+[ -f "$DEST/showcase.html" ] || { echo "Matterport bundle extracted but showcase.html is missing." >&2; exit 1; }
 echo "Installed Matterport bundle $(cat "$DEST/version.txt" 2>/dev/null) into $DEST"
