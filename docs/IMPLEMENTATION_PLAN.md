@@ -27,3 +27,9 @@ Last updated 2026-11-14.
 2. Optional photos per listing > 1; real photography for seed data.
 3. Reference spaces (CoStar/Matterport) if access is confirmed.
 4. Deployment config (hosted DB, object storage).
+
+## CoStar Stage 1: reference spaces (2026-11-14)
+- Done: importer (23,370 floor plans from 1,747 communities; 436 skipped: 435 no size, 1 invalid), `costar` provider with null default, `GET /api/reference-spaces`, "Start from a real apartment" picker with estimate label, source on the room, near-college filter.
+- Tests: 14 new unit tests (55 total), 2 new e2e (6 total). typecheck, lint, build, e2e green.
+- Limitations: room sizes are estimates; only Houston and Los Angeles; Matterport not shown yet (ids are stored only); JSON file store (Atlas is Stage 3).
+- Next: Stage 2 (Matterport embed, needs the connection docs from CoStar), Stage 3 (Atlas), Stage 4 (Vultr), Stage 5 (DEV post).

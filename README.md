@@ -50,7 +50,7 @@ Logic lives in `lib/` as pure functions (`matching`, `room`, `pickups`, `units`,
 - The Anthropic provider is implemented but was not exercised against a live key here. Mock and none paths are tested.
 - Matching is a rule-based score with a fixed threshold; weights are guesses, not tuned on real data.
 - Location is a neighborhood from a small static Princeton-area table, not geocoding.
-- CoStar / Matterport / Vexcel are **not** integrated: no documentation or credentials were available, so nothing calls them. `lib/reference-spaces` defines the interface with a null default.
+- CoStar apartment data is used for "Start from a real apartment" (`lib/reference-spaces`, `scripts/import-costar.ts`). The kit stays local and gitignored; without it the feature is hidden. Room sizes from it are **estimates** from total square footage. Matterport tours and Vexcel are **not** integrated yet.
 - Rate limiting is in-memory and per process. Notifications refresh by polling every 25 s (no websockets).
 - Uploaded photos are stored on local disk (`data/uploads`).
 

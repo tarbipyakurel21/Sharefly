@@ -17,6 +17,9 @@ export function getDb(): Database.Database {
   // Additive migration for databases created before driver_note existed.
   const cols = db.prepare("PRAGMA table_info(pickup_requests)").all() as { name: string }[];
   if (!cols.some((c) => c.name === "driver_note")) db.exec("ALTER TABLE pickup_requests ADD COLUMN driver_note TEXT");
+  // Additive migration: rooms created from a reference space keep a JSON snapshot of their source.
+  const roomCols = db.prepare("PRAGMA table_info(rooms)").all() as { name: string }[];
+  if (!roomCols.some((c) => c.name === "source")) db.exec("ALTER TABLE rooms ADD COLUMN source TEXT");
   g.__sfDb = db;
   g.__sfDbPath = file;
   return db;
