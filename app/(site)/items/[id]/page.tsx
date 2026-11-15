@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getListing, getUser, listRooms, hasInterest, hasMeasurementRequest, activePickupForListing, countOpenMeasurementRequests, markMatchesSeenForListing, firstName } from "@/lib/db/queries";
-import { getDb } from "@/lib/db/client";
+import { getListing, getUser, listRooms, hasInterest, hasMeasurementRequest, activePickupForListing, countOpenMeasurementRequests, countInterests, markMatchesSeenForListing, firstName } from "@/lib/db/queries";
 import { getSessionUser } from "@/lib/auth";
 import { FURNITURE, CATEGORY_LABEL } from "@/lib/categories";
 import { fitForRooms } from "@/lib/fit";
@@ -17,22 +16,27 @@ import { Chip } from "@/components/ui/Chip";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const l = getListing((await params).id);
+  const l = await getListing((await params).id);
   return { title: l?.title ?? "Item" };
 }
 
 export default async function ItemPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const l = getListing(id);
+  const l = await getListing(id);
   if (!l) notFound();
   const user = await getSessionUser();
-  const rooms = user ? listRooms(user.id) : [];
+  const rooms = user ? await listRooms(user.id) : [];
   const isOwner = user?.id === l.giverId;
-  if (user && !isOwner) markMatchesSeenForListing(l.id, user.id);
+  if (user && !isOwner) await markMatchesSeenForListing(l.id, user.id);
   const available = l.status === "available";
   const fit = user && !isOwner ? fitForRooms(l, rooms) : null;
   const hasSize = l.widthM != null && l.depthM != null && l.heightM != null;
-  const interestCount = (getDb().prepare("SELECT COUNT(*) c FROM interests WHERE listing_id=?").get(l.id) as { c: number }).c;
+  const interestCount = await countInterests(l.id);
+  const openRequests = isOwner && available ? await countOpenMeasurementRequests(l.id) : 0;
+  const interested = !!user && await hasInterest(l.id, user.id);
+  const requestedMeasure = !!user && await hasMeasurementRequest(l.id, user.id);
+  const activePickup = !!user && !!(await activePickupForListing(l.id, user.id));
+  const defaultTo = (user && (await getUser(user.id))?.neighborhood) || "";
   const unit = (rooms[0]?.displayUnit ?? "ft") as "ft" | "m";
 
   return (
@@ -45,7 +49,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
           ) : <div className="flex aspect-[4/3] items-center justify-center text-muted">No photo</div>}
         </div>
         {FURNITURE.includes(l.category) && l.status !== "removed" && (
-          <ArViewer title={l.title} category={l.category} photoUrl={l.photoUrl} widthM={l.widthM} depthM={l.depthM} heightM={l.heightM} unit={unit} />
+          <ArViewer title={l.title} category={l.category} photoUrl={l.photoUrl} widthM={l.widthM} depthM={l.depthM} heightM={l.heightM} unit={unit} roomHref={`/rooms?add=${l.id}`} />
         )}
       </div>
       <div className="space-y-6">
@@ -71,11 +75,11 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
             <dd>{hasSize ? `${formatLength(l.widthM!, unit)} wide × ${formatLength(l.depthM!, unit)} deep × ${formatLength(l.heightM!, unit)} tall (from the giver)` : <span>Size not provided yet. <span className="text-muted">We can't confirm it fits until someone measures it.</span></span>}</dd></div>
         </dl>
 
-        {available && isOwner && <OwnerPanel id={l.id} hasSize={hasSize} interestCount={interestCount} openRequests={countOpenMeasurementRequests(l.id)} status={l.status} />}
+        {available && isOwner && <OwnerPanel id={l.id} hasSize={hasSize} interestCount={interestCount} openRequests={openRequests} status={l.status} />}
         {available && !isOwner && (
-          <ItemActions listingId={l.id} hasSize={hasSize} isFurniture={FURNITURE.includes(l.category)} signedIn={!!user} interested={!!user && hasInterest(l.id, user.id)}
-            requestedMeasure={!!user && hasMeasurementRequest(l.id, user.id)} activePickup={!!user && !!activePickupForListing(l.id, user.id)}
-            rooms={rooms.map((r) => ({ id: r.id, name: r.name }))} defaultTo={(user && getUser(user.id)?.neighborhood) || ""} fromNeighborhood={l.neighborhood ?? "To be arranged"} />
+          <ItemActions listingId={l.id} hasSize={hasSize} isFurniture={FURNITURE.includes(l.category)} signedIn={!!user} interested={interested}
+            requestedMeasure={requestedMeasure} activePickup={activePickup}
+            rooms={rooms.map((r) => ({ id: r.id, name: r.name }))} defaultTo={defaultTo} fromNeighborhood={l.neighborhood ?? "To be arranged"} />
         )}
         {!available && isOwner && <OwnerPanel id={l.id} hasSize={hasSize} interestCount={interestCount} openRequests={0} status={l.status} />}
       </div>

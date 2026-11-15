@@ -10,8 +10,8 @@ const STEPS = [
   { n: "3", t: "Check it fits, get it home", b: "Try the piece in a 3D copy of your room, then ask a neighbor with a car for help." },
 ];
 
-export default function Landing() {
-  const recent = listListings({ limit: 6 });
+export default async function Landing() {
+  const recent = await listListings({ limit: 6 });
   return (
     <div className="space-y-16">
       <section className="grid items-center gap-8 pt-4 md:grid-cols-[1.1fr_1fr] md:pt-10">

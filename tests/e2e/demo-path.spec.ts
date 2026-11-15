@@ -18,6 +18,7 @@ test("demo path: wishlist + room -> photo listing -> match -> preview -> pickup"
   await expect(page.getByText("Up to $30")).toBeVisible();
 
   await page.goto("/rooms");
+  await page.getByRole("button", { name: "Enter dimensions" }).click();
   await page.getByLabel("Length").fill("12");
   await page.getByLabel("Width").fill("10");
   await page.getByLabel("Ceiling height").fill("8");
@@ -52,7 +53,8 @@ test("demo path: wishlist + room -> photo listing -> match -> preview -> pickup"
   await expect(page.getByText("Can't confirm fit yet")).toBeVisible();
 
   // 4. Preview in room with uncertainty
-  await page.getByRole("link", { name: "Arrange it on my floor plan" }).click();
+  await page.getByRole("link", { name: "Choose a room to arrange it in" }).click();
+  await page.getByRole("link", { name: "Select this room" }).first().click();
   await expect(page.getByTestId("piece-list")).toContainText("Typical size");
   await page.getByTestId("piece-list").getByRole("button").first().click();
   await expect(page.getByTestId("unconfirmed-note")).toContainText("Actual size not confirmed");
@@ -163,7 +165,7 @@ test("3D planner: dragging a piece moves it and keeps it inside the walls", asyn
   await expect(page.getByTestId("save-state")).toHaveText("Saved", { timeout: 10_000 });
 });
 
-test("View in your room: to-scale AR model for measured items, honest message otherwise", async ({ page }) => {
+test("View in 3D: to-scale AR model for measured items, honest message otherwise", async ({ page }) => {
   await page.goto("/items/l-shelf");
   await expect(page.getByTestId("ar-unavailable")).toContainText("Needs the giver's measurements");
   await expect(page.getByTestId("ar-open")).toHaveCount(0);
@@ -184,47 +186,8 @@ test("View in your room: to-scale AR model for measured items, honest message ot
   await expect(dialog).toHaveCount(0);
 });
 
-test("laptop: photo of your room places the item automatically; marking a door refines it", async ({ page }) => {
-  await page.goto("/items/l-sofa");
-  await page.getByTestId("ar-open").click();
-  await page.getByRole("tab", { name: "In a photo of my room" }).click();
-  await page.getByTestId("room-photo-input").setInputFiles("public/seed/demo-desk.jpg");
-
-  // no measuring step: the sofa is already standing on the floor, labelled as an estimate
-  await expect(page.getByTestId("photo-item").locator("canvas")).toBeVisible();
-  await expect(page.getByTestId("photo-scale-note")).toContainText("Size is an estimate");
-  await expect(page.getByTestId("photo-scale-note")).toContainText("not a photo of it");
-
-  // tap elsewhere on the floor moves it
-  const surf = page.getByTestId("photo-surface");
-  const b = (await surf.boundingBox())!;
-  await page.mouse.click(b.x + b.width * 0.3, b.y + b.height * 0.85);
-
-  // optional: refine with a door
-  await page.getByRole("button", { name: "Make it more accurate" }).click();
-  const use = page.getByRole("button", { name: "Use this measurement" });
-  await expect(use).toBeDisabled();
-  await page.mouse.move(b.x + b.width * 0.8, b.y + b.height * 0.9); await page.mouse.down();
-  await page.mouse.move(b.x + b.width * 0.8, b.y + b.height * 0.1, { steps: 6 }); await page.mouse.up();
-  await page.getByRole("button", { name: /Door height/ }).click();
-  await use.click();
-  await expect(page.getByTestId("photo-scale-note")).toContainText("Size is set from your 6 ft 8 in door measurement");
-
-  const download = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Save image" }).click();
-  expect((await download).suggestedFilename()).toBe("grey-three-seat-sofa-in-my-room.png");
-});
-
-test("iPhone HEIC photos work in Chrome: room photo and new listing", async ({ page }) => {
+test("iPhone HEIC photos work in Chrome: new listing", async ({ page }) => {
   // Chromium can't decode HEIC itself, so this exercises the on-device conversion.
-  await page.goto("/items/l-sofa");
-  await page.getByTestId("ar-open").click();
-  await page.getByRole("tab", { name: "In a photo of my room" }).click();
-  await page.getByTestId("room-photo-input").setInputFiles({ name: "IMG_0001.HEIC", mimeType: "", buffer: (await import("node:fs")).readFileSync("tests/fixtures/desk.heic") });
-  await expect(page.getByTestId("photo-surface")).toBeVisible({ timeout: 20_000 });
-  const nat = await page.getByAltText("Your room").evaluate((img: HTMLImageElement) => [img.naturalWidth, img.naturalHeight]);
-  expect(nat[0]).toBeGreaterThan(0);
-
   await switchTo(page, "Alex Brooks");
   await page.goto("/give");
   await page.locator("#file-lib").setInputFiles("tests/fixtures/desk.heic");

@@ -6,6 +6,7 @@ import type { ReferenceSpace } from "@/lib/reference-spaces/types";
 import type { RoomEstimate } from "@/lib/reference-spaces/estimate";
 import { Chip } from "@/components/ui/Chip";
 import { Field, Select, TextInput } from "@/components/ui/Field";
+import { tourCandidates } from "@/lib/matterport/tour";
 import { StreetMap } from "./StreetMap";
 
 export type PickedSpace = ReferenceSpace & { estimate: RoomEstimate | null; selectedUnitNumber?: string | null };
@@ -27,7 +28,7 @@ export function ApartmentPicker({ onPick, pickedId }: { onPick: (s: PickedSpace)
       if (q.trim()) p.set("q", q.trim());
       if (student) p.set("nearCollege", "true");
       setBusy(true); setErr(null);
-      try { setResults(await api<{ spaces: PickedSpace[]; total: number }>(`/api/reference-spaces?${p}`)); }
+      try { const r = await api<{ spaces: PickedSpace[]; total: number }>(`/api/reference-spaces?${p}`); setResults({ ...r, spaces: r.spaces.filter((s) => tourCandidates(s.matterport).length > 0) }); }
       catch (e) { setErr(errMsg(e)); }
       finally { setBusy(false); }
     }, 250);
@@ -37,8 +38,8 @@ export function ApartmentPicker({ onPick, pickedId }: { onPick: (s: PickedSpace)
   return (
     <section aria-label="Start from a real apartment" className="space-y-3 rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-[var(--shadow-soft)]">
       <div>
-        <h2 className="font-display text-xl">Start from a real apartment</h2>
-        <p className="text-sm text-muted">Pick a real floor plan in Houston or Los Angeles, or Rabinowitz Hall in Princeton and plan free furniture into it. Data: CoStar.</p>
+        <h2 className="font-display text-xl">Pick a 3D room</h2>
+        <p className="text-sm text-muted">Only apartments with a Matterport 3D tour are shown. Data: CoStar.</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-4">
         <Field label="City" htmlFor="ap-city"><Select id="ap-city" value={city} onChange={(e) => setCity(e.target.value)}><option value="">Any</option><option value="Houston">Houston</option><option value="Los Angeles">Los Angeles</option><option value="Princeton">Princeton</option></Select></Field>

@@ -18,7 +18,7 @@ Last updated 2026-11-14.
 - Phase 3 wishlists/matching: parser, hard filters + explainable score, both directions, notifications + polling bell, matches page.
 - Phase 4 room planner: room creation (ft/m), R3F scene, procedural furniture, drag/rotate/nudge/remove+undo, bounds, SAT collision, autosave, 2D plan fallback, uncertainty labeling, fit states.
 - Phase 5 RideBoard: state machine (server-enforced, compare-and-set), board, driver availability, notifications.
-- AR "View in your room": item page button opens a 3D viewer of a to-scale model (from the giver's measurements) with a "Place it in my room" AR button on capable phones. Furniture geometry moved to `lib/room/model.ts`, shared by planner and AR; shapes now stay within the measured box (bed headboard, storage lid, dresser fronts, sofa arm z-fighting fixed). Planner link renamed "Arrange it on my floor plan".
+- AR "View in 3D": item page button opens a 3D viewer of a to-scale model (from the giver's measurements) with a "Place it in my room" AR button on capable phones. Furniture geometry moved to `lib/room/model.ts`, shared by planner and AR; shapes now stay within the measured box (bed headboard, storage lid, dresser fronts, sofa arm z-fighting fixed). Planner link renamed "Arrange it on my floor plan".
 - "In a photo of my room" (for laptops): upload a room photo (stays on device); the item is placed on the floor automatically with an estimated phone camera (EXIF lens when available) in true perspective, labeled as an estimate; optional "Make it more accurate" door marking fixes the camera height; turn, camera tilt, save the composite PNG. Scale math in `lib/room/photo.ts`.
 - Preview polish (2026-11-14, uncommitted on `feature/preview-polish`): the procedural sofa is now an upholstered model (rounded seat and back cushions, one per seat by width; arms, base, back frame, tapered legs; woven-cloth normal map) that is still exactly the giver's width × depth × height, checked by unit tests and by `<model-viewer>`'s reported dimensions. The modal is larger (up to 1024 px, full-height sheet on phones) with studio lighting, a soft ground shadow, zoom in / zoom out / reset view buttons, a "True to size" chip and a rotate/zoom hint. Both tabs, AR, the GLB export and all test ids are unchanged. No new dependencies (`RoundedBoxGeometry` ships with three). The planner and photo mode share the model, so sofas there look the same.
 - Listing preview source-of-truth polish: the real listing photo is shown in the 3D preview as a labelled reference thumbnail. The GLB remains dimension-locked to confirmed giver measurements, and copy distinguishes the visual reference photo from the generated preview rather than implying a scan. Missing dimensions still gate the preview.
@@ -74,3 +74,23 @@ Last updated 2026-11-14.
 - Limitation: imported records still need a real CoStar kit run to verify which Houston/Los Angeles records contain unit numbers and unit-level models. Matterport remains an embedded scan/reference; ShareFly's editable planner is the fit-check surface.
 - Demo simplification: the demo switcher now shows three personas only—Jordan (giver), Maya (receiver), and Sam (ride sharer); the seed data is reassigned to those personas.
 - Demo labels: the three mock display names include their roles in parentheses so the role is visible wherever the demo user appears.
+
+## Matterport-only 3D room (2026-11-14)
+- Done: map-picked rooms render `BundleRoomStage` (no planner); room form is map OR dimensions; picker lists only spaces with a tour; item viewer renamed "View in 3D", photo tab removed; item link now "Arrange it in my 3D room".
+- Verified: typecheck, unit tests. E2E specs for the old estimate/adjust flow (`real-apartment.spec.ts`) need rewriting: see below.
+- NOT verified: furniture rendering inside a live Matterport scene (no SDK key in `.env.local`); placement offset/orientation uncalibrated; placements are not saved, so pickup-from-room is not wired for map rooms.
+- Next: add SDK key (allow-list localhost:3000), verify live, then persist placements and calibrate.
+
+## MongoDB Atlas and UploadThing wiring (2026-11-14)
+- Done: Atlas is read by the reference-space picker when `MONGO_URI`/`ATLAS_URI` is set with `REFERENCE_SPACES_PROVIDER=costar`, with JSON fallback. UploadThing photo storage added behind `STORAGE_PROVIDER=uploadthing`. README now has an optional-services section and Vercel notes; `.env.example` lists `UPLOADTHING_TOKEN`.
+- Tests: `tests/unit/storage.test.ts` (provider selection, fallback without token, error path, photoUrl validation) with UploadThing mocked.
+- Not verified: a live upload to UploadThing, and that Atlas holds loaded data (`npm run atlas:load` not run here).
+- Limitations: SQLite and Vercel's read-only disk. Listings, wishlists and pickups will not persist on Vercel without a database change.
+- Next: set `STORAGE_PROVIDER=uploadthing` in `.env.local` and verify one real upload; run `atlas:load`; decide on a hosted DB or a host with a persistent disk.
+- Done: CI workflow added (`.github/workflows/ci.yml`). Not yet run on GitHub. Known gap: `npm run lint` crashes on a missing `react-hooks` plugin (pre-existing), so lint is not in CI. The build was blocked by a Turbopack panic earlier in this environment, so the CI build step may fail until that is resolved.
+
+## MongoDB as primary store (2026-11-14)
+- Done: `lib/db/client.ts` (cached MongoClient, indexes on first use) and async `lib/db/queries.ts` replace SQLite. All pages, API routes, `lib/matching/run.ts` and `scripts/seed.ts` now await. `better-sqlite3` and `DATABASE_PATH` removed. E2E runs against `ATLAS_DB=sharefly_e2e`.
+- Tests: `npm run typecheck` and `npm test` (139) pass; seed runs against Atlas. E2E demo path result is recorded below once confirmed.
+- Limitations: no multi-document transactions (cascades are in code); existing SQLite data is not migrated; the app now requires `MONGO_URI` at runtime and in Atlas Network Access for Vercel. Matching and notification fan-out are sequential awaits.
+- Next: set env vars on Vercel (`MONGO_URI`, `SESSION_SECRET`, `STORAGE_PROVIDER=uploadthing`, `UPLOADTHING_TOKEN`), deploy, run `npm run db:seed` once against the production database.

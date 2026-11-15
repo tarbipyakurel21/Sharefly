@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { getSessionUser } from "@/lib/auth";
-import { listWishlists } from "@/lib/db/queries";
-import { getDb } from "@/lib/db/client";
+import { listWishlists, matchCountsByWishlist } from "@/lib/db/queries";
 import { SignInCard } from "@/components/layout/SignInForm";
 import { WishlistComposer } from "@/components/wishlist/WishlistComposer";
 import { WishlistList } from "@/components/wishlist/WishlistList";
@@ -14,9 +13,8 @@ export default async function WishlistsPage({ searchParams }: { searchParams: Pr
   const user = await getSessionUser();
   const { q } = await searchParams;
   if (!user) return <SignInCard title="Sign in to save a wishlist" body="Tell us what you're looking for and we'll let you know when it turns up." />;
-  const items = listWishlists(user.id);
-  const rows = getDb().prepare("SELECT wishlist_id, COUNT(*) c FROM matches m JOIN listings l ON l.id=m.listing_id WHERE l.status='available' AND m.status!='dismissed' GROUP BY wishlist_id").all() as { wishlist_id: string; c: number }[];
-  const counts = Object.fromEntries(rows.map((r) => [r.wishlist_id, r.c]));
+  const items = await listWishlists(user.id);
+  const counts = await matchCountsByWishlist(items.map((w) => w.id));
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div>

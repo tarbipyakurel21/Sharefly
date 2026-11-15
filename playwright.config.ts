@@ -12,7 +12,7 @@ export default defineConfig({
     url: "http://localhost:3100",
     reuseExistingServer: false,
     timeout: 120_000,
-    env: { E2E_DIST_DIR: ".next-e2e", AI_PROVIDER: "mock", DEMO_MODE: "true", DATABASE_PATH: "data/e2e.db", SESSION_SECRET: "e2e-secret-e2e-secret-e2e-secret", REFERENCE_SPACES_PROVIDER: "costar", REFERENCE_SPACES_PATH: "tests/fixtures/reference-spaces.sample.json", MATTERPORT_API_KEY: "e2e-key", MATTERPORT_API_SECRET: "e2e-secret", MATTERPORT_API_URL: "http://localhost:4010/graph" },
+    env: { E2E_DIST_DIR: ".next-e2e", AI_PROVIDER: "mock", DEMO_MODE: "true", ATLAS_DB: "sharefly_e2e", SESSION_SECRET: "e2e-secret-e2e-secret-e2e-secret", REFERENCE_SPACES_PROVIDER: "costar", REFERENCE_SPACES_PATH: "tests/fixtures/reference-spaces.sample.json", MATTERPORT_API_KEY: "e2e-key", MATTERPORT_API_SECRET: "e2e-secret", MATTERPORT_API_URL: "http://localhost:4010/graph" },
     },
   ],
 });

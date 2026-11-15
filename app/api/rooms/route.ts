@@ -5,7 +5,7 @@ import { getReferenceSpaceProvider } from "@/lib/reference-spaces/provider";
 import { sameSize, toRoomSource, type DimensionsKind } from "@/lib/reference-spaces/source";
 import { measuredRoomsForSpace } from "@/lib/matterport/resolve";
 
-export const GET = route(async () => ok({ rooms: listRooms((await requireUser()).id) }));
+export const GET = route(async () => ok({ rooms: await listRooms((await requireUser()).id) }));
 export const POST = route(async (req) => {
   const user = await requireUser();
   const { referenceSpaceId, measuredRoomId, unitNumber, ...b } = RoomBody.parse(await jsonBody(req));
@@ -26,5 +26,5 @@ export const POST = route(async (req) => {
     }
     source = toRoomSource(space, { kind, roomLabel, unitNumber: unitNumber ?? null });
   }
-  return ok({ room: createRoom(user.id, { ...b, source }) }, 201);
+  return ok({ room: await createRoom(user.id, { ...b, source }) }, 201);
 });
