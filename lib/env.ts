@@ -4,9 +4,20 @@ const schema = z.object({
   DATABASE_PATH: z.string().default("data/sharefly.db"),
   SESSION_SECRET: z.string().min(16).default("dev-only-secret-change-me-please"),
   DEMO_MODE: z.enum(["true", "false"]).default("false"),
-  AI_PROVIDER: z.enum(["anthropic", "mock", "none"]).default("none"),
+  AI_PROVIDER: z.enum(["anthropic", "gemini", "mock", "none"]).default("none"),
   ANTHROPIC_API_KEY: z.string().optional(),
   ANTHROPIC_MODEL: z.string().default("claude-sonnet-5-5"),
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_MODEL: z.string().default("gemini-3.5-flash"),
+  REFERENCE_SPACES_PROVIDER: z.enum(["none", "costar"]).default("none"),
+  REFERENCE_SPACES_PATH: z.string().default("data/reference-spaces.json"),
+  REFERENCE_SPACES_STORE: z.enum(["json", "atlas"]).default("json"),
+  ATLAS_URI: z.string().optional(),
+  ATLAS_DB: z.string().min(1).default("sharefly"),
+  ATLAS_COLLECTION: z.string().min(1).default("reference_spaces"),
+  MATTERPORT_API_KEY: z.string().optional(),
+  MATTERPORT_API_SECRET: z.string().optional(),
+  MATTERPORT_API_URL: z.string().url().default("https://api.matterport.com/api/models/graph"),
 });
 
 export function getEnv() {

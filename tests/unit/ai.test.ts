@@ -26,6 +26,24 @@ describe("provider selection", () => {
     expect(await getAIProvider().describeItem({ imageBytes: bytes, mimeType: "image/jpeg" })).toEqual({ status: "unavailable", reason: "no_provider" });
     process.env.AI_PROVIDER = "anthropic"; delete process.env.ANTHROPIC_API_KEY;
     expect(getAIProvider().name).toBe("none");
+    process.env.AI_PROVIDER = "gemini"; delete process.env.GEMINI_API_KEY;
+    expect(getAIProvider().name).toBe("none");
+    process.env.GEMINI_API_KEY = "test-key";
+    expect(getAIProvider().name).toBe("gemini");
+    delete process.env.GEMINI_API_KEY; delete process.env.AI_PROVIDER;
+  });
+  it("gemini parses a candidate and sanitizes it; failures are unavailable", async () => {
+    process.env.AI_PROVIDER = "gemini"; process.env.GEMINI_API_KEY = "test-key";
+    const orig = globalThis.fetch;
+    const reply = (text: string) => new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text }] } }] }));
+    try {
+      globalThis.fetch = (async () => reply('{"title":"Wooden desk","category":"desk","description":"A wooden desk, about 120 cm wide."}')) as typeof fetch;
+      expect(await getAIProvider().describeItem({ imageBytes: bytes, mimeType: "image/jpeg" })).toEqual({ status: "ok", source: "model", suggestion: { title: "Wooden desk", category: "desk", description: "" } });
+      globalThis.fetch = (async () => new Response("nope", { status: 500 })) as typeof fetch;
+      expect(await getAIProvider().describeItem({ imageBytes: bytes, mimeType: "image/jpeg" })).toEqual({ status: "unavailable", reason: "error" });
+      globalThis.fetch = (async () => reply("not json")) as typeof fetch;
+      expect(await getAIProvider().describeItem({ imageBytes: bytes, mimeType: "image/jpeg" })).toEqual({ status: "unavailable", reason: "error" });
+    } finally { globalThis.fetch = orig; delete process.env.GEMINI_API_KEY; delete process.env.AI_PROVIDER; }
   });
   it("mock is keyed on file name and says so", async () => {
     process.env.AI_PROVIDER = "mock";

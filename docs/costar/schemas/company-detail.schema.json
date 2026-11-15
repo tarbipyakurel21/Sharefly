@@ -1,0 +1,784 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CompanyDetail",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Id of the company location, the `tenantLocationId` of location-occupancy. Each record is one office or site of a company."
+    },
+    "address": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LocationDetailAddress"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Street address of the company location. For most locations this is the address of the building it occupies."
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Other names the company location is known by, such as a former or legal name."
+    },
+    "businessStatus": {
+      "$ref": "#/$defs/LocationBusinessStatus",
+      "description": "Whether the company location is still in business. Out-of-business locations are included; their past tenancies are in location-occupancy."
+    },
+    "locationPhone": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Main phone number of the company location. The number is fake: area code 555, the same fake for the same real number in every dataset."
+    },
+    "locationPhoneCountryCode": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Three-letter country code of `locationPhone`."
+    },
+    "numEmployees": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Number of employees at this location, as researched by CoStar."
+    },
+    "profile": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LocationDetailProfile"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The company profile shown for this location: its type, industry, website and description."
+    },
+    "mailingAddress": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LocationDetailAddress"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Postal address of the company location, when it differs from or adds to `address`, such as a PO box."
+    },
+    "name": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Name of the company location, such as `The Hileman Company LLC`."
+    },
+    "officeType": {
+      "$ref": "#/$defs/OfficeType",
+      "description": "What this location is to its company, such as main headquarters, branch or single location."
+    },
+    "suite": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Suite or unit at the address, as entered. Values can carry trailing spaces."
+    },
+    "brandProfiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/LocationBrandProfile"
+      },
+      "description": "Brands the location operates under, on the few locations that have one."
+    },
+    "latitude": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "A map position for the location itself, on 164 records. It is usually within about 100 meters of `address.latitude` and `address.longitude`; prefer those."
+    },
+    "longitude": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Longitude of the location's own map position, on 164 records. Prefer `address.longitude`."
+    }
+  },
+  "$defs": {
+    "LocationDetailAddress": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the address. On most occupancies it equals the occupancy's `addressId`, and it matches an address id in commercial-property."
+        },
+        "buildingName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the building, such as `Century Plaza Towers North`."
+        },
+        "buildingNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Building number or name within a complex, such as `2` or `Phoenix`."
+        },
+        "city": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "City name as entered, so capitalization varies (`Houston`, `houston`)."
+        },
+        "cityId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "CoStar id of the city."
+        },
+        "countryCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Three-letter country code, such as `USA`."
+        },
+        "countyId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "CoStar id of the county."
+        },
+        "crossStreetDescription": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Nearest cross street or a short location note, such as `SWC FM 1960 W. & Falling Creek Dr.`. Usually empty."
+        },
+        "latitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Latitude of the address."
+        },
+        "longitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Longitude of the address."
+        },
+        "postcode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Postal code. In the US this is the ZIP code."
+        },
+        "zip": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "ZIP code, filled on older addresses. Prefer `postcode`."
+        },
+        "postalBox": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "PO box number, on the few addresses that have one."
+        },
+        "state": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Two-letter state code, such as `TX` or `CA`."
+        },
+        "stateId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "CoStar id of the state."
+        },
+        "streetDirection": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Direction before the street name, such as `N` or `W`."
+        },
+        "streetName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Street name without number, direction or type, such as `Wilshire`."
+        },
+        "streetNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Street number, such as `1100`."
+        },
+        "streetNumberEndRange": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Last street number when the address covers a range, such as `1120` for 1100–1120."
+        },
+        "streetSuffix": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Direction after the street name, such as `E`."
+        },
+        "streetType": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Street type, such as `Blvd`, `St` or `Dr`."
+        }
+      }
+    },
+    "LocationDetailProfile": {
+      "type": "object",
+      "properties": {
+        "businessType": {
+          "$ref": "#/$defs/BusinessType",
+          "description": "What kind of business the company is, from a real estate point of view, such as Brokerage, Lender or Retailer. `0` (Unknown) for most companies that are only tenants."
+        },
+        "businessSubtype": {
+          "$ref": "#/$defs/BusinessSubtype",
+          "description": "A finer split of `businessType`, such as Brokerage_TenantRep. The name starts with its business type."
+        },
+        "industryType": {
+          "$ref": "#/$defs/IndustryType",
+          "description": "Industry of the company. Use this, not the occupancy's `industryType`, once a tenant is known."
+        },
+        "websiteUrl": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Company website. A few links to business directories carry a fake phone number in the address, so they do not work."
+        },
+        "locationBio": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Description of the company, in English. Email addresses and phone numbers in it are fake."
+        },
+        "companyName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the company the location belongs to, such as `Prudential` for the location named `Prudential Financial`. Several locations share it."
+        },
+        "companyNameLocal": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The company name in a local spelling, on the few records that have one."
+        }
+      }
+    },
+    "LocationBrandProfile": {
+      "type": "object",
+      "properties": {
+        "corporateBrandId": {
+          "type": "integer",
+          "format": "int32",
+          "description": "CoStar id of the brand."
+        },
+        "locationName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the location under that brand."
+        },
+        "locationPhone": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Phone number of the location under that brand. The number is fake, as in `locationPhone`."
+        },
+        "locationPhoneCountryCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Three-letter country code of `brandProfiles.locationPhone`."
+        }
+      }
+    },
+    "LocationBusinessStatus": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Active",
+        "OutOfBusiness",
+        "ShellCompany",
+        "MoveOrMerge",
+        "IndividualOwner",
+        "Undetermined",
+        "PendingDelete",
+        "ActivePaperCompany"
+      ],
+      "description": "Allowed values:\n0 = Unknown (also DefaultUnknown)\n1 = Active\n2 = OutOfBusiness\n3 = ShellCompany\n4 = MoveOrMerge\n5 = IndividualOwner\n6 = Undetermined\n7 = PendingDelete\n8 = ActivePaperCompany"
+    },
+    "BusinessType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "CorporateRealEstateOwners",
+        "ResidentialDevelopers",
+        "EducationOrUniversity",
+        "Government",
+        "InstitutionalInvestorEquity",
+        "Internal",
+        "InvestmentOrOwnershipOrCommercialDevelopers",
+        "Lender",
+        "PropertyManagement",
+        "PublicRelations",
+        "TaxAppeal",
+        "TradeGroupsOrNonprofitAssociations",
+        "VendorOrServices",
+        "AppraisalOrValuation",
+        "Brokerage",
+        "AreaAssociations",
+        "Telecommunications",
+        "Architect",
+        "ConsultantsRealEstate",
+        "MortgageBrokersOrFinance",
+        "Media",
+        "Retailer",
+        "BrokerageResidential",
+        "BrokerageResimercial",
+        "ConstructionCompanies",
+        "ExecutiveSuites",
+        "Hotels",
+        "ProfessionalServices",
+        "Utilities",
+        "TitleCompany",
+        "Operator",
+        "Academia",
+        "Destination",
+        "Bank",
+        "CreditUnion",
+        "InstitutionalInvestorFixedIncomeOrCredit"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = CorporateRealEstateOwners\n2 = ResidentialDevelopers\n3 = EducationOrUniversity\n4 = Government\n5 = InstitutionalInvestorEquity (also InstitutionalInvestment)\n6 = Internal\n7 = InvestmentOrOwnershipOrCommercialDevelopers\n8 = Lender\n9 = PropertyManagement\n10 = PublicRelations\n11 = TaxAppeal\n12 = TradeGroupsOrNonprofitAssociations\n13 = VendorOrServices\n14 = AppraisalOrValuation\n15 = Brokerage\n16 = AreaAssociations\n17 = Telecommunications\n18 = Architect\n19 = ConsultantsRealEstate\n20 = MortgageBrokersOrFinance\n21 = Media\n22 = Retailer\n23 = BrokerageResidential\n24 = BrokerageResimercial\n25 = ConstructionCompanies\n26 = ExecutiveSuites\n27 = Hotels\n28 = ProfessionalServices\n29 = Utilities\n30 = TitleCompany\n31 = Operator\n32 = Academia\n33 = Destination\n34 = Bank\n35 = CreditUnion\n36 = InstitutionalInvestorFixedIncomeOrCredit"
+    },
+    "BusinessSubtype": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "CorporateRealEstateOwners_Fortune500",
+        "Government_Federal",
+        "Government_Local",
+        "Government_State",
+        "Government_TaxAssessor",
+        "InstitutionalInvestment_1031ExchangeOrTenantInCommon",
+        "InstitutionalInvestment_CmbsOrMortgageBank",
+        "InstitutionalInvestment_ConsultantOrAdvisory",
+        "InstitutionalInvestment_InvestmentBank",
+        "InstitutionalInvestment_PensionFundOrInsuranceCompany",
+        "InstitutionalInvestment_PrivateEquityOrRealEstateFund",
+        "InstitutionalInvestment_RatingAgency",
+        "InstitutionalInvestment_Reit",
+        "InstitutionalInvestment_ReitAnalyst",
+        "VendorOrServices_Architect",
+        "VendorOrServices_GeneralContractor",
+        "VendorOrServices_Insurance",
+        "VendorOrServices_Landscaping",
+        "VendorOrServices_Maintenance",
+        "VendorOrServices_Moving",
+        "VendorOrServices_OfficeFurniture",
+        "VendorOrServices_Security",
+        "VendorOrServices_Telecom",
+        "VendorOrServices_Utility",
+        "Brokerage_Industrial",
+        "Brokerage_Office",
+        "Brokerage_Residential",
+        "Brokerage_Retail",
+        "AreaAssociations_EconomicDevelopment",
+        "Retailer_Fortune500",
+        "InvestmentOrOwnershipOrCommercialDevelopers_Office",
+        "InvestmentOrOwnershipOrCommercialDevelopers_Industrial",
+        "InvestmentOrOwnershipOrCommercialDevelopers_Retail",
+        "InvestmentOrOwnershipOrCommercialDevelopers_Multifamily",
+        "Brokerage_Multifamily",
+        "Brokerage_FullServiceBroker",
+        "Brokerage_InvestmentSales",
+        "Brokerage_LandlordRep",
+        "Brokerage_RetailBrokerage",
+        "Brokerage_TenantRep",
+        "InstitutionalInvestment_HedgeFund",
+        "InstitutionalInvestment_InsuranceCompany",
+        "InstitutionalInvestment_MoneyInvestmentManagement",
+        "InstitutionalInvestment_OtherInstitutionalInvestor",
+        "InstitutionalInvestment_PensionEndowmentFund",
+        "InstitutionalInvestment_PrivateEquityFund",
+        "InstitutionalInvestment_SovereignWealthFund",
+        "InvestmentOrOwnershipOrCommercialDevelopers_CommercialDeveloper",
+        "InvestmentOrOwnershipOrCommercialDevelopers_OwnerOperator",
+        "InvestmentOrOwnershipOrCommercialDevelopers_REIT",
+        "InvestmentOrOwnershipOrCommercialDevelopers_HomeBuilder",
+        "PropertyManagement_CommercialPM",
+        "PropertyManagement_MultifamilyPM",
+        "PropertyManagement_ResidentialPM",
+        "AreaAssociations_Education",
+        "AreaAssociations_NonProfit",
+        "AreaAssociations_Other",
+        "AreaAssociations_TradeGroup",
+        "VendorOrServices_Other",
+        "VendorOrServices_ParkingGarage",
+        "VendorOrServices_Roofing",
+        "CorporateRealEstateOwners_NationalCorporateUser",
+        "CorporateRealEstateOwners_RegionalLocalCorporateUser",
+        "Government_EDOs_and_DMOs",
+        "Lender_CommercialLender",
+        "Lender_NonCommercialLenders",
+        "ProfessionalServices_Architect",
+        "ProfessionalServices_AccountingFirms",
+        "ProfessionalServices_Lawyers",
+        "ProfessionalServices_MediaPR",
+        "ProfessionalServices_MortgageBrokers",
+        "ProfessionalServices_OtherProfessionalServices",
+        "Retailer_OtherRetail",
+        "CorporateRealEstateOwners_OtherCorpUser",
+        "TaxAppeal_TaxAppeal",
+        "AppraisalOrValuation_AppraisalValuation",
+        "ConsultantsRealEstate_Consultants",
+        "BrokerageResidential_BrokerageResidential",
+        "BrokerageResimercial_BrokerageResimercial",
+        "ConstructionCompanies_ConstructionCompanies",
+        "ExecutiveSuites_ExecutiveSuites",
+        "Hotels_Hotels",
+        "Utilities_Utilities",
+        "TitleCompany_TitleCompany",
+        "Hotels_HotelMembershipCompany",
+        "Hotels_Chain",
+        "Hotels_ManagementCompany",
+        "Hotels_OwnerOrOperator",
+        "Hotels_AssetManagementCompany",
+        "InvestmentOrOwnershipOrCommercialDevelopers_Hospitality",
+        "Bank_CommercialBank",
+        "Bank_CooperativeBank",
+        "Bank_IndustrialBank",
+        "Bank_HoldingCompanyOnly",
+        "Bank_InsuranceBrokerOrAgentAndOrInsuranceCompany",
+        "Bank_SecuritiesBrokerAndOrDealer",
+        "Bank_OtherNonDepositoryInstitution",
+        "InstitutionalInvestorFixedIncomeOrCredit_1031ExchangeTenantInommon",
+        "InstitutionalInvestorFixedIncomeOrCredit_CMBSMortgageBank",
+        "InstitutionalInvestorFixedIncomeOrCredit_ConsultantOrAdvisory",
+        "InstitutionalInvestorFixedIncomeOrCredit_InvestmentBank",
+        "InstitutionalInvestorFixedIncomeOrCredit_PensionFundOrInsuranceCompany",
+        "InstitutionalInvestorFixedIncomeOrCredit_PrivateEquityOrRealEstateFund",
+        "InstitutionalInvestorFixedIncomeOrCredit_RatingAgency",
+        "InstitutionalInvestorFixedIncomeOrCredit_REIT",
+        "InstitutionalInvestorFixedIncomeOrCredit_REITAnalyst",
+        "InstitutionalInvestorFixedIncomeOrCredit_HedgeFund",
+        "InstitutionalInvestorFixedIncomeOrCredit_InsuranceCompany",
+        "InstitutionalInvestorFixedIncomeOrCredit_MoneyOrInvestmentManagement",
+        "InstitutionalInvestorFixedIncomeOrCredit_OtherInstitutionalInvestor",
+        "InstitutionalInvestorFixedIncomeOrCredit_PensionOrEndowmentFund",
+        "InstitutionalInvestorFixedIncomeOrCredit_PrivateEquityFund",
+        "InstitutionalInvestorFixedIncomeOrCredit_SovereignWealthFund"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = CorporateRealEstateOwners_Fortune500\n2 = Government_Federal\n3 = Government_Local\n4 = Government_State\n5 = Government_TaxAssessor\n6 = InstitutionalInvestment_1031ExchangeOrTenantInCommon\n7 = InstitutionalInvestment_CmbsOrMortgageBank\n8 = InstitutionalInvestment_ConsultantOrAdvisory\n9 = InstitutionalInvestment_InvestmentBank\n10 = InstitutionalInvestment_PensionFundOrInsuranceCompany\n11 = InstitutionalInvestment_PrivateEquityOrRealEstateFund\n12 = InstitutionalInvestment_RatingAgency\n13 = InstitutionalInvestment_Reit\n14 = InstitutionalInvestment_ReitAnalyst\n15 = VendorOrServices_Architect\n16 = VendorOrServices_GeneralContractor\n17 = VendorOrServices_Insurance\n18 = VendorOrServices_Landscaping\n19 = VendorOrServices_Maintenance\n20 = VendorOrServices_Moving\n21 = VendorOrServices_OfficeFurniture\n22 = VendorOrServices_Security\n23 = VendorOrServices_Telecom\n24 = VendorOrServices_Utility\n25 = Brokerage_Industrial\n26 = Brokerage_Office\n27 = Brokerage_Residential\n28 = Brokerage_Retail\n29 = AreaAssociations_EconomicDevelopment\n30 = Retailer_Fortune500\n31 = InvestmentOrOwnershipOrCommercialDevelopers_Office\n32 = InvestmentOrOwnershipOrCommercialDevelopers_Industrial\n33 = InvestmentOrOwnershipOrCommercialDevelopers_Retail\n34 = InvestmentOrOwnershipOrCommercialDevelopers_Multifamily\n35 = Brokerage_Multifamily\n36 = Brokerage_FullServiceBroker\n37 = Brokerage_InvestmentSales\n38 = Brokerage_LandlordRep\n39 = Brokerage_RetailBrokerage\n40 = Brokerage_TenantRep\n41 = InstitutionalInvestment_HedgeFund\n42 = InstitutionalInvestment_InsuranceCompany\n43 = InstitutionalInvestment_MoneyInvestmentManagement\n44 = InstitutionalInvestment_OtherInstitutionalInvestor\n45 = InstitutionalInvestment_PensionEndowmentFund\n46 = InstitutionalInvestment_PrivateEquityFund\n47 = InstitutionalInvestment_SovereignWealthFund\n48 = InvestmentOrOwnershipOrCommercialDevelopers_CommercialDeveloper\n49 = InvestmentOrOwnershipOrCommercialDevelopers_OwnerOperator\n50 = InvestmentOrOwnershipOrCommercialDevelopers_REIT\n51 = InvestmentOrOwnershipOrCommercialDevelopers_HomeBuilder\n52 = PropertyManagement_CommercialPM\n53 = PropertyManagement_MultifamilyPM\n54 = PropertyManagement_ResidentialPM\n55 = AreaAssociations_Education\n56 = AreaAssociations_NonProfit\n57 = AreaAssociations_Other\n58 = AreaAssociations_TradeGroup\n59 = VendorOrServices_Other\n60 = VendorOrServices_ParkingGarage\n61 = VendorOrServices_Roofing\n62 = CorporateRealEstateOwners_NationalCorporateUser\n63 = CorporateRealEstateOwners_RegionalLocalCorporateUser\n64 = Government_EDOs_and_DMOs (also Government_Economic)\n65 = Lender_CommercialLender\n66 = Lender_NonCommercialLenders\n67 = ProfessionalServices_Architect\n68 = ProfessionalServices_AccountingFirms\n69 = ProfessionalServices_Lawyers\n70 = ProfessionalServices_MediaPR\n71 = ProfessionalServices_MortgageBrokers\n72 = ProfessionalServices_OtherProfessionalServices\n73 = Retailer_OtherRetail\n74 = CorporateRealEstateOwners_OtherCorpUser\n75 = TaxAppeal_TaxAppeal\n76 = AppraisalOrValuation_AppraisalValuation\n77 = ConsultantsRealEstate_Consultants\n78 = BrokerageResidential_BrokerageResidential\n79 = BrokerageResimercial_BrokerageResimercial\n80 = ConstructionCompanies_ConstructionCompanies\n81 = ExecutiveSuites_ExecutiveSuites\n82 = Hotels_Hotels\n83 = Utilities_Utilities\n84 = TitleCompany_TitleCompany\n85 = Hotels_HotelMembershipCompany\n86 = Hotels_Chain\n87 = Hotels_ManagementCompany\n88 = Hotels_OwnerOrOperator\n89 = Hotels_AssetManagementCompany\n90 = InvestmentOrOwnershipOrCommercialDevelopers_Hospitality\n91 = Bank_CommercialBank\n92 = Bank_CooperativeBank\n93 = Bank_IndustrialBank\n94 = Bank_HoldingCompanyOnly\n95 = Bank_InsuranceBrokerOrAgentAndOrInsuranceCompany\n96 = Bank_SecuritiesBrokerAndOrDealer\n97 = Bank_OtherNonDepositoryInstitution\n98 = InstitutionalInvestorFixedIncomeOrCredit_1031ExchangeTenantInommon\n99 = InstitutionalInvestorFixedIncomeOrCredit_CMBSMortgageBank\n100 = InstitutionalInvestorFixedIncomeOrCredit_ConsultantOrAdvisory\n101 = InstitutionalInvestorFixedIncomeOrCredit_InvestmentBank\n102 = InstitutionalInvestorFixedIncomeOrCredit_PensionFundOrInsuranceCompany\n103 = InstitutionalInvestorFixedIncomeOrCredit_PrivateEquityOrRealEstateFund\n104 = InstitutionalInvestorFixedIncomeOrCredit_RatingAgency\n105 = InstitutionalInvestorFixedIncomeOrCredit_REIT\n106 = InstitutionalInvestorFixedIncomeOrCredit_REITAnalyst\n107 = InstitutionalInvestorFixedIncomeOrCredit_HedgeFund\n108 = InstitutionalInvestorFixedIncomeOrCredit_InsuranceCompany\n109 = InstitutionalInvestorFixedIncomeOrCredit_MoneyOrInvestmentManagement\n110 = InstitutionalInvestorFixedIncomeOrCredit_OtherInstitutionalInvestor\n111 = InstitutionalInvestorFixedIncomeOrCredit_PensionOrEndowmentFund\n112 = InstitutionalInvestorFixedIncomeOrCredit_PrivateEquityFund\n113 = InstitutionalInvestorFixedIncomeOrCredit_SovereignWealthFund"
+    },
+    "IndustryType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Accountants",
+        "Transportation",
+        "EngineersOrArchitects",
+        "RealEstate",
+        "Manufacturing",
+        "RetailersOrWholesalers",
+        "FinancialInstitutions",
+        "ComputersOrDataProcessing",
+        "PublicAdministration",
+        "AgriculturalOrMiningOrUtilities",
+        "Information",
+        "ProfessionalScientificAndTechnicalServices",
+        "PersonalServices",
+        "Insurance",
+        "HealthCareAndSocialAssistance",
+        "LawFirms",
+        "AccommodationAndFoodServices",
+        "AdministrativeAndSupportServices",
+        "AgricultureForestryFishingAndHunting",
+        "ArtsEntertainmentAndRecreation",
+        "EducationalServices",
+        "ManagementOfCompaniesAndEnterprises",
+        "MiningQuarryingAndOilAndGasExtraction",
+        "RentalAndLeasingServices",
+        "Utilities",
+        "WasteManagementAndRemediationServices",
+        "Wholesaler"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Accountants\n2 = Transportation (also TransportationAndWarehousing)\n3 = EngineersOrArchitects\n4 = RealEstate\n5 = Manufacturing\n6 = RetailersOrWholesalers (also Retailer)\n7 = FinancialInstitutions (also FinanceAndInsurance)\n8 = ComputersOrDataProcessing\n9 = PublicAdministration (also Government)\n10 = AgriculturalOrMiningOrUtilities (also Construction)\n11 = Information (also Communications)\n12 = ProfessionalScientificAndTechnicalServices (also BusinessServices)\n13 = PersonalServices (also Services)\n14 = Insurance\n15 = HealthCareAndSocialAssistance (also Medical)\n16 = LawFirms\n17 = AccommodationAndFoodServices\n18 = AdministrativeAndSupportServices\n19 = AgricultureForestryFishingAndHunting\n20 = ArtsEntertainmentAndRecreation\n21 = EducationalServices\n22 = ManagementOfCompaniesAndEnterprises\n23 = MiningQuarryingAndOilAndGasExtraction\n24 = RentalAndLeasingServices\n25 = Utilities\n26 = WasteManagementAndRemediationServices\n27 = Wholesaler"
+    },
+    "OfficeType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "MainHeadquarters",
+        "DivisionalHeadquarters",
+        "CorporateOffice",
+        "Franchise",
+        "SingleLocation",
+        "RetailStoreOrBranch",
+        "Industrial",
+        "OnSitePropertyManagement",
+        "NoPhysicalLocation"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = MainHeadquarters\n2 = DivisionalHeadquarters\n3 = CorporateOffice (also Branch)\n4 = Franchise\n5 = SingleLocation\n6 = RetailStoreOrBranch\n7 = Industrial (also Warehouse)\n8 = OnSitePropertyManagement\n9 = NoPhysicalLocation"
+    }
+  }
+}

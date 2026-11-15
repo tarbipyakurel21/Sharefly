@@ -13,6 +13,6 @@ async function owned(ctx: Ctx) {
 export const GET = route<Ctx>(async (_r, ctx) => { const room = await owned(ctx); return ok({ room, placements: listPlacements(room.id) }); });
 export const PATCH = route<Ctx>(async (req, ctx) => {
   const room = await owned(ctx);
-  return ok({ room: updateRoom(room.id, RoomBody.partial().parse(await jsonBody(req))) });
+  return ok({ room: updateRoom(room.id, RoomBody.omit({ referenceSpaceId: true, measuredRoomId: true }).partial().parse(await jsonBody(req))) });
 });
 export const DELETE = route<Ctx>(async (_r, ctx) => { deleteRoom((await owned(ctx)).id); return ok({ ok: true }); });

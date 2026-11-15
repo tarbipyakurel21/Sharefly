@@ -52,6 +52,10 @@ export const RoomBody = z.object({
   widthM: z.number().min(ROOM_LIMITS.minLW, "Width should be between 1 m (3.3 ft) and 30 m (98 ft).").max(ROOM_LIMITS.maxLW, "Width should be between 1 m (3.3 ft) and 30 m (98 ft)."),
   heightM: z.number().min(ROOM_LIMITS.minH, "Ceiling height should be between 1.8 m (6 ft) and 6 m (19.7 ft).").max(ROOM_LIMITS.maxH, "Ceiling height should be between 1.8 m (6 ft) and 6 m (19.7 ft)."),
   displayUnit: z.enum(["ft", "m"]).default("ft"),
+  /** Optional: id of a reference space. The server looks it up; the client never supplies source details. */
+  referenceSpaceId: z.string().min(1).max(60).optional(),
+  /** Optional: id of a Matterport room of that space. The server re-reads its size; the client never claims it is measured. */
+  measuredRoomId: z.string().min(1).max(80).optional(),
 });
 
 export const PlacementsBody = z.object({

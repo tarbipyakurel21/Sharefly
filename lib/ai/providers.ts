@@ -30,28 +30,10 @@ class MockProvider implements AIProvider {
   }
 }
 
-class AnthropicProvider implements AIProvider {
-  readonly name = "anthropic";
-  private async call(input: { imageBytes: Uint8Array; mimeType: string }, signal: AbortSignal): Promise<unknown> {
-    const env = getEnv();
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST", signal,
-      headers: { "content-type": "application/json", "x-api-key": env.ANTHROPIC_API_KEY!, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({
-        model: env.ANTHROPIC_MODEL, max_tokens: 400,
-        messages: [{ role: "user", content: [
-          { type: "image", source: { type: "base64", media_type: input.mimeType, data: Buffer.from(input.imageBytes).toString("base64") } },
-          { type: "text", text: DESCRIBE_PROMPT },
-        ] }],
-      }),
-    });
-    if (!res.ok) throw new Error(`provider status ${res.status}`); // never include body/headers
-    const data = (await res.json()) as { content?: { type: string; text?: string }[] };
-    const text = data.content?.find((c) => c.type === "text")?.text ?? "";
-    const m = text.match(/\{[\s\S]*\}/);
-    if (!m) throw new Error("no json");
-    return JSON.parse(m[0]);
-  }
+/** Shared timeout + retry + schema validation. Subclasses only implement the HTTP call. */
+abstract class HttpVisionProvider implements AIProvider {
+  abstract readonly name: string;
+  protected abstract call(input: { imageBytes: Uint8Array; mimeType: string }, signal: AbortSignal): Promise<unknown>;
   async describeItem(input: { imageBytes: Uint8Array; mimeType: string }): Promise<DescribeResult> {
     let lastTimeout = false;
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -69,9 +51,59 @@ class AnthropicProvider implements AIProvider {
   }
 }
 
+function extractJson(text: string): unknown {
+  const m = text.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error("no json");
+  return JSON.parse(m[0]);
+}
+
+class AnthropicProvider extends HttpVisionProvider {
+  readonly name = "anthropic";
+  protected async call(input: { imageBytes: Uint8Array; mimeType: string }, signal: AbortSignal): Promise<unknown> {
+    const env = getEnv();
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST", signal,
+      headers: { "content-type": "application/json", "x-api-key": env.ANTHROPIC_API_KEY!, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({
+        model: env.ANTHROPIC_MODEL, max_tokens: 400,
+        messages: [{ role: "user", content: [
+          { type: "image", source: { type: "base64", media_type: input.mimeType, data: Buffer.from(input.imageBytes).toString("base64") } },
+          { type: "text", text: DESCRIBE_PROMPT },
+        ] }],
+      }),
+    });
+    if (!res.ok) throw new Error(`provider status ${res.status}`); // never include body/headers
+    const data = (await res.json()) as { content?: { type: string; text?: string }[] };
+    return extractJson(data.content?.find((c) => c.type === "text")?.text ?? "");
+  }
+}
+
+class GeminiProvider extends HttpVisionProvider {
+  readonly name = "gemini";
+  protected async call(input: { imageBytes: Uint8Array; mimeType: string }, signal: AbortSignal): Promise<unknown> {
+    const env = getEnv();
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(env.GEMINI_MODEL)}:generateContent`;
+    const res = await fetch(url, {
+      method: "POST", signal,
+      headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY! }, // key in header, never in the URL
+      body: JSON.stringify({
+        contents: [{ parts: [
+          { inline_data: { mime_type: input.mimeType, data: Buffer.from(input.imageBytes).toString("base64") } },
+          { text: DESCRIBE_PROMPT },
+        ] }],
+        generationConfig: { responseMimeType: "application/json", maxOutputTokens: 2048 },
+      }),
+    });
+    if (!res.ok) throw new Error(`provider status ${res.status}`); // never include body/headers
+    const data = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+    return extractJson(data.candidates?.[0]?.content?.parts?.find((p) => p.text)?.text ?? "");
+  }
+}
+
 export function getAIProvider(): AIProvider {
   const env = getEnv();
   if (env.AI_PROVIDER === "mock") return new MockProvider();
   if (env.AI_PROVIDER === "anthropic" && env.ANTHROPIC_API_KEY) return new AnthropicProvider();
+  if (env.AI_PROVIDER === "gemini" && env.GEMINI_API_KEY) return new GeminiProvider();
   return new NoneProvider();
 }

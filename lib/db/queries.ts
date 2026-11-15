@@ -1,5 +1,6 @@
 import { getDb, newId, nowIso } from "./client";
 import type { Category } from "@/lib/categories";
+import { RoomSourceSchema, type RoomSource } from "@/lib/reference-spaces/types";
 import { lookupNeighborhood } from "@/lib/geo/neighborhoods";
 import type { Listing, ListingStatus, MatchRow, Notification, Pickup, PickupStatusT, Placement, Room, User, Wishlist, Driver } from "./types";
 
@@ -198,17 +199,24 @@ export const markNotificationsRead = (userId: string, id?: string) => {
 };
 
 // ---------- rooms ----------
-const toRoom = (r: Row): Room => ({ id: r.id, userId: r.user_id, name: r.name, lengthM: r.length_m, widthM: r.width_m, heightM: r.height_m, displayUnit: r.display_unit, createdAt: r.created_at, updatedAt: r.updated_at });
+const parseSource = (raw: unknown): RoomSource | null => {
+  if (typeof raw !== "string") return null;
+  try { const p = RoomSourceSchema.safeParse(JSON.parse(raw)); return p.success ? p.data : null; } catch { return null; }
+};
+const toRoom = (r: Row): Room => ({ id: r.id, userId: r.user_id, name: r.name, lengthM: r.length_m, widthM: r.width_m, heightM: r.height_m, displayUnit: r.display_unit, source: parseSource(r.source), createdAt: r.created_at, updatedAt: r.updated_at });
 export const listRooms = (userId: string): Room[] => getDb().prepare("SELECT * FROM rooms WHERE user_id=? ORDER BY created_at").all(userId).map(toRoom);
 export const getRoom = (id: string): Room | null => { const r = getDb().prepare("SELECT * FROM rooms WHERE id=?").get(id); return r ? toRoom(r) : null; };
-export function createRoom(userId: string, r: { name: string; lengthM: number; widthM: number; heightM: number; displayUnit: "ft" | "m" }, id?: string): Room {
+export function createRoom(userId: string, r: { name: string; lengthM: number; widthM: number; heightM: number; displayUnit: "ft" | "m"; source?: RoomSource | null }, id?: string): Room {
   const rid = id ?? newId(); const t = nowIso();
-  getDb().prepare("INSERT INTO rooms (id,user_id,name,length_m,width_m,height_m,display_unit,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?)").run(rid, userId, r.name, r.lengthM, r.widthM, r.heightM, r.displayUnit, t, t);
+  getDb().prepare("INSERT INTO rooms (id,user_id,name,length_m,width_m,height_m,display_unit,source,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)").run(rid, userId, r.name, r.lengthM, r.widthM, r.heightM, r.displayUnit, r.source ? JSON.stringify(r.source) : null, t, t);
   return getRoom(rid)!;
 }
 export function updateRoom(id: string, r: Partial<{ name: string; lengthM: number; widthM: number; heightM: number; displayUnit: "ft" | "m" }>) {
   const c = getRoom(id); if (!c) return null; const m = { ...c, ...r };
-  getDb().prepare("UPDATE rooms SET name=?,length_m=?,width_m=?,height_m=?,display_unit=?,updated_at=? WHERE id=?").run(m.name, m.lengthM, m.widthM, m.heightM, m.displayUnit, nowIso(), id);
+  // A size that was measured by Matterport stops being labelled as such once it is edited.
+  const edited = m.lengthM !== c.lengthM || m.widthM !== c.widthM || m.heightM !== c.heightM;
+  const source = c.source && c.source.dimensions === "matterport" && edited ? { ...c.source, dimensions: "adjusted" as const } : c.source;
+  getDb().prepare("UPDATE rooms SET name=?,length_m=?,width_m=?,height_m=?,display_unit=?,source=?,updated_at=? WHERE id=?").run(m.name, m.lengthM, m.widthM, m.heightM, m.displayUnit, source ? JSON.stringify(source) : null, nowIso(), id);
   return getRoom(id);
 }
 export const deleteRoom = (id: string) => { getDb().prepare("DELETE FROM rooms WHERE id=?").run(id); };

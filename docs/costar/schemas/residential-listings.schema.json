@@ -1,0 +1,5160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ResidentialListingDetail",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Id of the MLS (multiple listing service) listing; each record in this file is one MLS listing."
+    },
+    "residentialListingId": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Id of one attempt to sell or rent one home, shared by every MLS listing of that home and attempt. Several records can have the same value."
+    },
+    "propertyId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Id of the home itself: a house, or one condo or apartment unit."
+    },
+    "transactionType": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TransactionType"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Whether the listing is for sale or for rent. Filter on this before comparing prices, because rentals carry monthly rent."
+    },
+    "listingStatus": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ListingStatus2"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "MLS status of the listing: active, contract (under contract), sold (which also covers a leased rental), inactive or removed."
+    },
+    "forSaleStatus": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ForSaleStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Homes.com for-sale status of the listing, such as for sale, under contract, sold or recently off market. Null on rentals."
+    },
+    "forRentStatus": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ForRentStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Homes.com for-rent status of the listing, such as for rent or rented. Filled only on rentals."
+    },
+    "listDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Date the listing was put on the market, as an ISO 8601 date-time."
+    },
+    "offMarketDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Date the listing went off the market, as an ISO 8601 date-time."
+    },
+    "contractDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Date the home went under contract, as an ISO 8601 date-time."
+    },
+    "closeDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Closing date of the sale, or the lease date for a rental, as an ISO 8601 date-time. Filled mainly on sold listings."
+    },
+    "availabilityDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Date a rental or new home becomes available, as an ISO 8601 date-time. Filled on few listings."
+    },
+    "certifiedDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Date a new-home listing was last certified or updated by the builder, as an ISO 8601 date-time. Filled on few listings."
+    },
+    "closePrice": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Final price at closing in US dollars: the sale price for a sale, or the agreed monthly rent for a rental. Null on Texas sold or recently-off-market for-sale listings, because Texas does not disclose sale prices."
+    },
+    "currentPrice": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Current asking price in US dollars: the list price for a sale or the monthly rent for a rental. On a sold listing it is the last asking price before the sale. Null on Texas sold or recently-off-market for-sale listings, because Texas does not disclose sale prices."
+    },
+    "listPriceMax": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Highest list price in US dollars across a new-home floor plan's listings. Filled on few listings."
+    },
+    "listPriceMin": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Lowest list price in US dollars across a new-home floor plan's listings. Filled on few listings."
+    },
+    "rentMax": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Highest monthly rent in US dollars for the rental listing. Filled on rentals only."
+    },
+    "rentMin": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Lowest monthly rent in US dollars for the rental listing. Filled on rentals only."
+    },
+    "listingType": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ListingType2"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Kind of sale, such as resale, new home, short sale or foreclosure. Bit flags: a value can combine several codes."
+    },
+    "dom": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Days on market: the number of days the listing has been on the market."
+    },
+    "domDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Date on which `dom` was last counted, as an ISO 8601 date-time."
+    },
+    "virtualDateOnMarket": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Date on market adjusted to account for time the home spent off the market, as an ISO 8601 date-time."
+    },
+    "monetaryUnit": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MonetaryUnit"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Currency of the prices on the listing; every listing in this kit uses US dollars."
+    },
+    "originalPrice": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Asking price when the listing was first put on the market, in US dollars (monthly rent for a rental). Null on Texas sold or recently-off-market for-sale listings, because Texas does not disclose sale prices."
+    },
+    "removedDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Date the listing was removed from Homes.com, as an ISO 8601 date-time. Filled on few listings."
+    },
+    "remarks": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The agent's public marketing description of the home, as free text."
+    },
+    "sourceNumber": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The MLS number of the listing, the number agents use to find it in their MLS."
+    },
+    "altSourceNumber": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "A second MLS number for the listing, when the MLS uses one. Filled on few listings."
+    },
+    "specialFeatures": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ListingSpecialFeatures"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Marketing flags on the listing, such as new home, price reduction or virtual tour. Bit flags: a value can combine several codes."
+    },
+    "resoValues": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ListingResoValues"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Standardized listing features (RESO, the real estate data standard) such as heating, cooling, pool, HOA fees and parking."
+    },
+    "property": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Property"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The home the listing is for: its address, type, size, beds and baths, and the other listings of the same home."
+    },
+    "media": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/Media"
+      },
+      "description": "Photos, 3D tours, videos and floor plans of the listing."
+    },
+    "agents": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/MlsAgent"
+      },
+      "description": "The agents on the listing, such as the listing agent, with their contact and brokerage details."
+    },
+    "openHouses": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/ListingOpenHouse"
+      },
+      "description": "Open houses scheduled for the listing. Filled on few listings."
+    },
+    "permissionLevels": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ListingPermissionLevels"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Access levels that control who may see parts of the listing on Homes.com."
+    },
+    "newHomesInfo": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NewHomesInfo"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Extra details for new-construction listings, such as the community, builder and floor plan. Filled on few listings."
+    },
+    "offices": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/MlsOffice"
+      },
+      "description": "The MLS offices (brokerages) on the listing, with their contact details."
+    },
+    "source": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Source"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Where the listing information came from: the MLS listing id and kind of data."
+    },
+    "history": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/ListingHistory"
+      },
+      "description": "Events in the life of the listing, such as new, price change, under contract and sold."
+    },
+    "isPrimaryForThisListingInstance": {
+      "type": "boolean",
+      "description": "Whether this is the primary MLS listing among those of the same sale or rent attempt."
+    },
+    "attributionContact": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Contact for crediting the listing under IDX rules, such as a phone number or email. Filled on few listings."
+    },
+    "displayPrice": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DisplayPrice"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Price information Homes.com shows to the public for a sold or recently off-market home: recent sale values and the latest automated value estimate."
+    },
+    "has3DTour": {
+      "type": "boolean",
+      "description": "Whether the listing has a 3D tour."
+    },
+    "hasOtherRecentlySoldOrOffMarketListings": {
+      "type": "boolean",
+      "description": "Whether the home has other recently sold or off-market listings."
+    },
+    "hasVideo": {
+      "type": "boolean",
+      "description": "Whether the listing has a video."
+    },
+    "costarFeatureValues": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CostarFeatureValues"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Home features detected by CoStar from photos and listing text, as a counterpart to resoValues."
+    },
+    "isInCondoBuilding": {
+      "type": "boolean",
+      "description": "Whether the home is part of a condo building."
+    },
+    "mls": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Mls"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The MLS (multiple listing service) that supplied the listing and its display rules."
+    }
+  },
+  "$defs": {
+    "ListingResoValues": {
+      "type": "object",
+      "properties": {
+        "architecturalStyleType": {
+          "$ref": "#/$defs/ArchitecturalStyleType",
+          "description": "Architectural style of the home, such as traditional or contemporary. Bit flags: a value can combine several codes."
+        },
+        "coolingType": {
+          "$ref": "#/$defs/CoolingType",
+          "description": "Cooling systems the home has, such as central air. Bit flags: a value can combine several codes."
+        },
+        "hasBasement": {
+          "type": "boolean",
+          "description": "Whether the home has a basement."
+        },
+        "hasGarage": {
+          "type": "boolean",
+          "description": "Whether the home has a garage."
+        },
+        "hasFireplace": {
+          "type": "boolean",
+          "description": "Whether the home has a fireplace."
+        },
+        "hasHardwoodFloors": {
+          "type": "boolean",
+          "description": "Whether the home has hardwood floors."
+        },
+        "hasInLawSuite": {
+          "type": "boolean",
+          "description": "Whether the home has an in-law suite."
+        },
+        "hasSpa": {
+          "type": "boolean",
+          "description": "Whether the home has a spa or hot tub."
+        },
+        "hasDishwasher": {
+          "type": "boolean",
+          "description": "Whether the home has a dishwasher."
+        },
+        "hasElevator": {
+          "type": "boolean",
+          "description": "Whether the building has an elevator."
+        },
+        "hasGym": {
+          "type": "boolean",
+          "description": "Whether the home or building has a gym."
+        },
+        "hasGolfCourse": {
+          "type": "boolean",
+          "description": "Whether the home is on or next to a golf course."
+        },
+        "hasAccessibilityFeatures": {
+          "type": "boolean",
+          "description": "Whether the home has accessibility features."
+        },
+        "hasStorage": {
+          "type": "boolean",
+          "description": "Whether the home has extra storage space."
+        },
+        "hasWasherDryer": {
+          "type": "boolean",
+          "description": "Whether the home has a washer and dryer."
+        },
+        "heatingType": {
+          "$ref": "#/$defs/HeatingType",
+          "description": "Heating systems the home has, such as forced air or electric. Bit flags: a value can combine several codes."
+        },
+        "hoa": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ListingResoValuesHoa"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Homeowners association (HOA) details for the home."
+        },
+        "isWaterfront": {
+          "type": "boolean",
+          "description": "Whether the home is on the waterfront."
+        },
+        "isNearPublicTransportation": {
+          "type": "boolean",
+          "description": "Whether the home is near public transportation."
+        },
+        "isPetFriendly": {
+          "type": "boolean",
+          "description": "Whether pets are allowed."
+        },
+        "lotType": {
+          "$ref": "#/$defs/LotType",
+          "description": "Features of the lot, such as corner lot or cul-de-sac. Bit flags: a value can combine several codes."
+        },
+        "listingDatesPriceChangeTimestamp": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Date and time of the latest price change, as an ISO 8601 date-time."
+        },
+        "listingStandardStatus": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Numeric code for the RESO standard listing status, such as active, pending or closed; the codes are not decoded in this kit."
+        },
+        "listingContractSpecialListingConditions": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Numeric code for special conditions of the listing contract, such as short sale or auction; the codes are not decoded in this kit."
+        },
+        "listPrice": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "List price in US dollars (monthly rent for a rental). Null on Texas sold or recently-off-market for-sale listings, because Texas does not disclose sale prices."
+        },
+        "originalListPrice": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "First list price in US dollars (monthly rent for a rental). Null on Texas sold or recently-off-market for-sale listings, because Texas does not disclose sale prices."
+        },
+        "outdoorSpaceType": {
+          "$ref": "#/$defs/OutdoorSpaceType",
+          "description": "Outdoor spaces the home has, such as patio, balcony or yard. Bit flags: a value can combine several codes."
+        },
+        "previousListPrice": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "List price before the latest change, in US dollars. Null on Texas sold or recently-off-market for-sale listings, because Texas does not disclose sale prices."
+        },
+        "poolType": {
+          "$ref": "#/$defs/PoolType",
+          "description": "Kind of pool the home has, such as private or community. Bit flags: a value can combine several codes."
+        },
+        "propertyConditionType": {
+          "$ref": "#/$defs/PropertyConditionType",
+          "description": "Condition of the property, such as new construction or needs repair."
+        },
+        "roomType": {
+          "$ref": "#/$defs/RoomType2",
+          "description": "Special rooms the home has, such as a den, office or game room. Bit flags: a value can combine several codes."
+        },
+        "securityFeatureType": {
+          "$ref": "#/$defs/SecurityFeatureType",
+          "description": "Security features the home has, such as gated entry or alarm system. Bit flags: a value can combine several codes."
+        },
+        "structure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ListingResoValuesStructure"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Building details such as stories, year built, parking and fireplaces."
+        },
+        "totalLandLeaseFeesPerMonth": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Monthly land lease fee in US dollars, for homes on leased land. Filled on few listings."
+        },
+        "viewType": {
+          "$ref": "#/$defs/ViewType",
+          "description": "Views the home has, such as city, water or mountain. Bit flags: a value can combine several codes."
+        },
+        "washerDryerType": {
+          "$ref": "#/$defs/WasherDryerType",
+          "description": "Washer and dryer arrangement, such as in-unit, hookups only or shared. Bit flags: a value can combine several codes."
+        }
+      }
+    },
+    "ListingResoValuesHoa": {
+      "type": "object",
+      "properties": {
+        "hasAssociation": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the home belongs to a homeowners association."
+        },
+        "totalFeesPerMonth": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Total HOA fees per month in US dollars."
+        },
+        "fee": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The HOA fee in US dollars, charged at the frequency given by feeFrequency."
+        },
+        "feeFrequency": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Numeric code for how often the HOA fee is charged, such as monthly or annually; the codes are not decoded in this kit."
+        },
+        "fee2": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "A second HOA fee in US dollars, charged at the frequency given by fee2Frequency. Filled on few listings."
+        },
+        "fee2Frequency": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Numeric code for how often the second HOA fee is charged; the codes are not decoded in this kit. Filled on few listings."
+        },
+        "associationName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the homeowners association or its management company."
+        },
+        "associationPhone": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Phone number of the homeowners association."
+        }
+      }
+    },
+    "ListingResoValuesStructure": {
+      "type": "object",
+      "properties": {
+        "hasNewConstruction": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the home is new construction."
+        },
+        "hasFireplace": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the home has a fireplace."
+        },
+        "fireplacesTotal": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Number of fireplaces in the home."
+        },
+        "stories": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Number of stories (floors) of the home or unit."
+        },
+        "storiesTotal": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Total number of stories of the building."
+        },
+        "yearBuilt": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Year the home was built."
+        },
+        "parkingTotal": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Total number of parking spaces."
+        },
+        "garageSpaces": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of garage parking spaces."
+        },
+        "hasCarport": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the home has a carport."
+        },
+        "carportSpaces": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of carport parking spaces. Filled on few listings."
+        },
+        "coveredSpaces": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of covered parking spaces. Filled on few listings."
+        },
+        "openParkingSpaces": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of open parking spaces. Filled on few listings."
+        },
+        "hasBasement": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the home has a basement."
+        },
+        "hasCooling": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the home has cooling."
+        },
+        "hasHeating": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the home has heating."
+        },
+        "architecturalStyle": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Architectural style of the home as free text, such as Traditional or Contemporary."
+        }
+      }
+    },
+    "Property": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Address"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Location of the home: street address, city, ZIP, coordinates and the areas it falls in."
+        },
+        "propertyType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ListingPropertyType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Type of home, such as detached house, townhouse or condo."
+        },
+        "listingPropertyType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ListingPropertyType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Type of home as given on the listing, such as detached house, townhouse or condo."
+        },
+        "propertyTypeSource": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AttributeSource"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Where the property type came from, such as the listing, public records or CoStar features."
+        },
+        "mlsPropertyType": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Property type text as the MLS reports it, such as Residential, Detached."
+        },
+        "bathsMin": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Lowest number of bathrooms; a half bath counts as 0.5. Equal to bathsMax for a single home."
+        },
+        "bathsMax": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "description": "Highest number of bathrooms; a half bath counts as 0.5."
+        },
+        "bathsFull": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Number of full bathrooms."
+        },
+        "bathsHalf": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Number of half bathrooms."
+        },
+        "bedsMin": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Lowest number of bedrooms. Equal to bedsMax for a single home."
+        },
+        "bedsMax": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Highest number of bedrooms."
+        },
+        "garageSpacesMax": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Highest number of garage spaces. Filled on few listings."
+        },
+        "garageSpacesMin": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Lowest number of garage spaces. Filled on few listings."
+        },
+        "lotSizeAcresMin": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Lot size in acres. Equal to lotSizeAcresMax for a single home."
+        },
+        "lotSizeAcresMax": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Largest lot size in acres."
+        },
+        "lotSizeSource": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AttributeSource"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Where the lot size came from, such as the listing or public records."
+        },
+        "model": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Builder's floor plan name for a new home. Filled on few listings."
+        },
+        "ownership": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Kind of ownership, such as Full Ownership or Fractional Ownership."
+        },
+        "sqftMin": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Living area in square feet. Equal to sqftMax for a single home."
+        },
+        "sqftMax": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Largest living area in square feet."
+        },
+        "sqftSource": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AttributeSource"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Where the square footage came from, such as the listing or public records."
+        },
+        "stories": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Number of stories of the home."
+        },
+        "subdivision": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the subdivision the home is in."
+        },
+        "taxes": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Annual property tax in US dollars, as reported by the MLS."
+        },
+        "totalParkingSpaces": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Total number of parking spaces."
+        },
+        "unitsCount": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Number of units in the building, for condos and multi-unit homes."
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Path of the home's page on Homes.com, made of state, city and street. Null on the 4 listings whose address is hidden from the public."
+        },
+        "yearBuilt": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Year the home was built."
+        },
+        "yearBuiltSource": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AttributeSource"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Where the year built came from, such as the listing or public records."
+        },
+        "listings": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/PropertyListing"
+          },
+          "description": "The MLS listings of the same home, usually including this one, with their status, dates and prices."
+        }
+      }
+    },
+    "Address": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the residential property (the parcel or building) that contains the home. A condo building has one property and many homes."
+        },
+        "buildingName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the building, for condos and apartments. Filled on few listings."
+        },
+        "city": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "City of the home."
+        },
+        "countryCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Three-letter country code; USA on every listing."
+        },
+        "streetNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "House or building number. Null on the 4 listings whose address is hidden from the public."
+        },
+        "streetName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Street name without number, direction or type. Null on the 4 listings whose address is hidden from the public."
+        },
+        "streetDirPrefix": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Direction before the street name, such as N or W. Filled on few listings."
+        },
+        "streetDirSuffix": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Direction after the street name, such as N or S. Filled on few listings."
+        },
+        "streetSuffix": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Street type, such as St, Ave or Dr."
+        },
+        "fullStreetAddress": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Full street address on one line. Null on the 4 listings whose address is hidden from the public."
+        },
+        "floorNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Floor the unit is on, for condos and apartments. Filled on few listings."
+        },
+        "unitNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Unit or apartment number, for condos, townhomes and apartments."
+        },
+        "latitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Latitude of the home in decimal degrees. Null on the 4 listings whose address is hidden from the public."
+        },
+        "longitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Longitude of the home in decimal degrees. Null on the 4 listings whose address is hidden from the public."
+        },
+        "modelName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Builder's floor plan name for a new home, such as Plan 1925. Filled on few listings."
+        },
+        "state": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Two-letter US state of the home: TX for Houston or CA for Los Angeles."
+        },
+        "zip": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Five-digit ZIP code."
+        },
+        "areas": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Area"
+          },
+          "description": "List of geographic areas the home falls in, such as state, county, city, neighborhood and school district."
+        },
+        "cityMetadata": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CityMetadata"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Display information about the city of the home."
+        },
+        "communityId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the new-home community the address belongs to. Filled on few listings."
+        }
+      }
+    },
+    "Area": {
+      "type": "object",
+      "properties": {
+        "enterpriseEntityType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EnterpriseEntityType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Kind of area, such as state, county, city or neighborhood."
+        },
+        "enterpriseEntitySubType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EnterpriseEntitySubType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "More specific kind of the area when there is one."
+        },
+        "enterpriseEntityId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the area, to be read together with its type."
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the area, such as Texas or Houston."
+        },
+        "isPreferred": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether this is the preferred area of its kind for the home."
+        },
+        "associatedCityId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the city the area is associated with."
+        },
+        "neighborhoodId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the neighborhood, when the area is a neighborhood."
+        },
+        "isCommunityProjectSchool": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the area is marked as a community project school. Filled on few listings."
+        },
+        "naturalFeatureType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NaturalFeatureType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Kind of natural feature the area is, such as a park or water body; 0 means none."
+        },
+        "neighborhoodType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NeighborhoodType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Kind of neighborhood the area is."
+        }
+      }
+    },
+    "CityMetadata": {
+      "type": "object",
+      "properties": {
+        "cityDisplayName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "City name as Homes.com displays it."
+        }
+      }
+    },
+    "PropertyListing": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of that MLS listing; the entry for this record has the record's own `id`."
+        },
+        "listingInstanceId": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the sale or rent attempt the listing belongs to; matches residentialListingId."
+        },
+        "listingStatus": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ListingStatus2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "MLS status of that listing, such as active, under contract or sold."
+        },
+        "transactionType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TransactionType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Whether that listing is for sale or for rent."
+        },
+        "closeDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Closing date of that listing, as an ISO 8601 date-time."
+        },
+        "listDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "List date of that listing, as an ISO 8601 date-time."
+        },
+        "mlsId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the MLS that supplied that listing."
+        },
+        "permissionLevels": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ListingPermissionLevels"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Access levels that control who may see parts of that listing on Homes.com."
+        },
+        "forSaleListingStatus": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ForSaleStatus"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Homes.com for-sale status of that listing. Null on rentals."
+        },
+        "forRentListingStatus": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ForRentStatus"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Homes.com for-rent status of that listing. Filled only on rentals."
+        },
+        "isPrimary": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether this is the primary listing of the home."
+        },
+        "isPrimaryForThisListingInstance": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether this is the primary listing of its sale or rent attempt."
+        },
+        "closePrice": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Closing price of that listing in US dollars. Null on Texas sale listings that are sold or recently off market, because Texas does not disclose sale prices."
+        },
+        "currentPrice": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Current asking price of that listing in US dollars (monthly rent for a rental). Null on Texas sale listings that are sold or recently off market, because Texas does not disclose sale prices."
+        },
+        "originalPrice": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "First asking price of that listing in US dollars (monthly rent for a rental). Null on Texas sale listings that are sold or recently off market, because Texas does not disclose sale prices."
+        }
+      }
+    },
+    "ListingPermissionLevels": {
+      "type": "object",
+      "properties": {
+        "homes": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 255,
+          "description": "Minimum Homes.com user level allowed to see the listing on Homes.com of that listing; 10 is public and higher values are restricted."
+        }
+      }
+    },
+    "Media": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "description": "Id of the media item."
+        },
+        "caption": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Caption of the media item."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Description of the media item, such as the room shown. MLS media only."
+        },
+        "displayOrder": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Position of the item in the MLS photo order. MLS media only."
+        },
+        "type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MediaType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Kind of media item, such as photo, 3D tour, floor plan or map."
+        },
+        "uri": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Link to the media item: a photo or map at homes.com, a Matterport tour at my.matterport.com, or a video or tour on another site. Photo links use image size 112; replace the /112/ path segment for another size. Map links are 1800x1200. Matterport links use the ids of the copies made for this kit, the same ids as in residential-listings.csv."
+        },
+        "videoKey": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Key that identifies a video or 3D tour, for example the id after m= in a Matterport tour link."
+        },
+        "height": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Height of the image in pixels."
+        },
+        "width": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Width of the image in pixels."
+        },
+        "fileExtension": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "File extension of the item, such as Jpg. Filled on few listings."
+        },
+        "entityId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the listing, unit or floor plan the item belongs to. Filled on few listings."
+        },
+        "threeDimensionalScanType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ThreeDimensionalScanType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Vendor of the 3D tour, such as Matterport. Filled on 3D tour items."
+        },
+        "videoType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/VideoType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Hosting service of the video, such as YouTube or Vimeo."
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MediaSource"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Who supplied the media item: the MLS, CoStar or a builder."
+        },
+        "thumbnailUri": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Link to a small preview image of the item. Replace the /112/ segment of the path to get another image size (114 is 1024x1024, 210 is 2560x1440, 102 is 984x658)."
+        },
+        "externalReferenceType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExternalReferenceType4"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Numeric code for the outside system that supplied the item; mostly useful to tell CoStar scans from MLS items."
+        },
+        "scenes": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/SceneInfo"
+          },
+          "description": "Labels from automatic image analysis of the photo, such as the kind of room or amenity shown."
+        },
+        "altText": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Alternative text describing the image, generated automatically."
+        },
+        "computerVisionKeywords": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "Names of the home features detected in the image by automatic image analysis, such as Hardwood Floor."
+        }
+      }
+    },
+    "SceneInfo": {
+      "type": "object",
+      "properties": {
+        "imageId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Id of the image the scene label belongs to."
+        },
+        "type": {
+          "$ref": "#/$defs/SceneClassificationType",
+          "description": "Kind of room or amenity detected in the image, such as kitchen, balcony or swimming pool."
+        }
+      }
+    },
+    "MlsAgent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the agent in the MLS."
+        },
+        "userId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the agent's Homes.com user account."
+        },
+        "companyName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the brokerage company the agent works for."
+        },
+        "email": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Agent's email address, as shown publicly on Homes.com."
+        },
+        "firstName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Agent's first name."
+        },
+        "lastName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Agent's last name."
+        },
+        "bio": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Agent's biography, as shown publicly on Homes.com."
+        },
+        "role": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ListingAgentRole"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Role of the agent on the listing, such as listing agent or selling agent. Bit flags: a value can combine several codes."
+        },
+        "mlsId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the MLS the agent belongs to."
+        },
+        "mlsOfficeId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the MLS office the agent works from; matches an id in offices."
+        },
+        "isActive": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the MLS agent record is active."
+        },
+        "profileImage": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Link to the agent's profile photo. Replace the /112/ segment of the path to get another size."
+        },
+        "website": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri",
+          "description": "Agent's website. Filled on few listings."
+        },
+        "phoneNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Agent's phone number, as shown publicly on Homes.com."
+        },
+        "phoneType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EnterprisePhoneType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Kind of the agent's phone number, such as mobile or office."
+        },
+        "licenseState": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "US state of the agent's license."
+        },
+        "brokerageName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the brokerage brand, such as RE/MAX. Filled on few listings."
+        },
+        "brokerageId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the brokerage brand. Filled on few listings."
+        },
+        "officePhoneNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Phone number of the agent's office."
+        },
+        "officeEmailAddress": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Email address of the agent's office."
+        },
+        "locationId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the brokerage location the agent is attached to."
+        }
+      }
+    },
+    "ListingOpenHouse": {
+      "type": "object",
+      "properties": {
+        "openHouseDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date of the open house, as an ISO 8601 date-time."
+        },
+        "openHouseBegins": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Start of the open house in the home's local time, written as an ISO 8601 date-time."
+        },
+        "openHouseBeginsUtc": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Start of the open house in UTC, as an ISO 8601 date-time."
+        },
+        "openHouseClose": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "End of the open house in the home's local time, written as an ISO 8601 date-time."
+        },
+        "openHouseCloseUtc": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "End of the open house in UTC, as an ISO 8601 date-time."
+        },
+        "remarks": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Agent's remarks about the open house, as free text."
+        },
+        "refreshments": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Refreshments offered at the open house, as free text."
+        },
+        "timeZoneId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the time zone of the local start and end times."
+        }
+      }
+    },
+    "NewHomesInfo": {
+      "type": "object",
+      "properties": {
+        "listingId": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the new-home listing as Homes.com search uses it."
+        },
+        "newHomesType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NewHomesListingType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Kind of new-home listing, such as floor plan or move-in ready home."
+        },
+        "community": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Community"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The new-home community the listing belongs to."
+        },
+        "communityProject": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CommunityProject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The new-home project (a group of homes being built together) the listing belongs to."
+        },
+        "floorPlan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FloorPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The builder's floor plan of the home. Filled on few listings."
+        },
+        "moveInReady": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MoveInReady"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Details for a move-in ready new home. Filled on few listings."
+        }
+      }
+    },
+    "Community": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the community."
+        },
+        "primaryNeigborhoodId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the neighborhood the community is mainly in."
+        },
+        "developerInfo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DeveloperInfo"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The developer of the community."
+        }
+      }
+    },
+    "DeveloperInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the developer."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Description of the developer, as free text."
+        },
+        "logoUrl": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Link to the developer's logo. Replace the /112/ segment of the path to get another size."
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the developer."
+        },
+        "phoneNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Phone number of the developer."
+        },
+        "websiteUrl": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Website of the developer."
+        },
+        "address": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Address2"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Business address of the developer."
+        }
+      }
+    },
+    "Address2": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the developer's address."
+        },
+        "city": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "City of the developer's address."
+        },
+        "countryCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Three-letter country code of the developer's address."
+        },
+        "streetNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Street number of the developer's address."
+        },
+        "streetName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Street name of the developer's address."
+        },
+        "latitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Latitude of the developer's address in decimal degrees."
+        },
+        "longitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Longitude of the developer's address in decimal degrees."
+        },
+        "state": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Two-letter US state of the developer's address."
+        }
+      }
+    },
+    "CommunityProject": {
+      "type": "object",
+      "properties": {
+        "listingId": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the project's listing as Homes.com search uses it."
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the project."
+        },
+        "propertyId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Id of the project's property."
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Website of the project."
+        },
+        "builderInfo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BuilderInfo"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The builder of the project."
+        }
+      }
+    },
+    "BuilderInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the builder."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Description of the builder, as free text."
+        },
+        "logoUrl": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Link to the builder's logo. Replace the /112/ segment of the path to get another size."
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the builder."
+        },
+        "phone": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Phone number of the builder."
+        },
+        "websiteUrl": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Website of the builder."
+        }
+      }
+    },
+    "FloorPlan": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the floor plan."
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Link to the floor plan on the builder's website."
+        }
+      }
+    },
+    "MoveInReady": {
+      "type": "object",
+      "properties": {
+        "floorPlanName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the floor plan the move-in ready home is built from."
+        },
+        "mlsFloorPlanListingId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the MLS listing of that floor plan."
+        }
+      }
+    },
+    "MlsOffice": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the MLS office; matches agents.mlsOfficeId."
+        },
+        "brokerageID": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the brokerage brand. Filled on few listings."
+        },
+        "city": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "City of the office."
+        },
+        "countryCode": {
+          "type": "string",
+          "description": "Three-letter country code of the office."
+        },
+        "email": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Email address of the office."
+        },
+        "fax": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Fax number of the office."
+        },
+        "fullStreetAddress": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Street address of the office."
+        },
+        "isActive": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the MLS office record is active."
+        },
+        "latitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Latitude of the office in decimal degrees. Filled on few listings."
+        },
+        "longitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Longitude of the office in decimal degrees. Filled on few listings."
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the office."
+        },
+        "phoneNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Phone number of the office."
+        },
+        "role": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Numeric code for the office's role on the listing, such as listing office; the codes are not decoded in this kit."
+        },
+        "status": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Numeric status code of the office; the codes are not decoded in this kit."
+        },
+        "state": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "State of the office, as an abbreviation or full name."
+        },
+        "website": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri",
+          "description": "Website of the office. Filled on few listings."
+        },
+        "zip": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "ZIP code of the office."
+        }
+      }
+    },
+    "Source": {
+      "type": "object",
+      "properties": {
+        "sourceType": {
+          "$ref": "#/$defs/SourceType",
+          "description": "Kind of data the listing comes from, such as MLS or new homes."
+        }
+      }
+    },
+    "ListingHistory": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Id of the history event."
+        },
+        "date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Date of the event, as an ISO 8601 date-time."
+        },
+        "currentPrice": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Asking price in US dollars at the time of the event (monthly rent for a rental). Null on the sold event of Texas for-sale listings, because Texas does not disclose sale prices."
+        },
+        "modificationTimestamp": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "When the event was recorded, as an ISO 8601 date-time."
+        },
+        "newValue": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Value after the change, as a number; for status changes it is a status code."
+        },
+        "newValueString": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Value after the change, as text."
+        },
+        "oldValue": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Value before the change, as a number; for status changes it is a status code."
+        },
+        "oldValueString": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Value before the change, as text."
+        },
+        "status": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ListingUpdateStatus"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Extra flags on the event, such as being a secondary event or a return to market. Bit flags: a value can combine several codes."
+        },
+        "updateType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ListingUpdateType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "What kind of change the event records, such as newly active, price change, under contract, sold or removed."
+        }
+      }
+    },
+    "DisplayPrice": {
+      "type": "object",
+      "properties": {
+        "residentialPropertyId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the residential property that contains the home; matches property.address.id."
+        },
+        "latitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Latitude of the home in decimal degrees."
+        },
+        "longitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Longitude of the home in decimal degrees."
+        },
+        "values": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/AssetValue"
+          },
+          "description": "List of price values for the home, such as the recent sale or an automated estimate. Has no estimate entries where the MLS forbids showing an estimate."
+        },
+        "isNonDisclosureState": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the home is in a non-disclosure state such as Texas, where sale prices are not public."
+        },
+        "latestAVM": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AVM"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The latest automated value estimate (AVM) of the home with its low and high range. Null where the MLS forbids showing an estimate."
+        }
+      }
+    },
+    "AssetValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The value in US dollars."
+        },
+        "valueType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AssetValueType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "What the value is, such as an automated estimate or a recent sale price. Bit flags: a value can combine several codes."
+        },
+        "listingId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Id of the MLS listing the value comes from, when it is a recent sale."
+        }
+      }
+    },
+    "AVM": {
+      "type": "object",
+      "properties": {
+        "year": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Year of the estimate. Filled on few listings."
+        },
+        "month": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Month of the estimate, 1 to 12. Filled on few listings."
+        },
+        "high": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "High end of the estimate range, in US dollars."
+        },
+        "low": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Low end of the estimate range, in US dollars."
+        },
+        "current": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The estimated value in US dollars."
+        }
+      }
+    },
+    "CostarFeatureValues": {
+      "type": "object",
+      "properties": {
+        "coolingType": {
+          "$ref": "#/$defs/CostarFeatureCoolingType",
+          "description": "Kind of cooling detected, such as central air. Bit flags: a value can combine several codes."
+        },
+        "hasBasement": {
+          "type": "boolean",
+          "description": "Whether a basement was detected."
+        },
+        "hasFireplace": {
+          "type": "boolean",
+          "description": "Whether a fireplace was detected."
+        },
+        "hasGarage": {
+          "type": "boolean",
+          "description": "Whether a garage was detected."
+        },
+        "hasHardwoodFloors": {
+          "type": "boolean",
+          "description": "Whether hardwood floors were detected."
+        },
+        "hasInLawSuite": {
+          "type": "boolean",
+          "description": "Whether an in-law suite was detected."
+        },
+        "heatingType": {
+          "$ref": "#/$defs/CostarFeatureHeatingType",
+          "description": "Kind of heating detected, such as forced air. Bit flags: a value can combine several codes."
+        },
+        "poolType": {
+          "$ref": "#/$defs/CostarFeaturePoolType",
+          "description": "Kind of pool detected, such as private or community. Bit flags: a value can combine several codes."
+        },
+        "viewType": {
+          "$ref": "#/$defs/CostarFeatureViewType",
+          "description": "Kind of view detected, such as city or water. Bit flags: a value can combine several codes."
+        }
+      }
+    },
+    "Mls": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Id of the MLS that supplied the listing."
+        }
+      }
+    },
+    "TransactionType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "x-enum-varnames": [
+        "None",
+        "ForSale",
+        "ForRent",
+        "All"
+      ],
+      "description": "Allowed values:\n0 = None\n1 = ForSale\n2 = ForRent\n3 = All"
+    },
+    "ListingStatus2": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      "x-enum-varnames": [
+        "None",
+        "Active",
+        "Contract",
+        "Sold",
+        "Inactive",
+        "Removed"
+      ],
+      "description": "Allowed values:\n0 = None\n1 = Active\n2 = Contract\n4 = Sold\n8 = Inactive\n16 = Removed"
+    },
+    "ForSaleStatus": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "ForSale",
+        "ComingSoon",
+        "ContingentPending",
+        "UnderContract",
+        "Sold",
+        "RecentlyOffMarket"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = ForSale\n2 = ComingSoon\n3 = ContingentPending\n4 = UnderContract\n5 = Sold\n6 = RecentlyOffMarket"
+    },
+    "ForRentStatus": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "ForRent",
+        "ComingSoon",
+        "RentalAgreement",
+        "Rented",
+        "RecentlyOffMarket",
+        "Inactive",
+        "OffMarket",
+        "Upsell",
+        "SubscriptionHold",
+        "AwaitingVerification",
+        "UserDeleted",
+        "Pending",
+        "Terminate"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = ForRent\n2 = ComingSoon\n4 = RentalAgreement\n5 = Rented\n6 = RecentlyOffMarket\n7 = Inactive\n8 = OffMarket\n9 = Upsell\n10 = SubscriptionHold\n11 = AwaitingVerification\n12 = UserDeleted\n13 = Pending\n14 = Terminate"
+    },
+    "ListingType2": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "None",
+        "Resale",
+        "NewHome",
+        "ShortSale",
+        "Foreclosure",
+        "Auction",
+        "RealEstateOwned",
+        "Preforeclosure"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = None\n1 = Resale\n2 = NewHome\n4 = ShortSale\n8 = Foreclosure\n16 = Auction\n32 = RealEstateOwned\n64 = Preforeclosure"
+    },
+    "MonetaryUnit": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "UnitedStatesDollar",
+        "CanadianDollar",
+        "PoundSterling",
+        "Euro",
+        "AustralianDollar",
+        "BrazilianReal",
+        "SwissFranc",
+        "JapaneseYen",
+        "SingaporeDollar",
+        "HongKongDollar",
+        "ChineseYuan",
+        "UnitedArabEmiratesDirham",
+        "AfghanistanAfghani",
+        "AlbanianLek",
+        "ArmenianDram",
+        "NetherlandsAntilleanGuilder",
+        "AngolanKwanza",
+        "ArgentinaPeso",
+        "ArubanGuilder",
+        "AzerbaijanNewManat",
+        "BosnianMark",
+        "BarbadosDollar",
+        "BangladeshTaka",
+        "BulgarianLev",
+        "BurundiFranc",
+        "BermudianDollars",
+        "BruneiDollars",
+        "BolivianBoliviano",
+        "BahamianDollar",
+        "Bitcoin",
+        "BotswanianPula",
+        "BelarusianRuble",
+        "BelizeDollar",
+        "CongoleseFranc",
+        "ChileanPeso",
+        "ColombianPeso",
+        "CostaRicanColon",
+        "CubanPeso",
+        "CapeVerdeEscudo",
+        "CzechKoruna",
+        "DjiboutiFranc",
+        "DanishKrone",
+        "DominicanPeso",
+        "AlgerianDinar",
+        "EgyptianPound",
+        "EthiopianBirr",
+        "FijiDollars",
+        "GeorgianLari",
+        "GhanaianNewCedi",
+        "GambianDalasi",
+        "GuineanFranc",
+        "GuatemalanQuetzal",
+        "GuyanaDollar",
+        "HondurasLempira",
+        "CroatianKuna",
+        "HaitianGourde",
+        "HungarianForint",
+        "IndonesianRupiah",
+        "IsraeliShekel",
+        "IndianRupee",
+        "IraqiDinar",
+        "IranianRial",
+        "IcelandKrona",
+        "JamaicanDollar",
+        "JordanDinar",
+        "KenyanShilling",
+        "KyrgyzstaniSom",
+        "CambodiaRiel",
+        "ComorosFranc",
+        "SouthKoreanWon",
+        "KuwaitiDinar",
+        "CaymanIslandDollar",
+        "KazakhstaniTenge",
+        "LaoKip",
+        "LebanesePound",
+        "SriLankanRupee",
+        "LiberianDollar",
+        "LesothoLoti",
+        "LibyanDinar",
+        "MoroccanDirham",
+        "MoldovanLeu",
+        "MalagasyAriary",
+        "MyanmarKyat",
+        "MacauPataca",
+        "MauritanianQuguiya",
+        "MauritiusRupee",
+        "MaldivesRufiyaa",
+        "MalawiKwacha",
+        "MexicanPeso",
+        "MalaysianRinggit",
+        "MozambiqueNewMetical",
+        "NamibianDollar",
+        "NigerianNaira",
+        "NicaraguanCordobaOro",
+        "NorwegianKrone",
+        "NepalRupee",
+        "NewZealandDollar",
+        "OmaniRial",
+        "PanameanBalboa",
+        "PeruvianNuevoSol",
+        "PapuaNewGuineaKina",
+        "PhilippinePeso",
+        "PakistaniRupee",
+        "PolishZloty",
+        "ParaguayanGuarani",
+        "QatarRiyal",
+        "NewRomanianLeu",
+        "SerbianDinar",
+        "RussianRuble",
+        "RwandanFranc",
+        "SaudiRiyal",
+        "SolomonIslandsDollar",
+        "SeychellesRupee",
+        "SudanesePound",
+        "SwedishKrona",
+        "SierraLeoneLeone",
+        "SomaliShilling",
+        "SurinameDollar",
+        "SaoTomeanDobra",
+        "ElSalvadorColon",
+        "SwazilandLilangeni",
+        "ThailandBaht",
+        "TajikistanSomoni",
+        "TurkmenNewManat",
+        "TunisianDinar",
+        "TonganPaanga",
+        "TurkishLira",
+        "TrinidadianDollar",
+        "TaiwanDollar",
+        "TanzanianShilling",
+        "UkrainianHryvnia",
+        "UgandanShilling",
+        "UruguayPeso",
+        "UzbekistaniSom",
+        "VenezuelanBolivarSoberano",
+        "VietnameseDong",
+        "CentralAfricanFranc",
+        "EastCaribbeanDollar",
+        "WestAfricanFranc",
+        "FrenchPacificIslandsFranc",
+        "YemenRial",
+        "SouthAfricanRand",
+        "ZambianKwacha",
+        "BahrainiDinar",
+        "EritreanNakfa",
+        "FalklandIslandsPound",
+        "GibraltarPound",
+        "NorthKoreanWon",
+        "MongolianTughrik",
+        "SaintHelenaPound",
+        "SyrianPound",
+        "VanuatuVatu",
+        "ZimbabweanDollar",
+        "SamoanTala",
+        "BhutaneseNgultrum",
+        "MacedonianDenar"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = UnitedStatesDollar\n2 = CanadianDollar\n3 = PoundSterling\n4 = Euro\n5 = AustralianDollar\n6 = BrazilianReal\n7 = SwissFranc\n8 = JapaneseYen\n9 = SingaporeDollar\n10 = HongKongDollar\n11 = ChineseYuan\n12 = UnitedArabEmiratesDirham\n13 = AfghanistanAfghani\n14 = AlbanianLek\n15 = ArmenianDram\n16 = NetherlandsAntilleanGuilder\n17 = AngolanKwanza\n18 = ArgentinaPeso\n19 = ArubanGuilder\n20 = AzerbaijanNewManat\n21 = BosnianMark\n22 = BarbadosDollar\n23 = BangladeshTaka\n24 = BulgarianLev\n25 = BurundiFranc\n26 = BermudianDollars\n27 = BruneiDollars\n28 = BolivianBoliviano\n29 = BahamianDollar\n30 = Bitcoin\n31 = BotswanianPula\n32 = BelarusianRuble\n33 = BelizeDollar\n34 = CongoleseFranc\n35 = ChileanPeso\n36 = ColombianPeso\n37 = CostaRicanColon\n38 = CubanPeso\n39 = CapeVerdeEscudo\n40 = CzechKoruna\n41 = DjiboutiFranc\n42 = DanishKrone\n43 = DominicanPeso\n44 = AlgerianDinar\n45 = EgyptianPound\n46 = EthiopianBirr\n47 = FijiDollars\n48 = GeorgianLari\n49 = GhanaianNewCedi\n50 = GambianDalasi\n51 = GuineanFranc\n52 = GuatemalanQuetzal\n53 = GuyanaDollar\n54 = HondurasLempira\n55 = CroatianKuna\n56 = HaitianGourde\n57 = HungarianForint\n58 = IndonesianRupiah\n59 = IsraeliShekel\n60 = IndianRupee\n61 = IraqiDinar\n62 = IranianRial\n63 = IcelandKrona\n64 = JamaicanDollar\n65 = JordanDinar\n66 = KenyanShilling\n67 = KyrgyzstaniSom\n68 = CambodiaRiel\n69 = ComorosFranc\n70 = SouthKoreanWon\n71 = KuwaitiDinar\n72 = CaymanIslandDollar\n73 = KazakhstaniTenge\n74 = LaoKip\n75 = LebanesePound\n76 = SriLankanRupee\n77 = LiberianDollar\n78 = LesothoLoti\n79 = LibyanDinar\n80 = MoroccanDirham\n81 = MoldovanLeu\n82 = MalagasyAriary\n83 = MyanmarKyat\n84 = MacauPataca\n85 = MauritanianQuguiya\n86 = MauritiusRupee\n87 = MaldivesRufiyaa\n88 = MalawiKwacha\n89 = MexicanPeso\n90 = MalaysianRinggit\n91 = MozambiqueNewMetical\n92 = NamibianDollar\n93 = NigerianNaira\n94 = NicaraguanCordobaOro\n95 = NorwegianKrone\n96 = NepalRupee\n97 = NewZealandDollar\n98 = OmaniRial\n99 = PanameanBalboa\n100 = PeruvianNuevoSol\n101 = PapuaNewGuineaKina\n102 = PhilippinePeso\n103 = PakistaniRupee\n104 = PolishZloty\n105 = ParaguayanGuarani\n106 = QatarRiyal\n107 = NewRomanianLeu\n108 = SerbianDinar\n109 = RussianRuble\n110 = RwandanFranc\n111 = SaudiRiyal\n112 = SolomonIslandsDollar\n113 = SeychellesRupee\n114 = SudanesePound\n115 = SwedishKrona\n116 = SierraLeoneLeone\n117 = SomaliShilling\n118 = SurinameDollar\n119 = SaoTomeanDobra\n120 = ElSalvadorColon\n121 = SwazilandLilangeni\n122 = ThailandBaht\n123 = TajikistanSomoni\n124 = TurkmenNewManat\n125 = TunisianDinar\n126 = TonganPaanga\n127 = TurkishLira\n128 = TrinidadianDollar\n129 = TaiwanDollar\n130 = TanzanianShilling\n131 = UkrainianHryvnia\n132 = UgandanShilling\n133 = UruguayPeso\n134 = UzbekistaniSom\n135 = VenezuelanBolivarSoberano\n136 = VietnameseDong\n137 = CentralAfricanFranc\n138 = EastCaribbeanDollar\n139 = WestAfricanFranc\n140 = FrenchPacificIslandsFranc\n141 = YemenRial\n142 = SouthAfricanRand\n143 = ZambianKwacha\n144 = BahrainiDinar\n145 = EritreanNakfa\n146 = FalklandIslandsPound\n147 = GibraltarPound\n148 = NorthKoreanWon\n149 = MongolianTughrik\n150 = SaintHelenaPound\n151 = SyrianPound\n152 = VanuatuVatu\n153 = ZimbabweanDollar\n154 = SamoanTala\n155 = BhutaneseNgultrum\n156 = MacedonianDenar"
+    },
+    "ListingSpecialFeatures": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "None",
+        "OpenHouse",
+        "NewHome",
+        "ShortSaleOrForeclosure",
+        "ShortSale",
+        "Forclosure",
+        "ComingSoon",
+        "Auction",
+        "Contingent",
+        "BrokerOpen",
+        "Luxury",
+        "RealEstateOwned",
+        "PriceReduction",
+        "VirtualTour",
+        "Resale",
+        "DoNotGeocodeOrChangeAddress",
+        "DoNotUpdate"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64,
+        128,
+        256,
+        512,
+        1024,
+        2048,
+        4096,
+        268435456,
+        536870912,
+        1073741824
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = None\n1 = OpenHouse\n2 = NewHome\n4 = ShortSaleOrForeclosure\n8 = ShortSale\n16 = Forclosure\n32 = ComingSoon\n64 = Auction\n128 = Contingent\n256 = BrokerOpen\n512 = Luxury\n1024 = RealEstateOwned\n2048 = PriceReduction\n4096 = VirtualTour\n268435456 = Resale\n536870912 = DoNotGeocodeOrChangeAddress\n1073741824 = DoNotUpdate"
+    },
+    "ArchitecturalStyleType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "ArtDeco",
+        "CapeCod",
+        "Colonial",
+        "Contemporary",
+        "Cottage",
+        "Craftsman",
+        "Duplex",
+        "Farmhouse",
+        "Federal",
+        "French",
+        "Green",
+        "Log",
+        "Ranch",
+        "Spanish",
+        "SplitLevel",
+        "Traditional",
+        "Tudor",
+        "Victorian",
+        "Other",
+        "Prewar"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64,
+        128,
+        256,
+        512,
+        1024,
+        2048,
+        4096,
+        8192,
+        16384,
+        32768,
+        65536,
+        131072,
+        262144,
+        524288
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = ArtDeco\n2 = CapeCod\n4 = Colonial\n8 = Contemporary\n16 = Cottage\n32 = Craftsman\n64 = Duplex\n128 = Farmhouse\n256 = Federal\n512 = French\n1024 = Green\n2048 = Log\n4096 = Ranch\n8192 = Spanish\n16384 = SplitLevel\n32768 = Traditional\n65536 = Tudor\n131072 = Victorian\n262144 = Other\n524288 = Prewar"
+    },
+    "CoolingType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "Central",
+        "Heatpump_Geothermal",
+        "Ductless_Wall_Window",
+        "Evaporative",
+        "Other"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = Central\n2 = Heatpump_Geothermal\n4 = Ductless_Wall_Window\n8 = Evaporative\n16 = Other"
+    },
+    "HeatingType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "Central",
+        "ForcedAir",
+        "HotWater",
+        "HeatPump_Geo",
+        "Radiant",
+        "Ductless",
+        "Furnace",
+        "Other"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64,
+        128
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = Central\n2 = ForcedAir\n4 = HotWater\n8 = HeatPump_Geo\n16 = Radiant\n32 = Ductless\n64 = Furnace\n128 = Other"
+    },
+    "LotType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "Corner",
+        "CulDeSac",
+        "Interior",
+        "Private"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = Corner\n2 = CulDeSac\n4 = Interior\n8 = Private"
+    },
+    "OutdoorSpaceType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "Balcony",
+        "Deck",
+        "PorchPatio",
+        "Fenced",
+        "Storage",
+        "Terrace"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        16,
+        32
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = Balcony\n2 = Deck\n4 = PorchPatio\n8 = Fenced\n16 = Storage\n32 = Terrace"
+    },
+    "PoolType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "Private",
+        "Association",
+        "Community"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = Private\n2 = Association\n4 = Community"
+    },
+    "PropertyConditionType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Fixer",
+        "UpdatedOrRemodeled"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Fixer\n2 = UpdatedOrRemodeled"
+    },
+    "RoomType2": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "Bonus",
+        "Den",
+        "Office",
+        "Dining",
+        "Family",
+        "Gym",
+        "Excercise",
+        "InlawSuite"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64,
+        128
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = Bonus\n2 = Den\n4 = Office\n8 = Dining\n16 = Family\n32 = Gym\n64 = Excercise\n128 = InlawSuite"
+    },
+    "SecurityFeatureType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "AllDay",
+        "Building",
+        "Gated",
+        "Service",
+        "System"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = AllDay\n2 = Building\n4 = Gated\n8 = Service\n16 = System"
+    },
+    "ViewType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "Beach",
+        "Ocean",
+        "Lake",
+        "River",
+        "Bay",
+        "Mountain",
+        "Hills",
+        "Valleys",
+        "Woods",
+        "City",
+        "Other",
+        "WaterOther"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64,
+        128,
+        256,
+        512,
+        1024,
+        2048
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = Beach\n2 = Ocean\n4 = Lake\n8 = River\n16 = Bay\n32 = Mountain\n64 = Hills\n128 = Valleys\n256 = Woods\n512 = City\n1024 = Other\n2048 = WaterOther"
+    },
+    "WasherDryerType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "Included",
+        "Hookups",
+        "Building",
+        "InUnit"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = Included\n2 = Hookups\n4 = Building\n8 = InUnit"
+    },
+    "EnterpriseEntityType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "State",
+        "County",
+        "Region",
+        "Market",
+        "Submarket",
+        "Cbsa",
+        "Country",
+        "PprMetro",
+        "City",
+        "UsPostalCode",
+        "UkPostalCodeArea",
+        "UkPostalCodeDistrict",
+        "UkPostalCodeSector",
+        "UkRegion",
+        "Subdivision",
+        "PostalCode",
+        "Neighborhood",
+        "ForwardSortation",
+        "Metro",
+        "College",
+        "SchoolAttendanceZone",
+        "SchoolDistrict",
+        "Cluster",
+        "UsCensus",
+        "UniversityArea",
+        "AssetClassMarket",
+        "NeighborhoodObsolete",
+        "School",
+        "NaturalFeature",
+        "CommunityFootPrint",
+        "EnterpriseSchoolDistrict"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = State\n2 = County\n3 = Region\n4 = Market\n5 = Submarket\n6 = Cbsa\n7 = Country\n8 = PprMetro\n9 = City\n10 = UsPostalCode\n11 = UkPostalCodeArea\n12 = UkPostalCodeDistrict\n13 = UkPostalCodeSector\n14 = UkRegion\n15 = Subdivision\n16 = PostalCode\n17 = Neighborhood\n18 = ForwardSortation\n19 = Metro\n20 = College\n21 = SchoolAttendanceZone\n22 = SchoolDistrict\n23 = Cluster\n24 = UsCensus\n25 = UniversityArea\n26 = AssetClassMarket\n27 = NeighborhoodObsolete\n28 = School\n29 = NaturalFeature\n30 = CommunityFootPrint\n31 = EnterpriseSchoolDistrict"
+    },
+    "EnterpriseEntitySubType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        5,
+        6,
+        11,
+        15,
+        16
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Hospitality",
+        "Industrial",
+        "Office",
+        "Retail",
+        "MultiFamily",
+        "Residential",
+        "Homes"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Hospitality\n2 = Industrial\n5 = Office\n6 = Retail\n11 = MultiFamily\n15 = Residential\n16 = Homes"
+    },
+    "NaturalFeatureType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Beach",
+        "Ocean",
+        "Lake",
+        "River",
+        "Bay",
+        "Island",
+        "Mountain",
+        "Valley",
+        "Peninsula",
+        "Forest",
+        "MetroArea",
+        "Coast",
+        "Region",
+        "Park",
+        "Trail"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Beach\n2 = Ocean\n3 = Lake\n4 = River\n5 = Bay\n6 = Island\n7 = Mountain\n8 = Valley\n9 = Peninsula\n10 = Forest\n11 = MetroArea\n12 = Coast\n13 = Region\n14 = Park\n15 = Trail"
+    },
+    "NeighborhoodType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Cluster",
+        "Submarket",
+        "Subdivision"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Cluster\n2 = Submarket\n3 = Subdivision"
+    },
+    "ListingPropertyType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64,
+        128,
+        256,
+        512,
+        1024,
+        2048
+      ],
+      "x-enum-varnames": [
+        "None",
+        "Detached",
+        "Townhouse",
+        "Condo",
+        "Other",
+        "MultiFamily",
+        "LotsLands",
+        "MobileManufactured",
+        "Commercial",
+        "Coop",
+        "Duplex",
+        "Triplex",
+        "Quadruplex"
+      ],
+      "description": "Allowed values:\n0 = None\n1 = Detached\n2 = Townhouse\n4 = Condo\n8 = Other\n16 = MultiFamily\n32 = LotsLands\n64 = MobileManufactured\n128 = Commercial\n256 = Coop\n512 = Duplex\n1024 = Triplex\n2048 = Quadruplex"
+    },
+    "AttributeSource": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "ListingData",
+        "PropertyData",
+        "PublicRecord",
+        "CoStarFeatures",
+        "Enterprise"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = ListingData\n2 = PropertyData\n3 = PublicRecord\n4 = CoStarFeatures\n5 = Enterprise"
+    },
+    "MediaType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        137,
+        138,
+        100001,
+        100002,
+        100003
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Aerial",
+        "Financial",
+        "PrimaryPhoto",
+        "BuildingPhoto",
+        "VirtualTour",
+        "Lobby",
+        "Other",
+        "MarketingBrochureFlyer",
+        "PlatMap",
+        "FloorPlan",
+        "SitePlan",
+        "TypicalFloorPlan",
+        "Slate",
+        "PrimaryContactPhoto",
+        "Logo",
+        "Map",
+        "SixteenSquarePng",
+        "TwentyFourSquarePng",
+        "TenantPhoto",
+        "LeaseDocument",
+        "PublicFiling",
+        "Deed",
+        "TransferTaxDeclaration",
+        "PropertyRecordCard",
+        "AssignmentOfRentsAndLeases",
+        "Loan",
+        "Article",
+        "PressRelease",
+        "SecFiling",
+        "CompanyReport",
+        "MediaSource",
+        "DirectoryPhoto",
+        "InteriorPhoto",
+        "GoadMap",
+        "CommunityBrochure",
+        "PlacardLogo",
+        "PropertyLogo",
+        "ConstructionPhoto",
+        "ReinforcingAdvertisement",
+        "ProVideoApartments",
+        "CityPhoto",
+        "NeighborhoodPhoto",
+        "Matterport3DScan",
+        "ProVideoApartmentFinder",
+        "ConfidentialityAgreement",
+        "ProVideoApartamentos",
+        "CommercialListingVideo",
+        "MarketingLogo",
+        "ProVideoLoopNet",
+        "State",
+        "County",
+        "MilitaryBase",
+        "CollegeUniversity",
+        "ArticleVideo",
+        "AerialVideo",
+        "ThermalVideo",
+        "UavVideo",
+        "ProVideoForRent",
+        "PlacardPrimaryPhoto",
+        "ShortUavVideo",
+        "PlacardLogoVector",
+        "PlaneView",
+        "ProfileCoverDesktopResidential",
+        "PlacardHighlightPhoto",
+        "PlacardHighlightVideo",
+        "AmenityPhoto",
+        "AmenityVideo",
+        "ProfileCoverMobileResidential",
+        "ProfileCoverDesktopCommercial",
+        "ProfileCoverMobileCommercial",
+        "LandRegistry",
+        "CollegeLogo",
+        "TenantExternalPhoto",
+        "TenantInternalPhoto",
+        "PylonPhoto",
+        "StockPhoto",
+        "CoverPagePhoto",
+        "SpaceManagerPhoto",
+        "ResidentialListingVideo",
+        "OfferingMemorandum",
+        "BrandExteriorPhoto",
+        "BrandInteriorPhoto",
+        "NeighborhoodVideo",
+        "NeighborhoodVideoClip",
+        "ParkVideo",
+        "ParkVideoClip",
+        "SchoolVideo",
+        "SchoolVideoClip",
+        "CondoBuildingVideo",
+        "CondoBuildingVideoClip",
+        "VideoProjectFile",
+        "AudioFile",
+        "ProductionScript",
+        "ParkPhoto",
+        "SchoolPhoto",
+        "CaseDocument",
+        "ViewFromUnit",
+        "AgentVideo",
+        "AgentVideoClip",
+        "StockVideo",
+        "RetailBrandRequirement",
+        "NeighborhoodEventPhoto",
+        "CityVideo",
+        "CityVideoClip",
+        "TransportationLogo",
+        "TextMessagePhoto",
+        "AgencyFees",
+        "MarketingHeroImage",
+        "AreaGuidePhoto",
+        "AreaGuideVideoClip",
+        "AreaGuideVideo",
+        "FloorPlanElevation",
+        "CommunityCollectionPhoto",
+        "FieldLeadSignPhoto",
+        "CommunityPhoto",
+        "SpecificationSheet",
+        "CommunityBoundary",
+        "CommunityCollectionVideo",
+        "FloorPlanVideo",
+        "GOADMarketingParticulars",
+        "CommunityCollectionVideoShortHorizontal",
+        "CommunityCollectionVideoShortVertical",
+        "CommunityCollectionVideoShortSquare",
+        "SquareLogo",
+        "CommunityCollectionVideoClip",
+        "FloorPlanVideoClip",
+        "MatterportExterior",
+        "GaussianFlyoverRaw",
+        "CommunityVideo",
+        "CommunityVideoClip",
+        "MatterportCommunity",
+        "ExteriorPhoto",
+        "MatterportCommunityThumbnailVideo",
+        "MatterportAerialPlusInteriorXray",
+        "MatterportAerialExteriorOnly",
+        "StreetView",
+        "StaticMap",
+        "ParcelMap"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Aerial\n2 = Financial\n3 = PrimaryPhoto\n4 = BuildingPhoto\n5 = VirtualTour\n6 = Lobby\n7 = Other\n8 = MarketingBrochureFlyer\n9 = PlatMap\n10 = FloorPlan\n11 = SitePlan\n12 = TypicalFloorPlan\n13 = Slate\n14 = PrimaryContactPhoto\n15 = Logo\n16 = Map\n17 = SixteenSquarePng\n18 = TwentyFourSquarePng\n19 = TenantPhoto\n20 = LeaseDocument\n21 = PublicFiling\n22 = Deed\n23 = TransferTaxDeclaration\n24 = PropertyRecordCard\n25 = AssignmentOfRentsAndLeases\n26 = Loan\n27 = Article\n28 = PressRelease\n29 = SecFiling\n30 = CompanyReport\n31 = MediaSource\n32 = DirectoryPhoto\n33 = InteriorPhoto\n34 = GoadMap\n35 = CommunityBrochure\n36 = PlacardLogo\n37 = PropertyLogo\n38 = ConstructionPhoto\n39 = ReinforcingAdvertisement\n40 = ProVideoApartments (also Video)\n41 = CityPhoto\n42 = NeighborhoodPhoto\n43 = Matterport3DScan (also ThreeDimensionalScan)\n44 = ProVideoApartmentFinder\n45 = ConfidentialityAgreement\n46 = ProVideoApartamentos\n47 = CommercialListingVideo\n48 = MarketingLogo\n49 = ProVideoLoopNet\n50 = State\n51 = County\n52 = MilitaryBase\n53 = CollegeUniversity\n54 = ArticleVideo\n55 = AerialVideo\n56 = ThermalVideo\n57 = UavVideo\n58 = ProVideoForRent\n59 = PlacardPrimaryPhoto\n60 = ShortUavVideo\n61 = PlacardLogoVector\n62 = PlaneView\n63 = ProfileCoverDesktopResidential (also ProfileCoverDesktop, CoverPhoto)\n64 = PlacardHighlightPhoto\n65 = PlacardHighlightVideo\n66 = AmenityPhoto\n67 = AmenityVideo\n68 = ProfileCoverMobileResidential (also ProfileCoverMobile)\n69 = ProfileCoverDesktopCommercial\n70 = ProfileCoverMobileCommercial\n71 = LandRegistry\n72 = CollegeLogo\n73 = TenantExternalPhoto\n74 = TenantInternalPhoto\n75 = PylonPhoto\n76 = StockPhoto\n77 = CoverPagePhoto\n78 = SpaceManagerPhoto\n79 = ResidentialListingVideo\n80 = OfferingMemorandum\n81 = BrandExteriorPhoto\n82 = BrandInteriorPhoto\n83 = NeighborhoodVideo\n84 = NeighborhoodVideoClip\n85 = ParkVideo\n86 = ParkVideoClip\n87 = SchoolVideo\n88 = SchoolVideoClip\n89 = CondoBuildingVideo\n90 = CondoBuildingVideoClip\n91 = VideoProjectFile\n92 = AudioFile\n93 = ProductionScript\n94 = ParkPhoto\n95 = SchoolPhoto\n96 = CaseDocument\n97 = ViewFromUnit\n98 = AgentVideo\n99 = AgentVideoClip\n100 = StockVideo\n101 = RetailBrandRequirement\n102 = NeighborhoodEventPhoto\n103 = CityVideo\n104 = CityVideoClip\n105 = TransportationLogo\n106 = TextMessagePhoto\n107 = AgencyFees\n108 = MarketingHeroImage\n109 = AreaGuidePhoto\n110 = AreaGuideVideoClip\n111 = AreaGuideVideo\n112 = FloorPlanElevation\n113 = CommunityCollectionPhoto\n114 = FieldLeadSignPhoto\n115 = CommunityPhoto\n116 = SpecificationSheet\n117 = CommunityBoundary\n118 = CommunityCollectionVideo\n119 = FloorPlanVideo\n120 = GOADMarketingParticulars\n121 = CommunityCollectionVideoShortHorizontal\n122 = CommunityCollectionVideoShortVertical\n123 = CommunityCollectionVideoShortSquare\n124 = SquareLogo\n125 = CommunityCollectionVideoClip\n126 = FloorPlanVideoClip\n127 = MatterportExterior\n128 = GaussianFlyoverRaw\n129 = CommunityVideo\n130 = CommunityVideoClip\n131 = MatterportCommunity\n132 = ExteriorPhoto\n133 = MatterportCommunityThumbnailVideo\n137 = MatterportAerialPlusInteriorXray\n138 = MatterportAerialExteriorOnly\n100001 = StreetView\n100002 = StaticMap\n100003 = ParcelMap"
+    },
+    "ThreeDimensionalScanType": {
+      "type": "integer",
+      "enum": [
+        36,
+        51,
+        85,
+        86,
+        87,
+        128,
+        131,
+        135,
+        136,
+        137,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        168,
+        200,
+        210,
+        220,
+        230,
+        240,
+        250,
+        260,
+        270,
+        280,
+        290,
+        300,
+        400,
+        500
+      ],
+      "x-enum-varnames": [
+        "MatterPort",
+        "PanoskinViewer",
+        "AtlasBayVR",
+        "Peek",
+        "Helix",
+        "CloudPano",
+        "Gryd",
+        "Kuula",
+        "TheView",
+        "ThreeDPlans",
+        "Asteroom",
+        "AsteroomMLS",
+        "Vpix360",
+        "Roundme",
+        "My360Virtual",
+        "Eyespy360Vr360",
+        "LivetourIstaging",
+        "Realtview",
+        "Hommati",
+        "Panoskin",
+        "P2pvr",
+        "IT49",
+        "Realvision",
+        "homevisit",
+        "iGuide",
+        "RealTourVision",
+        "Ricoh360",
+        "BdxInteractive",
+        "Giraffe360",
+        "VrTourHosts",
+        "InsideMaps",
+        "Modsy",
+        "NodalView",
+        "AltitudeHomes",
+        "PropertyPanorama"
+      ],
+      "description": "Allowed values:\n36 = MatterPort\n51 = PanoskinViewer\n85 = AtlasBayVR\n86 = Peek\n87 = Helix\n128 = CloudPano\n131 = Gryd\n135 = Kuula\n136 = TheView\n137 = ThreeDPlans\n147 = Asteroom\n148 = AsteroomMLS\n149 = Vpix360\n150 = Roundme\n151 = My360Virtual\n152 = Eyespy360Vr360 (also Vr360Tour)\n153 = LivetourIstaging\n154 = Realtview\n155 = Hommati\n156 = Panoskin\n157 = P2pvr\n168 = IT49\n200 = Realvision\n210 = homevisit\n220 = iGuide\n230 = RealTourVision\n240 = Ricoh360\n250 = BdxInteractive\n260 = Giraffe360\n270 = VrTourHosts\n280 = InsideMaps\n290 = Modsy\n300 = NodalView\n400 = AltitudeHomes\n500 = PropertyPanorama"
+    },
+    "VideoType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "x-enum-varnames": [
+        "None",
+        "YouTube",
+        "Vimeo",
+        "Vidly",
+        "Other"
+      ],
+      "description": "Allowed values:\n0 = None\n1 = YouTube\n2 = Vimeo\n3 = Vidly\n4 = Other"
+    },
+    "MediaSource": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Mls",
+        "CoStar",
+        "Builder"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Mls\n2 = CoStar\n3 = Builder"
+    },
+    "ExternalReferenceType4": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "LoopNetAssociateId",
+        "DisplayBoardFlag",
+        "LoopNetSalesLead",
+        "LoopNetMasterProperty",
+        "LoopNetAttachment",
+        "InfogroupIdNumber",
+        "MarketLocationIdNumber",
+        "ListHub",
+        "RentalHomesPlus",
+        "InboundPropertyPlatform",
+        "Equity",
+        "Vaultware",
+        "Yardi",
+        "MarylandUpdates",
+        "VenterraUpdates",
+        "BozzutoUpdates",
+        "AspenSquareUpdates",
+        "CrossfireUpdates",
+        "CollierUpdates",
+        "Udr",
+        "Aimco",
+        "Ellipse",
+        "Apartments247Updates",
+        "PropertySolutions",
+        "ILoveLeasing",
+        "OnSite",
+        "RelatedUpdates",
+        "MaacUpdates",
+        "PropertyLinkOnline",
+        "RentSentinel",
+        "ThreeSixtyFiveConnectUpdates",
+        "VaultwareUpdates",
+        "InboundPropertyPlatformAttachment",
+        "ListHubAttachment",
+        "RentalHomesPlusAttachment",
+        "MatterportScan",
+        "GreatSchools",
+        "WaypointListingKey",
+        "WaypointAttachmentKey",
+        "ApartmentFinderAttachment",
+        "VaultwareId",
+        "Vidly",
+        "WestSideRentalsListingKey",
+        "WestsideRentalsAttachmentKey",
+        "DeprecatedLoopNetAssociateId",
+        "DunAndBradstreetDunsNumber",
+        "InsideView",
+        "CoStarDataExtractor",
+        "CollegeDMP",
+        "ListingManagerTenant",
+        "LCP360",
+        "Factual",
+        "KCL",
+        "Vimeo",
+        "YouTube",
+        "StrCensusId",
+        "StrPipelineHotelId",
+        "StrMainHeadquarters",
+        "StrDivisionalHeadquarters",
+        "CoStarAttachmentHandlerDocument",
+        "Creditsafe",
+        "TenXProperty",
+        "TenXListing",
+        "IntexLoan",
+        "StrOwner",
+        "StrOperator",
+        "StrAssetManager",
+        "StrMembership",
+        "FederalEmergencyManagementAgency",
+        "AmericanHotelAndLodgingAssociationPropertyId",
+        "StrCustomerLocation",
+        "IntexTenant",
+        "Starlink",
+        "Marsha",
+        "Hilton",
+        "HiltonAlpha",
+        "Hyatt",
+        "InExtenso",
+        "PeopleSoft",
+        "Bookingdotcom",
+        "Barcelo",
+        "GHLink",
+        "EmporisBuilding",
+        "DoordaUKTenant",
+        "AtlasBayVirtualReality",
+        "PeekdotUS",
+        "Helix",
+        "HmLandRegistry",
+        "ComunidadDeMadrid",
+        "TenX_MA_ID",
+        "Preqin",
+        "OraclePartyId",
+        "OracleCustomerAccountId",
+        "OracleLocationId",
+        "OraclePartySiteId",
+        "OracleCustomerAccountSiteId",
+        "OracleBillToSiteUseId",
+        "OracleDunningSiteUseId",
+        "OraclePersonPartyId",
+        "OracleRelationshipId",
+        "OracleEmailContact",
+        "OracleLandlinePhoneContact",
+        "OracleMobilePhoneContact",
+        "StrProduct",
+        "StrPosSohId",
+        "StrPosSosId",
+        "StrCustomerContractId",
+        "StrCustomerContractsId",
+        "OracleInvoiceId",
+        "TenXOpportunity",
+        "StrPeopleId",
+        "GreystarPropertyCode",
+        "StrOpportunityAttachmentId",
+        "StrOpportunity",
+        "CustomerSelfServicePortal",
+        "StrQuote",
+        "AdpWorkMarketId",
+        "Catastro",
+        "StrWorkflowProcessName",
+        "StrWorkflowInstanceId",
+        "BdTopo",
+        "HomesnapAgentId",
+        "InstituteOfMuseumAndLibraryServices",
+        "StrUsername",
+        "HomeSnapMlsOffice",
+        "HomeSnapMlsUserAgent",
+        "Sirene",
+        "CloudPano",
+        "ThomasDaily",
+        "ADV",
+        "Gryd",
+        "BureauxLocaux",
+        "BusinessImmo",
+        "Realnyc",
+        "Kuula",
+        "TheView",
+        "ThreeDPlansdotcom",
+        "VoaIreland",
+        "Belbex",
+        "NicheId",
+        "LivCor",
+        "Explore",
+        "Realla",
+        "MediaConvertJobId",
+        "SignedUri",
+        "BIProduct",
+        "BIContract",
+        "ItalianPropertyMappingId",
+        "BISalesforceCompany",
+        "BISalesforceContact",
+        "SIRET",
+        "EnterpriseThirdPartyListingInstance",
+        "Dataforsyningen_Denmark",
+        "Geonorge_Norway",
+        "Inspire_Finland",
+        "Morningstar",
+        "InsideMaps",
+        "HomeSnapContract",
+        "HomeSnapProduct",
+        "IT49",
+        "ShowMyProperty",
+        "RealTourVision",
+        "Giraffe360",
+        "CreditsafeWorldwide",
+        "BureauxLocauxHubspotCompany",
+        "BureauxLocauxHubspotContact",
+        "SeekNow",
+        "KadasterNetherlands",
+        "UPRN",
+        "IhgFacId",
+        "ScimUserID",
+        "VideoHandlerKey",
+        "LARSTransactionID",
+        "OnTheMarket",
+        "NewsWebForms",
+        "BuilderIdentifier",
+        "LEED",
+        "Majic",
+        "SplatHandlerKey",
+        "RawSplatHandlerKey",
+        "BureauxLocauxProduct",
+        "BureauxLocauxDeal",
+        "BureauxLocauxLineItem",
+        "MatterportMedia",
+        "OracleCreditID",
+        "CompaniesHouseRegNoUK",
+        "OracleTransactionID",
+        "HighRadiusUsername",
+        "FoursquareV2",
+        "ValuationOfficeAgency",
+        "DomainSFCompany",
+        "DomainSFContact",
+        "DomainCompany",
+        "DomainContact",
+        "Kato",
+        "AgencyPilot",
+        "LogiPro",
+        "DomainSVPProperty",
+        "CommercialAgentId",
+        "DemandesDeValeursFoncieres",
+        "RSSDID",
+        "NCUACharterID",
+        "GNAFAddressDetailPID",
+        "CadastrePolygonPID",
+        "CommercialListingDirectFeed",
+        "RealVision",
+        "Asteroom",
+        "AsteroomMls",
+        "VPiX360",
+        "Roundme",
+        "VR360Tour",
+        "LiveTourIStaging",
+        "RealTView",
+        "Hommati",
+        "Panoskin",
+        "P2PVR",
+        "HomeVisit",
+        "IGuide",
+        "Ricoh360",
+        "VRTourHosts",
+        "Modsy",
+        "NodalView",
+        "AltitudeHomes",
+        "My360Virtual",
+        "EyeSpy360",
+        "MatterportStreamingKey"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = LoopNetAssociateId\n2 = DisplayBoardFlag\n3 = LoopNetSalesLead\n4 = LoopNetMasterProperty\n5 = LoopNetAttachment\n6 = InfogroupIdNumber\n7 = MarketLocationIdNumber\n8 = ListHub\n9 = RentalHomesPlus\n10 = InboundPropertyPlatform\n11 = Equity\n12 = Vaultware\n13 = Yardi\n14 = MarylandUpdates\n15 = VenterraUpdates\n16 = BozzutoUpdates\n17 = AspenSquareUpdates\n18 = CrossfireUpdates\n19 = CollierUpdates\n20 = Udr\n21 = Aimco\n22 = Ellipse\n23 = Apartments247Updates\n24 = PropertySolutions\n25 = ILoveLeasing\n26 = OnSite\n27 = RelatedUpdates\n28 = MaacUpdates\n29 = PropertyLinkOnline\n30 = RentSentinel\n31 = ThreeSixtyFiveConnectUpdates\n32 = VaultwareUpdates\n33 = InboundPropertyPlatformAttachment\n34 = ListHubAttachment\n35 = RentalHomesPlusAttachment\n36 = MatterportScan\n37 = GreatSchools\n38 = WaypointListingKey\n39 = WaypointAttachmentKey\n40 = ApartmentFinderAttachment\n41 = VaultwareId\n42 = Vidly\n43 = WestSideRentalsListingKey\n44 = WestsideRentalsAttachmentKey\n45 = DeprecatedLoopNetAssociateId\n46 = DunAndBradstreetDunsNumber\n47 = InsideView\n48 = CoStarDataExtractor\n49 = CollegeDMP\n50 = ListingManagerTenant\n51 = LCP360\n52 = Factual\n53 = KCL\n54 = Vimeo\n55 = YouTube\n56 = StrCensusId\n57 = StrPipelineHotelId\n58 = StrMainHeadquarters\n59 = StrDivisionalHeadquarters\n60 = CoStarAttachmentHandlerDocument\n61 = Creditsafe\n62 = TenXProperty\n63 = TenXListing\n64 = IntexLoan\n65 = StrOwner\n66 = StrOperator\n67 = StrAssetManager\n68 = StrMembership\n69 = FederalEmergencyManagementAgency\n70 = AmericanHotelAndLodgingAssociationPropertyId\n71 = StrCustomerLocation\n72 = IntexTenant\n73 = Starlink\n74 = Marsha\n75 = Hilton\n76 = HiltonAlpha\n77 = Hyatt\n78 = InExtenso\n79 = PeopleSoft\n80 = Bookingdotcom\n81 = Barcelo\n82 = GHLink\n83 = EmporisBuilding\n84 = DoordaUKTenant\n85 = AtlasBayVirtualReality\n86 = PeekdotUS\n87 = Helix\n88 = HmLandRegistry\n89 = ComunidadDeMadrid\n90 = TenX_MA_ID\n91 = Preqin\n92 = OraclePartyId\n93 = OracleCustomerAccountId\n94 = OracleLocationId\n95 = OraclePartySiteId\n96 = OracleCustomerAccountSiteId\n97 = OracleBillToSiteUseId\n98 = OracleDunningSiteUseId\n99 = OraclePersonPartyId\n100 = OracleRelationshipId\n101 = OracleEmailContact\n102 = OracleLandlinePhoneContact\n103 = OracleMobilePhoneContact\n104 = StrProduct\n105 = StrPosSohId\n106 = StrPosSosId\n107 = StrCustomerContractId\n108 = StrCustomerContractsId\n109 = OracleInvoiceId\n110 = TenXOpportunity\n111 = StrPeopleId\n112 = GreystarPropertyCode\n113 = StrOpportunityAttachmentId\n114 = StrOpportunity\n115 = CustomerSelfServicePortal\n116 = StrQuote\n117 = AdpWorkMarketId\n118 = Catastro\n119 = StrWorkflowProcessName\n120 = StrWorkflowInstanceId\n121 = BdTopo\n122 = HomesnapAgentId\n123 = InstituteOfMuseumAndLibraryServices\n124 = StrUsername\n125 = HomeSnapMlsOffice\n126 = HomeSnapMlsUserAgent\n127 = Sirene\n128 = CloudPano\n129 = ThomasDaily\n130 = ADV\n131 = Gryd\n132 = BureauxLocaux\n133 = BusinessImmo\n134 = Realnyc\n135 = Kuula\n136 = TheView\n137 = ThreeDPlansdotcom\n146 = VoaIreland\n147 = Belbex\n148 = NicheId\n149 = LivCor\n150 = Explore\n151 = Realla\n152 = MediaConvertJobId\n153 = SignedUri\n154 = BIProduct\n155 = BIContract\n156 = ItalianPropertyMappingId\n157 = BISalesforceCompany\n158 = BISalesforceContact\n159 = SIRET\n160 = EnterpriseThirdPartyListingInstance\n161 = Dataforsyningen_Denmark\n162 = Geonorge_Norway\n163 = Inspire_Finland\n164 = Morningstar\n165 = InsideMaps\n166 = HomeSnapContract\n167 = HomeSnapProduct\n168 = IT49\n169 = ShowMyProperty\n170 = RealTourVision\n171 = Giraffe360\n172 = CreditsafeWorldwide\n173 = BureauxLocauxHubspotCompany\n174 = BureauxLocauxHubspotContact\n175 = SeekNow\n176 = KadasterNetherlands\n177 = UPRN\n178 = IhgFacId\n179 = ScimUserID\n180 = VideoHandlerKey\n181 = LARSTransactionID\n182 = OnTheMarket\n183 = NewsWebForms\n184 = BuilderIdentifier\n185 = LEED\n186 = Majic\n187 = SplatHandlerKey\n188 = RawSplatHandlerKey\n189 = BureauxLocauxProduct\n190 = BureauxLocauxDeal\n191 = BureauxLocauxLineItem\n192 = MatterportMedia\n193 = OracleCreditID\n194 = CompaniesHouseRegNoUK\n195 = OracleTransactionID\n196 = HighRadiusUsername\n197 = FoursquareV2\n198 = ValuationOfficeAgency\n199 = DomainSFCompany\n200 = DomainSFContact\n201 = DomainCompany\n202 = DomainContact\n203 = Kato\n204 = AgencyPilot\n205 = LogiPro\n206 = DomainSVPProperty\n207 = CommercialAgentId\n208 = DemandesDeValeursFoncieres\n209 = RSSDID\n210 = NCUACharterID\n211 = GNAFAddressDetailPID\n212 = CadastrePolygonPID\n213 = CommercialListingDirectFeed\n214 = RealVision\n215 = Asteroom\n216 = AsteroomMls\n217 = VPiX360\n218 = Roundme\n219 = VR360Tour\n220 = LiveTourIStaging\n221 = RealTView\n222 = Hommati\n223 = Panoskin\n224 = P2PVR\n225 = HomeVisit\n226 = IGuide\n227 = Ricoh360\n228 = VRTourHosts\n229 = Modsy\n230 = NodalView\n231 = AltitudeHomes\n232 = My360Virtual\n233 = EyeSpy360\n234 = MatterportStreamingKey"
+    },
+    "SceneClassificationType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "Balcony",
+        "Beach",
+        "BicycleStorage",
+        "BoatDock",
+        "Clubhouse",
+        "CommunityCabanas",
+        "CommunityStorageSpace",
+        "Courtyard",
+        "DogPark",
+        "ElectricVehicleChargingStation",
+        "FitnessCenter",
+        "Gated",
+        "LaundryRoom",
+        "Lobby",
+        "Marina",
+        "OutdoorKitchen",
+        "OutdoorTennisCourts",
+        "SwimmingPool",
+        "Restaurant",
+        "RooftopDeck",
+        "Sauna",
+        "Spa",
+        "HomeTheater",
+        "Yoga",
+        "MountainHillsView",
+        "OceanBayView",
+        "WaterViews",
+        "CityView",
+        "GolfCourseView",
+        "Interior",
+        "Exterior",
+        "IndoorPool",
+        "CommunityElevator",
+        "CondoGarage",
+        "LaundryFacilities",
+        "HighRiseCondos",
+        "AssignedParking",
+        "MidRiseCondos",
+        "Garage",
+        "Doorman",
+        "PrivateElevator",
+        "CoveredParking",
+        "Waterfront",
+        "PuttingGreen",
+        "BikePath",
+        "Picnic",
+        "Concierge",
+        "OpenFloorplan",
+        "SecurityService",
+        "CommunityBarbecueGrill",
+        "Park",
+        "GuestParking",
+        "LaundryHookup",
+        "LowRiseCondos",
+        "RanchStyleHouse",
+        "FarmhouseArchitecture",
+        "Kitchen",
+        "Bathroom",
+        "WalkInCloset",
+        "Bedroom",
+        "DiningRoom",
+        "LivingRoom",
+        "Backyard",
+        "WineCellar",
+        "Library",
+        "OutdoorPlatform",
+        "Foyer",
+        "Basement",
+        "mock",
+        "Floorplan",
+        "BonusRoom",
+        "FamilyRoom",
+        "Closet",
+        "GameRoom",
+        "Hallway",
+        "HomeGym",
+        "HomeOffice",
+        "Mudroom",
+        "Pantry",
+        "Patio",
+        "PowderRoom",
+        "Porch",
+        "UtilityRoom",
+        "Driveway",
+        "Breezeway",
+        "Carport",
+        "SittingRoom",
+        "ReadingNook",
+        "WalkInPantry",
+        "StainlessSteelAppliances",
+        "DoubleOven",
+        "BrickExterior",
+        "StoneExterior",
+        "MetalRoof",
+        "ShingleRoof",
+        "TerraCottaRoof",
+        "WaterHeater",
+        "TanklessWaterHeater",
+        "SolarPanels",
+        "OneCarGarage",
+        "TwoCarGarage",
+        "ThreeCarGarage",
+        "ScreenedInPorch",
+        "BacklitMirrors",
+        "BuiltInVanity",
+        "TiledShower",
+        "BathtubwithShower",
+        "PrivateWaterCloset",
+        "SeatinShower",
+        "EatinKitchen",
+        "Dishwasher",
+        "RangeHood",
+        "Chandelier",
+        "WineBar",
+        "TileFloor",
+        "TrayCeiling",
+        "CeilingFan",
+        "PanelMolding",
+        "LaundryRoomSink",
+        "BeamedCeiling",
+        "Stairs",
+        "CofferedCeiling",
+        "FlushMountFixture",
+        "Carpet",
+        "Landscaped",
+        "Pergola",
+        "Fenced",
+        "OutdoorLiving",
+        "Frontviewoftheproperty",
+        "Rearviewoftheproperty",
+        "Sideviewoftheproperty",
+        "NotSure",
+        "InUnitLaundry",
+        "MediaroomorHometheatre",
+        "Attic",
+        "KitchenIsland",
+        "QuartzCountertops",
+        "BoschAppliances",
+        "Fireplace",
+        "CrownMolding",
+        "GasRange",
+        "ConvectionOven",
+        "CounterDepthRefrigerator",
+        "MultiHeadShower",
+        "MarbleCountertops",
+        "AccessibleElevator",
+        "PlantationShutters",
+        "BreakfastNook",
+        "FarmhouseSink",
+        "RecessedLighting",
+        "SubzeroRefrigerator",
+        "VaultedCeiling",
+        "CathedralCeiling",
+        "SteamShower",
+        "EVcharging",
+        "SoakingTub",
+        "FreestandingTub",
+        "ButlersPantry",
+        "WolfAppliances",
+        "Vesselsink",
+        "Stackedwasheranddryer",
+        "Vikingappliances",
+        "Gasoven",
+        "Potfillerfaucet",
+        "Stonecountertops",
+        "WalkInShower",
+        "GourmetKitchen",
+        "CateringKitchen",
+        "Updatedkitchen",
+        "Doublevanities",
+        "Pendantlighting",
+        "Granitecounters",
+        "Electroluxappliances",
+        "Columnrefrigerator",
+        "Panelrefrigerator",
+        "Designercloset",
+        "TiledBacksplash",
+        "Hardwoodfloor",
+        "WineRefridgerator",
+        "SlateRoof",
+        "Microwave",
+        "OutdoorLighting",
+        "ButcherBlockCountertops",
+        "ConcreteCountertops",
+        "TileCountertops",
+        "StainlessSteelCountertops",
+        "VesselSink",
+        "InductionCooktop",
+        "ElectricCooktop",
+        "DowndraftCooktop",
+        "WarmingDrawer",
+        "BuiltInMicrowave",
+        "TrashCompactor",
+        "UnderCabinetLighting",
+        "BayWindow",
+        "SlidingGlassDoors",
+        "FrenchDoors",
+        "BuiltInBookshelves",
+        "FormalLivingRoom",
+        "Bidet",
+        "RainShowerHead",
+        "PedestalSink",
+        "MedicineCabinet",
+        "LinenCloset",
+        "ExhaustFan",
+        "SmokeDetector",
+        "FireSprinkler",
+        "MatureLandscaping",
+        "NoLandscaping",
+        "WoodFence",
+        "ChainLinkFence",
+        "WaterFeature",
+        "GalleyKitchen",
+        "GraniteCountertops",
+        "BrownCarpet",
+        "GreyCarpet",
+        "BlueCarpet",
+        "WhiteCarpet",
+        "MultiColorCarpet",
+        "BanquetteSeating",
+        "ElectricalOutlet",
+        "LightSwitch",
+        "MicrowaveDrawer",
+        "UndercounterRefrigerator",
+        "FreezerDrawer",
+        "RefrigeratorDrawer",
+        "ChestFreezer",
+        "DoubleSink",
+        "TouchlessFaucet",
+        "GlassFrontCabinets",
+        "OpenShelving",
+        "WallMountedTV",
+        "WallSconces",
+        "LargeWindows",
+        "Mirror",
+        "FloatingShelves",
+        "CozyLivingRoom",
+        "WallMountedReadingLight",
+        "FullLengthMirror",
+        "ClosetDoors",
+        "Toilet",
+        "WallMountedToilet",
+        "BidetAttachment",
+        "ShowerGlassEnclosure",
+        "ShowerRod",
+        "ShowerNicheorRecessedshelf",
+        "HandheldShowerHead",
+        "UnderMountSink",
+        "ConsoleSink",
+        "FloatingVanity",
+        "MirrorCabinet",
+        "LEDMirror",
+        "TowelRack",
+        "TowelHooks",
+        "ToiletPaperHolder",
+        "BathroomShelves",
+        "LinenCabinet",
+        "PonyWall",
+        "WiFiRouter",
+        "NewLandscaping",
+        "FlowerBeds",
+        "TrexDecking",
+        "WoodDecking",
+        "CompositeDecking",
+        "WhiteFence",
+        "Hardscaping",
+        "OpenConceptKitchen"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        261,
+        262,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        269,
+        270
+      ],
+      "description": "Codes outside this list also occur and have no known meaning. Allowed values:\n0 = Unknown\n1 = Balcony\n2 = Beach\n3 = BicycleStorage\n4 = BoatDock\n5 = Clubhouse\n6 = CommunityCabanas\n7 = CommunityStorageSpace\n8 = Courtyard\n9 = DogPark\n10 = ElectricVehicleChargingStation\n12 = FitnessCenter\n13 = Gated\n14 = LaundryRoom\n15 = Lobby\n16 = Marina\n17 = OutdoorKitchen\n18 = OutdoorTennisCourts\n19 = SwimmingPool\n20 = Restaurant\n21 = RooftopDeck\n22 = Sauna\n23 = Spa\n24 = HomeTheater\n25 = Yoga\n26 = MountainHillsView\n27 = OceanBayView\n28 = WaterViews\n29 = CityView\n30 = GolfCourseView\n31 = Interior\n32 = Exterior\n33 = IndoorPool\n34 = CommunityElevator\n35 = CondoGarage\n36 = LaundryFacilities\n37 = HighRiseCondos\n38 = AssignedParking\n39 = MidRiseCondos\n40 = Garage\n41 = Doorman\n42 = PrivateElevator\n43 = CoveredParking\n44 = Waterfront\n45 = PuttingGreen\n46 = BikePath\n47 = Picnic\n48 = Concierge\n49 = OpenFloorplan\n50 = SecurityService\n51 = CommunityBarbecueGrill\n52 = Park\n53 = GuestParking\n54 = LaundryHookup\n55 = LowRiseCondos\n56 = RanchStyleHouse\n57 = FarmhouseArchitecture\n58 = Kitchen\n59 = Bathroom\n61 = WalkInCloset\n62 = Bedroom\n63 = DiningRoom\n64 = LivingRoom\n65 = Backyard\n66 = WineCellar\n67 = Library\n68 = OutdoorPlatform\n69 = Foyer\n70 = Basement\n71 = mock\n72 = Floorplan\n73 = BonusRoom\n74 = FamilyRoom\n75 = Closet\n76 = GameRoom\n77 = Hallway\n78 = HomeGym\n79 = HomeOffice\n80 = Mudroom\n81 = Pantry\n82 = Patio\n83 = PowderRoom\n84 = Porch\n85 = UtilityRoom\n86 = Driveway\n87 = Breezeway\n88 = Carport\n89 = SittingRoom\n90 = ReadingNook\n91 = WalkInPantry\n92 = StainlessSteelAppliances\n93 = DoubleOven\n94 = BrickExterior\n95 = StoneExterior\n96 = MetalRoof\n97 = ShingleRoof\n98 = TerraCottaRoof\n99 = WaterHeater\n100 = TanklessWaterHeater\n101 = SolarPanels\n102 = OneCarGarage\n103 = TwoCarGarage\n104 = ThreeCarGarage\n105 = ScreenedInPorch\n106 = BacklitMirrors\n107 = BuiltInVanity\n108 = TiledShower\n109 = BathtubwithShower\n110 = PrivateWaterCloset\n111 = SeatinShower\n112 = EatinKitchen\n113 = Dishwasher\n114 = RangeHood\n115 = Chandelier\n116 = WineBar\n117 = TileFloor\n118 = TrayCeiling\n119 = CeilingFan\n120 = PanelMolding\n121 = LaundryRoomSink\n122 = BeamedCeiling\n123 = Stairs\n124 = CofferedCeiling\n125 = FlushMountFixture\n126 = Carpet\n127 = Landscaped\n128 = Pergola\n129 = Fenced\n130 = OutdoorLiving\n131 = Frontviewoftheproperty\n132 = Rearviewoftheproperty\n133 = Sideviewoftheproperty\n134 = NotSure\n135 = InUnitLaundry\n136 = MediaroomorHometheatre\n137 = Attic\n138 = KitchenIsland\n139 = QuartzCountertops\n140 = BoschAppliances\n141 = Fireplace\n142 = CrownMolding\n143 = GasRange\n144 = ConvectionOven\n145 = CounterDepthRefrigerator\n146 = MultiHeadShower\n147 = MarbleCountertops\n148 = AccessibleElevator\n149 = PlantationShutters\n150 = BreakfastNook\n151 = FarmhouseSink\n152 = RecessedLighting\n153 = SubzeroRefrigerator\n154 = VaultedCeiling\n155 = CathedralCeiling\n156 = SteamShower\n157 = EVcharging\n158 = SoakingTub\n159 = FreestandingTub\n160 = ButlersPantry\n161 = WolfAppliances\n162 = Vesselsink\n163 = Stackedwasheranddryer\n164 = Vikingappliances\n165 = Gasoven\n166 = Potfillerfaucet\n167 = Stonecountertops\n168 = WalkInShower\n169 = GourmetKitchen\n170 = CateringKitchen\n171 = Updatedkitchen\n172 = Doublevanities\n173 = Pendantlighting\n174 = Granitecounters\n175 = Electroluxappliances\n176 = Columnrefrigerator\n177 = Panelrefrigerator\n178 = Designercloset\n179 = TiledBacksplash\n180 = Hardwoodfloor\n181 = WineRefridgerator\n182 = SlateRoof\n183 = Microwave\n184 = OutdoorLighting\n185 = ButcherBlockCountertops\n186 = ConcreteCountertops\n187 = TileCountertops\n188 = StainlessSteelCountertops\n189 = VesselSink\n191 = InductionCooktop\n192 = ElectricCooktop\n193 = DowndraftCooktop\n194 = WarmingDrawer\n195 = BuiltInMicrowave\n196 = TrashCompactor\n197 = UnderCabinetLighting\n198 = BayWindow\n199 = SlidingGlassDoors\n200 = FrenchDoors\n201 = BuiltInBookshelves\n202 = FormalLivingRoom\n203 = Bidet\n204 = RainShowerHead\n205 = PedestalSink\n206 = MedicineCabinet\n207 = LinenCloset\n208 = ExhaustFan\n209 = SmokeDetector\n210 = FireSprinkler\n211 = MatureLandscaping\n212 = NoLandscaping\n213 = WoodFence\n214 = ChainLinkFence\n215 = WaterFeature\n216 = GalleyKitchen\n217 = GraniteCountertops\n218 = BrownCarpet\n219 = GreyCarpet\n220 = BlueCarpet\n221 = WhiteCarpet\n222 = MultiColorCarpet\n223 = BanquetteSeating\n224 = ElectricalOutlet\n225 = LightSwitch\n226 = MicrowaveDrawer\n227 = UndercounterRefrigerator\n228 = FreezerDrawer\n229 = RefrigeratorDrawer\n230 = ChestFreezer\n231 = DoubleSink\n232 = TouchlessFaucet\n233 = GlassFrontCabinets\n234 = OpenShelving\n235 = WallMountedTV\n236 = WallSconces\n237 = LargeWindows\n238 = Mirror\n239 = FloatingShelves\n240 = CozyLivingRoom\n241 = WallMountedReadingLight\n242 = FullLengthMirror\n243 = ClosetDoors\n244 = Toilet\n245 = WallMountedToilet\n246 = BidetAttachment\n247 = ShowerGlassEnclosure\n248 = ShowerRod\n249 = ShowerNicheorRecessedshelf\n250 = HandheldShowerHead\n251 = UnderMountSink\n252 = ConsoleSink\n253 = FloatingVanity\n254 = MirrorCabinet\n255 = LEDMirror\n256 = TowelRack\n257 = TowelHooks\n258 = ToiletPaperHolder\n259 = BathroomShelves\n260 = LinenCabinet\n261 = PonyWall\n262 = WiFiRouter\n263 = NewLandscaping\n264 = FlowerBeds\n265 = TrexDecking\n266 = WoodDecking\n267 = CompositeDecking\n268 = WhiteFence\n269 = Hardscaping\n270 = OpenConceptKitchen"
+    },
+    "ListingAgentRole": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "None",
+        "ListingAgent",
+        "SellingAgent",
+        "BothSides",
+        "AltListingAgent",
+        "BothListing",
+        "ShowingContact",
+        "AltSellingAgent",
+        "BothSelling",
+        "AllExceptShowingContact"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        8,
+        16,
+        18,
+        23
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = None\n1 = ListingAgent\n2 = SellingAgent\n3 = BothSides\n4 = AltListingAgent\n5 = BothListing\n8 = ShowingContact\n16 = AltSellingAgent\n18 = BothSelling\n23 = AllExceptShowingContact"
+    },
+    "EnterprisePhoneType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "Phone",
+        "Mobile",
+        "Fax",
+        "Other",
+        "Override"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = Phone\n2 = Mobile\n3 = Fax\n4 = Other\n5 = Override"
+    },
+    "NewHomesListingType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "x-enum-varnames": [
+        "Unknown",
+        "CommunityProject",
+        "Building",
+        "Community",
+        "FloorPlan",
+        "CustomHomeLot",
+        "MoveInReady"
+      ],
+      "description": "Allowed values:\n0 = Unknown\n1 = CommunityProject\n2 = Building\n3 = Community\n4 = FloorPlan\n5 = CustomHomeLot\n6 = MoveInReady"
+    },
+    "SourceType": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "x-enum-varnames": [
+        "None",
+        "Mls",
+        "Multifamily",
+        "Land",
+        "NewHomes"
+      ],
+      "description": "Allowed values:\n0 = None\n1 = Mls\n2 = Multifamily\n3 = Land\n4 = NewHomes"
+    },
+    "ListingUpdateStatus": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "None",
+        "IsSecondaryEvent",
+        "RelatedToNewListing",
+        "IsReturnToMarketEvent"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = None\n1 = IsSecondaryEvent\n2 = RelatedToNewListing\n4 = IsReturnToMarketEvent"
+    },
+    "ListingUpdateType": {
+      "type": "integer",
+      "enum": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64,
+        128
+      ],
+      "x-enum-varnames": [
+        "NewlyActive",
+        "PriceChange",
+        "NewlyUnderContract",
+        "NewlySold",
+        "OffMarket",
+        "NewlyComingSoon",
+        "Removed",
+        "ListDateChange"
+      ],
+      "description": "Allowed values:\n1 = NewlyActive\n2 = PriceChange\n4 = NewlyUnderContract\n8 = NewlySold\n16 = OffMarket\n32 = NewlyComingSoon\n64 = Removed\n128 = ListDateChange"
+    },
+    "AssetValueType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "None",
+        "AVM",
+        "Last3Months",
+        "Last12Months",
+        "Last24Months",
+        "Last5Years"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = None\n1 = AVM\n2 = Last3Months\n4 = Last12Months\n8 = Last24Months\n16 = Last5Years"
+    },
+    "CostarFeatureCoolingType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "Central",
+        "Geothermal"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = Central\n2 = Geothermal"
+    },
+    "CostarFeatureHeatingType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "Central",
+        "ForcedAir",
+        "Radiant",
+        "Geothermal"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = Central\n2 = ForcedAir\n4 = Radiant\n8 = Geothermal"
+    },
+    "CostarFeaturePoolType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "Private",
+        "Community"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = Private\n2 = Community"
+    },
+    "CostarFeatureViewType": {
+      "type": "integer",
+      "x-enum-varnames": [
+        "Unknown",
+        "MountainHills",
+        "Water",
+        "City",
+        "Woods",
+        "Other"
+      ],
+      "x-enum-values": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      "description": "Bit flags: a value can be the sum of several codes. Allowed values:\n0 = Unknown\n1 = MountainHills\n2 = Water\n4 = City\n8 = Woods\n16 = Other"
+    }
+  }
+}

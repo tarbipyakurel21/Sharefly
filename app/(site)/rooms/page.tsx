@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getSessionUser } from "@/lib/auth";
 import { listRooms } from "@/lib/db/queries";
+import { getReferenceSpaceProvider } from "@/lib/reference-spaces/provider";
 import { formatLength } from "@/lib/units";
 import { SignInCard } from "@/components/layout/SignInForm";
 import { RoomForm } from "@/components/room/RoomForm";
@@ -31,7 +32,7 @@ export default async function RoomsPage({ searchParams }: { searchParams: Promis
           ))}
         </ul>
       ) : <EmptyState title="No rooms yet" body="Add one below. It only takes length, width and height." />}
-      <RoomForm addListingId={add} defaultName={rooms.length ? `Room ${rooms.length + 1}` : "Bedroom"} />
+      <RoomForm realApartments={await getReferenceSpaceProvider().isAvailable()} addListingId={add} defaultName={rooms.length ? `Room ${rooms.length + 1}` : "Bedroom"} />
     </div>
   );
 }
