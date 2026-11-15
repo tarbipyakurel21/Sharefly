@@ -11,6 +11,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "import:costar": "tsx scripts/import-costar.ts",
+    "atlas:load": "tsx scripts/atlas-load.ts",
+    "atlas:drop": "tsx scripts/atlas-drop.ts",
     "audit:kit": "tsx scripts/audit-kit-leaks.ts",
     "db:seed": "tsx scripts/seed.ts",
     "demo:reset": "tsx scripts/seed.ts --reset"
@@ -19,6 +21,7 @@
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.2",
     "better-sqlite3": "^11.10.0",
+    "mongodb": "^7.9.0",
     "next": "^16.4.6",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

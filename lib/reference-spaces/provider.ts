@@ -4,27 +4,11 @@ import { z } from "zod";
 import { getEnv } from "@/lib/env";
 import { searchSpaces } from "./filter";
 import { CURATED_SPACES } from "./curated";
+import { AtlasReferenceSpaceProvider } from "./atlas";
+import { NullReferenceSpaceProvider, type ReferenceSpaceProvider, type StoreHealth } from "./base";
 import { ReferenceSpaceSchema, type ReferenceSpace, type SearchFilters } from "./types";
 
-export type { ReferenceSpace } from "./types";
-
-export type SearchResult = { spaces: ReferenceSpace[]; total: number };
-export type StoreHealth = { provider: "costar" | "none"; store: "json" | "none"; available: boolean; count: number; note?: string };
-
-export interface ReferenceSpaceProvider {
-  isAvailable(): boolean;
-  search(filters: Partial<SearchFilters>): Promise<SearchResult>;
-  get(id: string): Promise<ReferenceSpace | null>;
-  health(): Promise<StoreHealth>;
-}
-
-/** Default when the CoStar data is absent: nothing is offered and no related UI renders. */
-export class NullReferenceSpaceProvider implements ReferenceSpaceProvider {
-  isAvailable() { return false; }
-  async search() { return { spaces: [], total: 0 }; }
-  async get() { return null; }
-  async health(): Promise<StoreHealth> { return { provider: "none", store: "none", available: false, count: 0 }; }
-}
+export * from "./base";
 
 const FileSchema = z.object({ spaces: z.array(z.unknown()) });
 const g = globalThis as unknown as { __sfRef?: { file: string; mtime: number; spaces: ReferenceSpace[]; byId: Map<string, ReferenceSpace> } };
@@ -55,6 +39,9 @@ export class JsonFileReferenceSpaceProvider implements ReferenceSpaceProvider {
 export function getReferenceSpaceProvider(): ReferenceSpaceProvider {
   const env = getEnv();
   if (env.REFERENCE_SPACES_PROVIDER !== "costar") return new NullReferenceSpaceProvider();
-  const p = new JsonFileReferenceSpaceProvider(path.resolve(process.cwd(), env.REFERENCE_SPACES_PATH));
-  return p.isAvailable() ? p : new NullReferenceSpaceProvider();
+  const json = new JsonFileReferenceSpaceProvider(path.resolve(process.cwd(), env.REFERENCE_SPACES_PATH));
+  if (env.REFERENCE_SPACES_STORE === "atlas" && env.ATLAS_URI) {
+    return new AtlasReferenceSpaceProvider(json.isAvailable() ? json : new NullReferenceSpaceProvider());
+  }
+  return json.isAvailable() ? json : new NullReferenceSpaceProvider();
 }
