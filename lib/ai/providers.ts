@@ -1,7 +1,8 @@
 import { getEnv } from "@/lib/env";
 import { categoriesIn } from "@/lib/matching/text";
 import { CATEGORY_LABEL, CATEGORIES } from "@/lib/categories";
-import type { AIProvider, DescribeResult } from "./types";
+import type { AIProvider, DescribeResult, MeasurementResult } from "./types";
+import { measurePrompt, sanitizeMeasurements } from "./measurements";
 import { sanitizeSuggestion } from "./validate";
 
 export const DESCRIBE_PROMPT = `You help a neighbor list an item they are giving away, from one photo.
@@ -15,6 +16,7 @@ Return ONLY a JSON object: {"title": string (3-60 chars), "category": one of [${
 class NoneProvider implements AIProvider {
   readonly name = "none";
   async describeItem(): Promise<DescribeResult> { return { status: "unavailable", reason: "no_provider" }; }
+  async readMeasurements(): Promise<MeasurementResult> { return { status: "unavailable", reason: "no_provider" }; }
 }
 
 /** Deterministic, keyed on the file name. For tests and as a demo safety net. Never claims a model looked at the photo. */
@@ -28,12 +30,14 @@ class MockProvider implements AIProvider {
       : { title: label, category: cat, description: `A ${label.toLowerCase()} shown in the photo.` };
     return { status: "ok", suggestion, source: "mock" };
   }
+  /** The mock never fabricates a size. */
+  async readMeasurements(): Promise<MeasurementResult> { return { status: "unavailable", reason: "no_provider" }; }
 }
 
 /** Shared timeout + retry + schema validation. Subclasses only implement the HTTP call. */
 abstract class HttpVisionProvider implements AIProvider {
   abstract readonly name: string;
-  protected abstract call(input: { imageBytes: Uint8Array; mimeType: string }, signal: AbortSignal): Promise<unknown>;
+  protected abstract call(input: { imageBytes: Uint8Array; mimeType: string; prompt?: string }, signal: AbortSignal): Promise<unknown>;
   async describeItem(input: { imageBytes: Uint8Array; mimeType: string }): Promise<DescribeResult> {
     let lastTimeout = false;
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -49,6 +53,17 @@ abstract class HttpVisionProvider implements AIProvider {
     }
     return { status: "unavailable", reason: lastTimeout ? "timeout" : "error" };
   }
+  async readMeasurements(input: { imageBytes: Uint8Array; mimeType: string; knownLabels?: string[] }): Promise<MeasurementResult> {
+    let lastTimeout = false;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 12_000);
+      try { return sanitizeMeasurements(await this.call({ imageBytes: input.imageBytes, mimeType: input.mimeType, prompt: measurePrompt(input.knownLabels) }, ctrl.signal)); }
+      catch (e) { lastTimeout = e instanceof Error && e.name === "AbortError"; }
+      finally { clearTimeout(timer); }
+    }
+    return { status: "unavailable", reason: lastTimeout ? "timeout" : "error" };
+  }
 }
 
 function extractJson(text: string): unknown {
@@ -59,7 +74,7 @@ function extractJson(text: string): unknown {
 
 class AnthropicProvider extends HttpVisionProvider {
   readonly name = "anthropic";
-  protected async call(input: { imageBytes: Uint8Array; mimeType: string }, signal: AbortSignal): Promise<unknown> {
+  protected async call(input: { imageBytes: Uint8Array; mimeType: string; prompt?: string }, signal: AbortSignal): Promise<unknown> {
     const env = getEnv();
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST", signal,
@@ -68,7 +83,7 @@ class AnthropicProvider extends HttpVisionProvider {
         model: env.ANTHROPIC_MODEL, max_tokens: 400,
         messages: [{ role: "user", content: [
           { type: "image", source: { type: "base64", media_type: input.mimeType, data: Buffer.from(input.imageBytes).toString("base64") } },
-          { type: "text", text: DESCRIBE_PROMPT },
+          { type: "text", text: input.prompt ?? DESCRIBE_PROMPT },
         ] }],
       }),
     });
@@ -80,7 +95,7 @@ class AnthropicProvider extends HttpVisionProvider {
 
 class GeminiProvider extends HttpVisionProvider {
   readonly name = "gemini";
-  protected async call(input: { imageBytes: Uint8Array; mimeType: string }, signal: AbortSignal): Promise<unknown> {
+  protected async call(input: { imageBytes: Uint8Array; mimeType: string; prompt?: string }, signal: AbortSignal): Promise<unknown> {
     const env = getEnv();
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(env.GEMINI_MODEL)}:generateContent`;
     const res = await fetch(url, {
@@ -89,7 +104,7 @@ class GeminiProvider extends HttpVisionProvider {
       body: JSON.stringify({
         contents: [{ parts: [
           { inline_data: { mime_type: input.mimeType, data: Buffer.from(input.imageBytes).toString("base64") } },
-          { text: DESCRIBE_PROMPT },
+          { text: input.prompt ?? DESCRIBE_PROMPT },
         ] }],
         generationConfig: { responseMimeType: "application/json", maxOutputTokens: 2048 },
       }),

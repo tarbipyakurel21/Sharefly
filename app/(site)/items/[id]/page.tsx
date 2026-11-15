@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getListing, getUser, listRooms, hasInterest, hasMeasurementRequest, activePickupForListing, countOpenMeasurementRequests, countInterests, markMatchesSeenForListing, firstName } from "@/lib/db/queries";
+import { getListing, listRooms, hasInterest, hasMeasurementRequest, countOpenMeasurementRequests, countInterests, popularMeasurementLabels, markMatchesSeenForListing, firstName } from "@/lib/db/queries";
 import { getSessionUser } from "@/lib/auth";
 import { FURNITURE, CATEGORY_LABEL } from "@/lib/categories";
 import { fitForRooms } from "@/lib/fit";
-import { formatPrice, timeAgo } from "@/lib/format";
+import { timeAgo } from "@/lib/format";
 import { formatLength } from "@/lib/units";
 import { ItemActions } from "@/components/listing/ItemActions";
 import { ArViewer } from "@/components/listing/ArViewer";
 import { OwnerPanel } from "@/components/listing/OwnerPanel";
+import { ScanSection } from "@/components/listing/ScanSection";
 import { FitBadge } from "@/components/listing/FitBadge";
 import { LinkButton } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
@@ -30,13 +31,12 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
   if (user && !isOwner) await markMatchesSeenForListing(l.id, user.id);
   const available = l.status === "available";
   const fit = user && !isOwner ? fitForRooms(l, rooms) : null;
+  const labelSuggestions = isOwner ? await popularMeasurementLabels() : [];
   const hasSize = l.widthM != null && l.depthM != null && l.heightM != null;
   const interestCount = await countInterests(l.id);
   const openRequests = isOwner && available ? await countOpenMeasurementRequests(l.id) : 0;
   const interested = !!user && await hasInterest(l.id, user.id);
   const requestedMeasure = !!user && await hasMeasurementRequest(l.id, user.id);
-  const activePickup = !!user && !!(await activePickupForListing(l.id, user.id));
-  const defaultTo = (user && (await getUser(user.id))?.neighborhood) || "";
   const unit = (rooms[0]?.displayUnit ?? "ft") as "ft" | "m";
 
   return (
@@ -48,8 +48,12 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
             <img src={l.photoUrl} alt={l.title} className="aspect-[4/3] w-full object-cover" />
           ) : <div className="flex aspect-[4/3] items-center justify-center text-muted">No photo</div>}
         </div>
-        {FURNITURE.includes(l.category) && l.status !== "removed" && (
-          <ArViewer title={l.title} category={l.category} photoUrl={l.photoUrl} widthM={l.widthM} depthM={l.depthM} heightM={l.heightM} unit={unit} roomHref={`/rooms?add=${l.id}`} />
+        {l.videoUrl && l.status !== "removed" && (
+          <video src={l.videoUrl} controls playsInline preload="metadata" className="w-full rounded-2xl bg-black" aria-label={`Video of ${l.title}`} data-testid="listing-video" />
+        )}
+        {l.model && !isOwner && l.status !== "removed" && <ScanSection url={l.model.url} format={l.model.format} title={l.title} />}
+        {(FURNITURE.includes(l.category) || l.model) && l.status !== "removed" && (
+          <ArViewer scan={l.model ?? null} title={l.title} category={l.category} photoUrl={l.photoUrl} widthM={l.widthM} depthM={l.depthM} heightM={l.heightM} unit={unit} roomHref={`/rooms?add=${l.id}`} />
         )}
       </div>
       <div className="space-y-6">
@@ -63,7 +67,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
         <div>
           <div className="flex flex-wrap items-center gap-2"><Chip tone="accent">{CATEGORY_LABEL[l.category]}</Chip>{fit && <FitBadge status={fit} />}</div>
           <h1 className="mt-3 font-display text-3xl font-semibold">{l.title}</h1>
-          <p className={`mt-1 text-xl font-semibold ${l.priceCents === 0 ? "text-good" : ""}`}>{formatPrice(l.priceCents)}</p>
+          <p className="mt-1 text-xl font-semibold text-good">Free</p>
           <p className="mt-2 text-sm text-muted">Shared by {firstName(l.giverName)} · {l.neighborhood ?? "Neighborhood not shared"}{l.publishedAt ? ` · ${timeAgo(l.publishedAt)}` : ""}</p>
         </div>
 
@@ -72,16 +76,20 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
           <div className="flex gap-2"><dt className="w-32 shrink-0 text-muted">Condition</dt><dd>{l.conditionNote ?? <span className="text-muted">Not provided</span>}</dd></div>
           {l.purchasedFrom && <div className="flex gap-2"><dt className="w-32 shrink-0 text-muted">Bought at</dt><dd>{l.purchasedFrom}</dd></div>}
           <div className="flex gap-2"><dt className="w-32 shrink-0 text-muted">Size</dt>
-            <dd>{hasSize ? `${formatLength(l.widthM!, unit)} wide × ${formatLength(l.depthM!, unit)} deep × ${formatLength(l.heightM!, unit)} tall (from the giver)` : <span>Size not provided yet. <span className="text-muted">We can't confirm it fits until someone measures it.</span></span>}</dd></div>
+            <dd>{hasSize ? `${formatLength(l.widthM!, unit)} wide × ${formatLength(l.depthM!, unit)} deep × ${formatLength(l.heightM!, unit)} tall (from the owner)` : <span>Size not provided yet. <span className="text-muted">We can't confirm it fits until someone measures it.</span></span>}</dd></div>
+          {(l.extraMeasurements ?? []).length > 0 && (
+            <div className="flex gap-2"><dt className="w-32 shrink-0 text-muted">Other sizes</dt>
+              <dd><ul>{l.extraMeasurements!.map((m) => <li key={m.label}>{m.label}: {formatLength(m.valueM, unit)} <span className="text-muted">(from the owner)</span></li>)}</ul></dd></div>
+          )}
         </dl>
 
-        {available && isOwner && <OwnerPanel id={l.id} hasSize={hasSize} interestCount={interestCount} openRequests={openRequests} status={l.status} />}
+        {available && isOwner && <OwnerPanel id={l.id} model={l.model ?? null} size={hasSize ? { widthM: l.widthM!, depthM: l.depthM!, heightM: l.heightM! } : null} extras={l.extraMeasurements ?? []} labelSuggestions={labelSuggestions} hasSize={hasSize} interestCount={interestCount} openRequests={openRequests} status={l.status} />}
         {available && !isOwner && (
           <ItemActions listingId={l.id} hasSize={hasSize} isFurniture={FURNITURE.includes(l.category)} signedIn={!!user} interested={interested}
-            requestedMeasure={requestedMeasure} activePickup={activePickup}
-            rooms={rooms.map((r) => ({ id: r.id, name: r.name }))} defaultTo={defaultTo} fromNeighborhood={l.neighborhood ?? "To be arranged"} />
+            requestedMeasure={requestedMeasure}
+            rooms={rooms.map((r) => ({ id: r.id, name: r.name }))} />
         )}
-        {!available && isOwner && <OwnerPanel id={l.id} hasSize={hasSize} interestCount={interestCount} openRequests={0} status={l.status} />}
+        {!available && isOwner && <OwnerPanel id={l.id} model={l.model ?? null} size={hasSize ? { widthM: l.widthM!, depthM: l.depthM!, heightM: l.heightM! } : null} extras={l.extraMeasurements ?? []} labelSuggestions={labelSuggestions} hasSize={hasSize} interestCount={interestCount} openRequests={0} status={l.status} />}
       </div>
     </div>
   );

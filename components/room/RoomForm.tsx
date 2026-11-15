@@ -44,6 +44,15 @@ export function RoomForm({ addListingId, defaultName, realApartments = false }: 
     return () => { live = false; };
   }, [picked]);
 
+  // The room list is no longer shown. When a space has no floor-plan estimate, its largest Matterport-measured room supplies the size
+  // so the person can still continue; otherwise the estimate stays.
+  useEffect(() => {
+    if (!picked || picked.estimate || measuredId || measured?.state !== "done" || measured.rooms.length === 0) return;
+    const biggest = [...measured.rooms].sort((a, b) => b.widthM * b.depthM - a.widthM * a.depthM)[0];
+    chooseMeasured(biggest);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [measured, picked, measuredId]);
+
   function chooseMeasured(r: MeasuredRoom) {
     setMeasuredId(r.id);
     setLen(f(r.depthM)); setWid(f(r.widthM)); setHgt(f(r.heightM));
@@ -81,22 +90,6 @@ export function RoomForm({ addListingId, defaultName, realApartments = false }: 
           {picked.selectedUnitNumber && <p className="text-sm text-muted">Apartment {picked.selectedUnitNumber} selected. The exact unit scan is used when available; otherwise the floor-plan or community scan is shown.</p>}
           <TourPanel matterport={picked.matterport} title={picked.communityName ?? "this apartment"} stageHref="#room-form" stageLabel="Continue" />
           {measured?.state === "loading" && <p className="text-sm text-muted">Checking for measured rooms…</p>}
-          {measured?.state === "done" && measured.rooms.length > 0 && (
-            <div data-testid="measured-rooms" className="space-y-2">
-              <p className="text-sm font-medium">Measured by Matterport. Pick a room:</p>
-              <ul className="grid gap-2 sm:grid-cols-2">
-                {measured.rooms.map((r) => (
-                  <li key={r.id}>
-                    <button type="button" aria-pressed={measuredId === r.id} onClick={() => chooseMeasured(r)}
-                      className={`w-full rounded-xl border p-3 text-left text-sm ${measuredId === r.id ? "border-accent bg-accent-soft" : "border-line hover:bg-sunken"}`}>
-                      <span className="block font-semibold">{r.label ?? "Room (name not provided)"}</span>
-                      <span className="block text-muted">{dimsText(r)}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
           {!sizeReady && measured?.state === "done" && <p data-testid="no-size-note" className="rounded-xl bg-sunken p-3 text-sm text-muted">No size is provided for this space. Pick another apartment, or enter dimensions instead.</p>}
         </>}
         {!mapMode && <>

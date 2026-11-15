@@ -18,12 +18,17 @@ export async function runMatchingForListing(listingId: string): Promise<{ matche
   return { matched, created };
 }
 
-/** A new or edited wishlist searches all available listings. */
+/**
+ * A new or edited wishlist only matches listings published AFTER the wishlist was made. Items that were already up are never matched
+ * retroactively: the match appears later, when someone uploads a fitting item (see runMatchingForListing).
+ */
 export async function runMatchingForWishlist(wishlistId: string): Promise<{ matched: number; created: number }> {
   const wl = await getWishlist(wishlistId);
   if (!wl) return { matched: 0, created: 0 };
   let matched = 0, created = 0;
+  const since = new Date(wl.createdAt).getTime();
   for (const listing of await allAvailableListings()) {
+    if (!listing.publishedAt || new Date(listing.publishedAt).getTime() <= since) continue;
     const r = evaluate(listing, wl);
     if (!r) continue;
     matched++;

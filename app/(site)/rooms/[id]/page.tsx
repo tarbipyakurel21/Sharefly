@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getSessionUser } from "@/lib/auth";
-import { getListing, getRoom, listPlacements } from "@/lib/db/queries";
+import { getListing, getRoom, hasInterest, listPlacements } from "@/lib/db/queries";
 import { SignInCard } from "@/components/layout/SignInForm";
 import { RoomPlannerLoader } from "@/components/room/RoomPlannerLoader";
 import type { ListingMeta } from "@/components/room/RoomPlanner";
@@ -24,14 +24,14 @@ export default async function RoomPage({ params, searchParams }: { params: Promi
   const listings: Record<string, ListingMeta> = {};
   for (const lid of ids) {
     const l = await getListing(lid);
-    if (l) listings[lid] = { title: l.title, status: l.status, category: l.category, widthM: l.widthM, depthM: l.depthM, heightM: l.heightM, hasSize: l.widthM != null };
+    if (l) listings[lid] = { own: l.giverId === user.id, interested: await hasInterest(lid, user.id), model: l.model ?? null, title: l.title, status: l.status, category: l.category, widthM: l.widthM, depthM: l.depthM, heightM: l.heightM, hasSize: l.widthM != null };
   }
   const addable = add && listings[add] && listings[add].status === "available" ? add : null;
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 text-sm"><Link href="/rooms" className="text-muted underline">All rooms</Link></div>
       {room.source && (
-        <p data-testid="room-source" className="rounded-xl bg-sunken p-3 text-sm text-muted">
+        <p data-testid="room-source" className="sr-only">
           Based on {room.source.communityName ?? "a community (name not provided)"}{room.source.floorPlanName ? `, floor plan ${room.source.floorPlanName}` : ""} in {room.source.city}, {room.source.state}.
           {room.source.dimensions === "matterport" ? ` Room size: Measured by Matterport${room.source.matterportRoomLabel ? ` (${room.source.matterportRoomLabel})` : ""}.`
             : room.source.dimensions === "adjusted" ? ` Room size started from a Matterport measurement${room.source.matterportRoomLabel ? ` (${room.source.matterportRoomLabel})` : ""} and was adjusted by you.`
@@ -40,7 +40,8 @@ export default async function RoomPage({ params, searchParams }: { params: Promi
       )}
       {room.source ? (
         <MatterportRoom matterport={room.source.matterport} title={room.source.communityName ?? "this apartment"}
-          items={[...ids].filter((i) => listings[i]).map((i) => ({ id: i, title: listings[i].title, category: listings[i].category, widthM: listings[i].widthM, depthM: listings[i].depthM, heightM: listings[i].heightM }))} />
+          items={[...ids].filter((i) => listings[i]).map((i) => ({ id: i, title: listings[i].title, category: listings[i].category, widthM: listings[i].widthM, depthM: listings[i].depthM, heightM: listings[i].heightM, model: listings[i].model ?? null, own: listings[i].own, interested: listings[i].interested, available: listings[i].status === "available" }))}
+          roomDims={{ lengthM: room.lengthM, widthM: room.widthM, heightM: room.heightM }} />
       ) : (
         <div id="room-planner" className="scroll-mt-6">
           <RoomPlannerLoader room={room} initial={placements.map(({ roomId: _r, ...p }) => p)} listings={listings} addListingId={addable} />

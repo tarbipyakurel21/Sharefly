@@ -36,6 +36,9 @@ export function GiveFlow({ defaultNeighborhood }: { defaultNeighborhood: string 
   const [photoErr, setPhotoErr] = useState<string | null>(null);
   const [opening, setOpening] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [video, setVideo] = useState<{ url: string; preview: string } | null>(null);
+  const [videoBusy, setVideoBusy] = useState(false);
+  const [videoErr, setVideoErr] = useState<string | null>(null);
   const blobRef = useRef<{ blob: Blob; name: string; width: number; height: number } | null>(null);
   const [ai, setAi] = useState<Ai>("idle");
   const [aiSource, setAiSource] = useState<"model" | "mock" | null>(null);
@@ -46,7 +49,6 @@ export function GiveFlow({ defaultNeighborhood }: { defaultNeighborhood: string 
   const [condition, setCondition] = useState("");
   const [from, setFrom] = useState("");
   const [nb, setNb] = useState(defaultNeighborhood ?? "");
-  const [price, setPrice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [needSignIn, setNeedSignIn] = useState(false);
@@ -86,20 +88,33 @@ export function GiveFlow({ defaultNeighborhood }: { defaultNeighborhood: string 
     } catch { setAi("failed"); }
   }
 
+  /** Optional short clip of the item. Uploaded straight away, like the photo; publishing never depends on it. */
+  async function onVideo(file: File | undefined | null) {
+    if (!file) return;
+    setVideoErr(null);
+    if (file.size > 30 * 1024 * 1024) { setVideoErr("That video is too big. Try a shorter clip (under 30 MB)."); return; }
+    setVideoBusy(true);
+    try {
+      const fd = new FormData(); fd.append("file", file);
+      const r = await api<{ url: string }>("/api/uploads/video", { method: "POST", body: fd });
+      setVideo((old) => { if (old) URL.revokeObjectURL(old.preview); return { url: r.url, preview: URL.createObjectURL(file) }; });
+    } catch (e) { setVideoErr(errMsg(e)); } finally { setVideoBusy(false); }
+  }
+  function removeVideo() { setVideo((old) => { if (old) URL.revokeObjectURL(old.preview); return null; }); setVideoErr(null); }
+
   async function publish() {
     if (busy) return;
     if (title.trim().length < 3) { setErr("Please add a short title."); return; }
+    if (videoBusy) { setErr("Your video is still uploading. One moment."); return; }
     if (!photo) { setErr(uploading ? "Your photo is still uploading. One moment." : "Your photo didn't upload yet. Tap Try again above."); return; }
     setBusy(true); setErr(null);
     try {
-      const dollars = price !== null && price.trim() !== "" ? Math.round(parseFloat(price) * 100) : 0;
-      if (Number.isNaN(dollars) || dollars < 0) throw new Error("Please enter a price like 10, or leave it free.");
       const r = await api<{ listing: { id: string; title: string }; matchCount: number }>("/api/listings", {
         method: "POST",
         json: {
-          title: title.trim(), description: description.trim(), category, priceCents: dollars, conditionNote: condition.trim() || null,
+          title: title.trim(), description: description.trim(), category, conditionNote: condition.trim() || null,
           purchasedFrom: from.trim() || null, neighborhood: nb.trim() || null, aiGenerated: ai === "done" && aiSource === "model",
-          photoUrl: photo.url, photoWidth: photo.width, photoHeight: photo.height, clientKey: clientKey.current,
+          photoUrl: photo.url, photoWidth: photo.width, photoHeight: photo.height, videoUrl: video?.url ?? null, clientKey: clientKey.current,
         },
       });
       setDone({ id: r.listing.id, matchCount: r.matchCount, title: r.listing.title });
@@ -183,6 +198,21 @@ export function GiveFlow({ defaultNeighborhood }: { defaultNeighborhood: string 
             )}
           </div>
 
+          <section className="space-y-3 rounded-2xl border border-line bg-surface p-4" aria-label="Video">
+            <p className="font-semibold">Add a video of it (optional)</p>
+            <p className="text-sm text-muted">A short clip helps people see it from every side. MP4, MOV or WebM, under 30 MB.</p>
+            {video && <video src={video.preview} controls playsInline className="max-h-72 w-full rounded-xl bg-black" aria-label="Preview of your video" data-testid="video-preview" />}
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="inline-flex min-h-11 cursor-pointer items-center rounded-xl border border-line px-4 text-sm font-semibold hover:bg-sunken">
+                {videoBusy ? "Uploading…" : video ? "Replace the video" : "Add a video"}
+                <input type="file" accept="video/mp4,video/quicktime,video/webm,.mp4,.mov,.webm" className="sr-only" data-testid="video-file" disabled={videoBusy}
+                  onChange={(e) => { void onVideo(e.target.files?.[0]); e.target.value = ""; }} />
+              </label>
+              {video && <Button type="button" variant="ghost" onClick={removeVideo}>Remove video</Button>}
+            </div>
+            {videoErr && <p role="alert" className="text-sm text-bad">{videoErr}</p>}
+          </section>
+
           <details className="rounded-2xl border border-line bg-surface p-4">
             <summary className="cursor-pointer font-semibold">Add a few details (optional)</summary>
             <div className="mt-4 space-y-4">
@@ -195,13 +225,7 @@ export function GiveFlow({ defaultNeighborhood }: { defaultNeighborhood: string 
             </div>
           </details>
 
-          <div className="flex items-center justify-between text-[15px]">
-            <span>Price: <strong className="text-good">{price === null || price.trim() === "" ? "Free" : `$${price}`}</strong></span>
-            {price === null ? <button type="button" className="min-h-11 px-2 font-semibold text-accent" onClick={() => setPrice("")}>Change</button> : (
-              <span className="flex items-center gap-2">$<TextInput aria-label="Price in dollars" inputMode="decimal" className="!w-24" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0" />
-                <button type="button" className="min-h-11 px-2 font-semibold text-accent" onClick={() => setPrice(null)}>Free</button></span>
-            )}
-          </div>
+          <p className="text-[15px]">Price: <strong className="text-good">Free</strong></p>
 
           {needSignIn && (
             <div className="rise"><SignInCard title="One last thing: who are you?" body="Your listing is ready. Sign in and we'll publish it." /><div className="mt-3 text-center"><Button onClick={() => { setNeedSignIn(false); publish(); }}>I've signed in, publish</Button></div></div>

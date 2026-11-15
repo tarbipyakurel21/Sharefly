@@ -1,17 +1,34 @@
 export type Neighborhood = { name: string; lat: number; lng: number };
 
-/** Approximate neighborhood centres around Princeton, NJ. Coarse on purpose; never a street address. */
+/**
+ * Approximate neighborhood centres in Los Angeles, CA (listed first, the demo city) and Houston, TX: the two metros covered by the
+ * Matterport scans in the reference-space dataset. Coarse on purpose; never a street address.
+ */
 export const NEIGHBORHOODS: Neighborhood[] = [
-  { name: "Princeton University Campus", lat: 40.3431, lng: -74.6551 },
-  { name: "Downtown Princeton", lat: 40.3573, lng: -74.6672 },
-  { name: "Witherspoon-Jackson", lat: 40.3512, lng: -74.6690 },
-  { name: "Princeton Junction", lat: 40.3156, lng: -74.6234 },
-  { name: "West Windsor", lat: 40.2987, lng: -74.6293 },
-  { name: "Plainsboro", lat: 40.3340, lng: -74.5857 },
-  { name: "Lawrenceville", lat: 40.2976, lng: -74.7288 },
-  { name: "Rocky Hill", lat: 40.4001, lng: -74.6355 },
-  { name: "Hopewell", lat: 40.3896, lng: -74.7627 },
-  { name: "Kingston", lat: 40.3770, lng: -74.6130 },
+  // Los Angeles
+  { name: "Downtown Los Angeles", lat: 34.0407, lng: -118.2468 },
+  { name: "Koreatown", lat: 34.0578, lng: -118.3010 },
+  { name: "Hollywood", lat: 34.0928, lng: -118.3287 },
+  { name: "West Hollywood", lat: 34.0900, lng: -118.3617 },
+  { name: "Westwood / UCLA", lat: 34.0689, lng: -118.4452 },
+  { name: "Santa Monica", lat: 34.0195, lng: -118.4912 },
+  { name: "USC / Exposition Park", lat: 34.0224, lng: -118.2851 },
+  { name: "Silver Lake", lat: 34.0869, lng: -118.2702 },
+  { name: "Echo Park", lat: 34.0782, lng: -118.2606 },
+  { name: "Culver City", lat: 34.0211, lng: -118.3965 },
+  { name: "Pasadena", lat: 34.1478, lng: -118.1445 },
+  // Houston
+  { name: "Downtown Houston", lat: 29.7604, lng: -95.3698 },
+  { name: "Midtown Houston", lat: 29.7413, lng: -95.3800 },
+  { name: "Montrose", lat: 29.7459, lng: -95.3913 },
+  { name: "Museum District", lat: 29.7228, lng: -95.3893 },
+  { name: "Rice University / Rice Village", lat: 29.7174, lng: -95.4018 },
+  { name: "University of Houston", lat: 29.7199, lng: -95.3422 },
+  { name: "Texas Medical Center", lat: 29.7075, lng: -95.4010 },
+  { name: "Heights", lat: 29.7988, lng: -95.3980 },
+  { name: "Galleria / Uptown", lat: 29.7387, lng: -95.4613 },
+  { name: "Energy Corridor", lat: 29.7840, lng: -95.6390 },
+  { name: "Katy", lat: 29.7858, lng: -95.8245 },
 ];
 
 const norm = (s: string) => s.trim().toLowerCase();

@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { embedUrl, LEVEL_LABEL, tourCandidates, type MatterportIdSet } from "@/lib/matterport/tour";
 
@@ -69,7 +70,8 @@ export function TourPanel({ matterport, title, stageHref = "#room-view", stageLa
     <section aria-label="3D tour" data-testid="tour-panel" className="space-y-2 rounded-[var(--radius-card)] border border-line bg-surface p-4 shadow-[var(--shadow-soft)]">
       <span data-testid="tour-level" className="sr-only">{LEVEL_LABEL[current.level]}</span>
       {!open ? (
-        <button type="button" onClick={() => setOpen(true)} className="w-full rounded-xl border border-line bg-sunken p-6 text-sm font-medium hover:bg-line/40">
+        <button type="button" onClick={() => setOpen(true)} className="flex w-full flex-col items-center gap-2 rounded-xl border border-line bg-sunken p-6 text-sm font-medium hover:bg-line/40">
+          <Image src="/brand/helping-hands.svg" alt="" width={56} height={56} className="h-14 w-14 rounded-2xl object-cover" />
           Load 3D tour
         </button>
       ) : (
@@ -80,19 +82,6 @@ export function TourPanel({ matterport, title, stageHref = "#room-view", stageLa
             onLoad={() => setLoaded(true)} className="absolute inset-0 h-full w-full border-0"
           />
           {!loaded && <p className="absolute inset-x-0 bottom-0 bg-surface/90 p-2 text-center text-xs text-muted">Loading tour…</p>}
-        </div>
-      )}
-      {open && (
-        <div className="rounded-xl bg-accent-soft p-3 text-sm" data-testid="matterport-status">
-          <p className="font-semibold">Matterport space connected</p>
-          <p className="mt-1 text-muted">
-            {sdkState === "connected" ? `SDK metadata is available for model ${sdkModelId ?? current.modelId}. This tour is the apartment reference; ShareFly stages furniture in its editable planner after you create the room.`
-              : sdkState === "connecting" ? "Connecting to the Matterport SDK…"
-              : "Tour is available. Add NEXT_PUBLIC_MATTERPORT_SDK_KEY to enable SDK metadata."}
-          </p>
-          <a href={stageHref} className="mt-3 inline-flex min-h-10 items-center rounded-xl bg-accent px-3 py-2 font-semibold text-white hover:opacity-90">
-            {stageLabel}
-          </a>
         </div>
       )}
       {open && slow && !loaded && (

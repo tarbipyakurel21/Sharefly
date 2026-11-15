@@ -233,7 +233,7 @@ export default function PhotoPlacer({ title, category, widthM, depthM, heightM, 
               {calibratedWith
                 ? <>Size is set from your {formatLength(calibratedWith, unit)} door measurement.</>
                 : <>Size is an <strong>estimate</strong>: we assume the photo was taken at about chest height with {photo.focal35 ? `the ${photo.focal35} mm lens recorded in your photo` : "a typical phone lens"}. If it looks off, tap <em>Make it more accurate</em>.</>}
-              {" "}The item is a simple stand-in shape at the giver's measurements, not a photo of it.
+              {" "}The item is a simple stand-in shape at the owner's measurements, not a photo of it.
             </p>
           </>
         ) : (

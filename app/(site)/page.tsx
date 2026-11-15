@@ -15,8 +15,8 @@ export default async function Landing() {
     <div className="space-y-16">
       <section className="grid items-center gap-8 pt-4 md:grid-cols-[1.1fr_1fr] md:pt-10">
         <div>
-          <h1 className="font-display text-4xl font-semibold leading-tight sm:text-5xl">Giving something away should take seconds.</h1>
-          <p className="mt-4 max-w-xl text-lg text-muted">Finding something you need should feel effortless. ShareFly connects neighbors who have things they no longer want with people who could really use them.</p>
+          <h1 className="font-display text-4xl font-semibold leading-tight sm:text-5xl">Finding something you need should feel effortless.</h1>
+          <p className="mt-4 max-w-xl text-lg text-muted">ShareFly connects neighbors who have things they no longer want with people who could really use them.</p>
           <form action="/browse" className="mt-7 flex max-w-xl gap-2" role="search">
             <label htmlFor="dashboard-search" className="sr-only">Search for items</label>
             <input id="dashboard-search" name="q" type="search" placeholder="Search for a desk, a lamp, a bookshelf…" className="min-h-12 min-w-0 flex-1 rounded-xl border border-line bg-surface px-4 text-base outline-none placeholder:text-muted focus:border-accent focus:ring-2 focus:ring-accent/20" />

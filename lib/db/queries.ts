@@ -63,7 +63,7 @@ export type NewListing = {
   id?: string; giverId: string; title: string; description?: string; category: Category; priceCents?: number;
   conditionNote?: string | null; purchasedFrom?: string | null; neighborhood?: string | null;
   widthM?: number | null; depthM?: number | null; heightM?: number | null; aiGenerated?: boolean; clientKey?: string | null;
-  photo?: { url: string; width?: number | null; height?: number | null } | null; publishedAt?: string; createdAt?: string;
+  photo?: { url: string; width?: number | null; height?: number | null } | null; videoUrl?: string | null; publishedAt?: string; createdAt?: string;
 };
 export async function createListing(n: NewListing): Promise<Listing> {
   const id = n.id ?? newId();
@@ -72,12 +72,12 @@ export async function createListing(n: NewListing): Promise<Listing> {
   const now = n.publishedAt ?? nowIso();
   await (await col("listings")).insertOne({
     _id: id as never, giverId: n.giverId, title: n.title, description: n.description ?? "", category: n.category, status: "available",
-    priceCents: n.priceCents ?? 0, conditionNote: n.conditionNote ?? null, purchasedFrom: n.purchasedFrom ?? null,
+    priceCents: 0, // everything on ShareFly is free conditionNote: n.conditionNote ?? null, purchasedFrom: n.purchasedFrom ?? null,
     neighborhood: n.neighborhood ?? null, lat: nb?.lat ?? null, lng: nb?.lng ?? null,
     widthM: hasDims ? n.widthM : null, depthM: hasDims ? n.depthM : null, heightM: hasDims ? n.heightM : null,
     dimensionsSource: hasDims ? "giver_provided" : "unknown", aiGenerated: !!n.aiGenerated, clientKey: n.clientKey ?? null,
     createdAt: n.createdAt ?? now, publishedAt: now,
-    photoUrl: n.photo?.url ?? null, photoWidth: n.photo?.width ?? null, photoHeight: n.photo?.height ?? null,
+    videoUrl: n.videoUrl ?? null, photoUrl: n.photo?.url ?? null, photoWidth: n.photo?.width ?? null, photoHeight: n.photo?.height ?? null,
   });
   return (await getListing(id))!;
 }
@@ -101,9 +101,9 @@ export async function listListings(f: ListingFilters = {}): Promise<Listing[]> {
 export const allAvailableListings = () => listListings({ limit: 1000 });
 
 export async function updateListing(id: string, patch: Partial<{ title: string; description: string; category: Category; priceCents: number; conditionNote: string | null;
-  purchasedFrom: string | null; neighborhood: string | null; widthM: number | null; depthM: number | null; heightM: number | null; status: ListingStatus }>) {
+  purchasedFrom: string | null; neighborhood: string | null; widthM: number | null; depthM: number | null; heightM: number | null; extraMeasurements: { label: string; valueM: number }[]; status: ListingStatus }>) {
   const set: Doc = {};
-  for (const k of ["title", "description", "category", "priceCents", "conditionNote", "purchasedFrom", "status"] as const) {
+  for (const k of ["title", "description", "category", "conditionNote", "purchasedFrom", "status"] as const) {
     if (patch[k] !== undefined) set[k] = patch[k];
   }
   if (patch.neighborhood !== undefined) {
@@ -115,8 +115,27 @@ export async function updateListing(id: string, patch: Partial<{ title: string; 
     set.widthM = has ? patch.widthM : null; set.depthM = has ? patch.depthM : null; set.heightM = has ? patch.heightM : null;
     set.dimensionsSource = has ? "giver_provided" : "unknown";
   }
+  if (patch.extraMeasurements !== undefined) set.extraMeasurements = patch.extraMeasurements;
   if (Object.keys(set).length) await (await col("listings")).updateOne({ _id: id as never }, { $set: set });
   return getListing(id);
+}
+
+export async function setListingModel(id: string, model: { url: string; format: "glb" | "usdz" } | null) {
+  await (await col("listings")).updateOne({ _id: id as never }, { $set: { model } });
+  return getListing(id);
+}
+
+/** Names people have given their own measurements, most used first. Suggestions and hints for the screenshot reader; nothing is trained. */
+export async function popularMeasurementLabels(limit = 15): Promise<string[]> {
+  try {
+    const rows = await (await col("listings")).aggregate([
+      { $match: { "extraMeasurements.0": { $exists: true } } },
+      { $unwind: "$extraMeasurements" },
+      { $group: { _id: { $toLower: "$extraMeasurements.label" }, n: { $sum: 1 }, shown: { $first: "$extraMeasurements.label" } } },
+      { $sort: { n: -1, _id: 1 } }, { $limit: limit },
+    ]).toArray();
+    return rows.map((r) => String(r.shown));
+  } catch { return []; }
 }
 
 export async function addInterest(listingId: string, userId: string, message?: string | null): Promise<boolean> {
@@ -235,6 +254,10 @@ export async function listNotifications(userId: string, limit = 30): Promise<Not
   return (await (await col("notifications")).find({ userId }).sort({ createdAt: -1, seq: -1 }).limit(limit).toArray()).map(toNotif);
 }
 export const unreadCount = async (userId: string): Promise<number> => col("notifications").then((c) => c.countDocuments({ userId, readAt: null }));
+/** Deletes one of the person's notifications, or all of them when no id is given. Only their own rows are ever touched. */
+export async function deleteNotifications(userId: string, id?: string) {
+  await (await col("notifications")).deleteMany(id ? { userId, _id: id as never } : { userId });
+}
 export async function markNotificationsRead(userId: string, id?: string) {
   const c = await col("notifications");
   await c.updateMany({ userId, readAt: null, ...(id ? { _id: id as never } : {}) }, { $set: { readAt: nowIso() } });

@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import type { Category } from "@/lib/categories";
 import { makeGlb } from "@/lib/room/glb";
+import { scanToGlb } from "@/lib/room/scan-glb";
+import { scanToSizedGlb } from "@/lib/room/scan-model";
 import { formatLength, type Unit } from "@/lib/units";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
@@ -46,9 +48,9 @@ function loadModelViewer(): Promise<void> {
   return loader;
 }
 
-type Props = { title: string; category: Category; photoUrl?: string | null; widthM: number | null; depthM: number | null; heightM: number | null; unit: Unit; roomHref?: string };
+type Props = { scan?: { url: string; format: "glb" | "usdz" } | null; title: string; category: Category; photoUrl?: string | null; widthM: number | null; depthM: number | null; heightM: number | null; unit: Unit; roomHref?: string };
 
-export function ArViewer({ title, category, photoUrl, widthM, depthM, heightM, unit, roomHref = "/rooms" }: Props) {
+export function ArViewer({ scan, title, category, photoUrl, widthM, depthM, heightM, unit, roomHref = "/rooms" }: Props) {
   const [open, setOpen] = useState(false);
   const [src, setSrc] = useState<string | null>(null);
   const [state, setState] = useState<"idle" | "loading" | "ready" | "error">("idle");
@@ -66,7 +68,7 @@ export function ArViewer({ title, category, photoUrl, widthM, depthM, heightM, u
     el.fieldOfView = homeFlip.current ? "30.01deg" : "30deg";
     el.cameraOrbit = homeFlip.current ? HOME_ORBIT_ALT : HOME_ORBIT;
   };
-  const hasSize = widthM != null && depthM != null && heightM != null;
+  const hasSize = (widthM != null && depthM != null && heightM != null) || !!scan;
 
   const start = useCallback(async () => {
     if (!hasSize) return;
@@ -74,11 +76,11 @@ export function ArViewer({ title, category, photoUrl, widthM, depthM, heightM, u
     if (src) return;
     setState("loading");
     try {
-      const [blob] = await Promise.all([makeGlb(category, widthM!, depthM!, heightM!), loadModelViewer()]);
+      const [blob] = await Promise.all([scan ? (widthM != null && depthM != null && heightM != null ? scanToSizedGlb(scan, widthM, depthM, heightM) : scanToGlb(scan)) : makeGlb(category, widthM!, depthM!, heightM!), loadModelViewer()]);
       setSrc(URL.createObjectURL(blob));
       setState("ready");
     } catch { setState("error"); }
-  }, [hasSize, src, category, widthM, depthM, heightM]);
+  }, [hasSize, src, scan, category, widthM, depthM, heightM]);
 
   useEffect(() => () => { if (src) URL.revokeObjectURL(src); }, [src]);
 
@@ -105,12 +107,12 @@ export function ArViewer({ title, category, photoUrl, widthM, depthM, heightM, u
     return (
       <div className="rounded-2xl border border-dashed border-line p-3 text-sm text-muted" data-testid="ar-unavailable">
         <p className="flex items-center gap-2 font-medium text-ink"><Icon name="room" size={18} /> View in 3D</p>
-        <p className="mt-1">Needs the giver's measurements first, so we can show it at its real size.</p>
+        <p className="mt-1">Needs the owner's measurements first, so we can show it at its real size.</p>
       </div>
     );
   }
 
-  const size = `${formatLength(widthM!, unit)} wide × ${formatLength(depthM!, unit)} deep × ${formatLength(heightM!, unit)} tall`;
+  const size = widthM != null && depthM != null && heightM != null ? `${formatLength(widthM, unit)} wide × ${formatLength(depthM, unit)} deep × ${formatLength(heightM, unit)} tall` : "3D scan";
   return (
     <>
       <Button variant="secondary" className="w-full" onClick={start} data-testid="ar-open"><Icon name="room" size={18} /> View in 3D</Button>
@@ -120,7 +122,7 @@ export function ArViewer({ title, category, photoUrl, widthM, depthM, heightM, u
             <div className="flex items-start justify-between gap-3 p-4 pb-2 sm:px-6 sm:pt-5">
               <div className="min-w-0">
                 <h2 id="ar-title" className="truncate font-display text-xl font-semibold sm:text-2xl">{title}</h2>
-                <p className="text-sm text-muted">{size} · from the giver</p>
+                <p className="text-sm text-muted">{size} · from the owner</p>
               </div>
               <button type="button" aria-label="Close" className="rounded-full p-2 hover:bg-sunken" onClick={() => setOpen(false)}><Icon name="x" /></button>
             </div>
@@ -130,7 +132,7 @@ export function ArViewer({ title, category, photoUrl, widthM, depthM, heightM, u
               {state === "loading" && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted">
                   <span className="skeleton h-24 w-40" aria-hidden="true" />
-                  <p>Building a to-scale model…</p>
+                  <p>{scan ? "Opening the owner's 3D scan…" : "Building a to-scale model…"}</p>
                 </div>
               )}
               {state === "error" && <p role="alert" className="absolute inset-0 flex items-center justify-center p-6 text-center text-bad">We couldn't load the 3D viewer. Check your connection and try again.</p>}
@@ -182,12 +184,8 @@ export function ArViewer({ title, category, photoUrl, widthM, depthM, heightM, u
             </div>
 
             <div className="space-y-2 p-4 text-sm sm:px-6 sm:pb-5">
-              {state === "ready" && arSupported === false && (
-                <p className="rounded-xl bg-sunken p-3" data-testid="ar-phone-hint"><strong>On a laptop?</strong> <a className="font-semibold text-accent underline" href={roomHref}>Arrange it in your 3D room</a>, or open this page on your phone to place it on your floor through the camera.</p>
-              )}
               {arSupported && !arFailed && <p>Tap <strong>Place it in my room</strong>, then point your camera at the floor and move the phone slowly until it finds the floor. Drag to move it, twist with two fingers to turn it.</p>}
               {arFailed && <p role="alert" className="text-bad">Your phone couldn't start AR. Try more light, or a floor with some texture.</p>}
-              <p className="text-muted">The original listing photo is the visual reference. This generated 3D preview is dimension-locked to the giver's confirmed measurements, but it is not a scan, so use the photo for the item's exact shape, finish and condition.</p>
             </div>
           </div>
         </div>
